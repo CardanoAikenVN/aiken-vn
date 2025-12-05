@@ -19,10 +19,10 @@ const Curriculum: React.FC = () => {
 
   return (
     <section id="curriculum" style={{
-      padding: '6rem 0',
+      padding: '8rem 0',
       borderTop: '1px solid rgba(255,255,255,0.05)',
       borderBottom: '1px solid rgba(255,255,255,0.05)',
-      background: 'rgba(0,0,0,0.5)'
+      background: 'var(--bg-secondary)'
     }}>
       <div style={{
         maxWidth: '1280px',
@@ -51,9 +51,9 @@ const Curriculum: React.FC = () => {
             position: 'absolute',
             top: '50%',
             left: 0,
-            width: '100%',
+            width: '2px', // Vertical line for desktop flow usually requires width not height if horizontal... wait, this is horizontal.
             height: '2px',
-            background: '#1f2937',
+            background: '#5CE1E6',
             zIndex: -10,
             transform: 'translateY(-50%)'
           }}></div>
@@ -73,8 +73,8 @@ const Curriculum: React.FC = () => {
               <div style={{
                 width: '3rem',
                 height: '3rem',
-                borderRadius: '50%',
-                border: activeStep === step.id ? '4px solid #8B5CF6' : '4px solid #374151',
+                borderRadius: '4px',
+                border: activeStep === step.id ? '2px solid #5CE1E6' : '2px solid #1A2738',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -83,7 +83,8 @@ const Curriculum: React.FC = () => {
                 background: '#0a0a0a',
                 zIndex: 10,
                 transition: 'all 0.3s',
-                color: activeStep === step.id ? '#8B5CF6' : '#6b7280'
+                color: activeStep === step.id ? '#1E2A3A' : '#1E2A3A',
+                backgroundColor: activeStep === step.id ? '#5CE1E6' : '#13253A'
               }}>
                 {step.id}
               </div>
@@ -97,11 +98,11 @@ const Curriculum: React.FC = () => {
                 textAlign: 'center',
                 width: '8rem'
               }}>
-                 <h4 style={{
-                   fontWeight: 600,
-                   transition: 'color 0.3s',
-                   color: activeStep === step.id ? 'white' : '#6b7280'
-                 }}>{step.title}</h4>
+                <h4 style={{
+                  fontWeight: 600,
+                  transition: 'color 0.3s',
+                  color: activeStep === step.id ? 'white' : '#6b7280'
+                }}>{step.title}</h4>
               </div>
 
               {/* Tooltip Popup */}
@@ -127,18 +128,18 @@ const Curriculum: React.FC = () => {
                       zIndex: 20
                     }}
                   >
-                     <p style={{ fontSize: '0.75rem', color: '#d1d5db' }}>{step.description}</p>
-                     <div style={{
-                       position: 'absolute',
-                       bottom: 0,
-                       left: '50%',
-                       transform: 'translateX(-50%) translateY(50%) rotate(45deg)',
-                       width: '0.75rem',
-                       height: '0.75rem',
-                       background: '#1E1E1E',
-                       borderRight: '1px solid rgba(255,255,255,0.1)',
-                       borderBottom: '1px solid rgba(255,255,255,0.1)'
-                     }}></div>
+                    <p style={{ fontSize: '0.75rem', color: '#d1d5db' }}>{step.description}</p>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: 0,
+                      left: '50%',
+                      transform: 'translateX(-50%) translateY(50%) rotate(45deg)',
+                      width: '0.75rem',
+                      height: '0.75rem',
+                      background: '#1E1E1E',
+                      borderRight: '1px solid rgba(255,255,255,0.1)',
+                      borderBottom: '1px solid rgba(255,255,255,0.1)'
+                    }}></div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -156,39 +157,39 @@ const Curriculum: React.FC = () => {
           borderLeft: '2px solid #1f2937',
           marginLeft: '1rem'
         }} className="curriculum-mobile">
-            {steps.map((step) => (
-                <div key={step.id} style={{ position: 'relative' }}>
-                    <div style={{
-                      position: 'absolute',
-                      left: '-1.8125rem',
-                      top: 0,
-                      width: '2rem',
-                      height: '2rem',
-                      borderRadius: '50%',
-                      border: '4px solid #1f2937',
-                      background: '#0a0a0a',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.75rem',
-                      color: '#6b7280'
-                    }}>
-                        {step.id}
-                    </div>
-                    <div>
-                        <h3 style={{
-                          fontSize: '1.125rem',
-                          fontWeight: 700,
-                          color: 'white',
-                          marginBottom: '0.25rem'
-                        }}>{step.title}</h3>
-                        <p style={{
-                          color: '#9ca3af',
-                          fontSize: '0.875rem'
-                        }}>{step.description}</p>
-                    </div>
-                </div>
-            ))}
+          {steps.map((step) => (
+            <div key={step.id} style={{ position: 'relative' }}>
+              <div style={{
+                position: 'absolute',
+                left: '-1.8125rem',
+                top: 0,
+                width: '2rem',
+                height: '2rem',
+                borderRadius: '4px',
+                border: '2px solid #5CE1E6',
+                background: '#13253A',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.75rem',
+                color: '#5CE1E6'
+              }}>
+                {step.id}
+              </div>
+              <div>
+                <h3 style={{
+                  fontSize: '1.125rem',
+                  fontWeight: 700,
+                  color: 'white',
+                  marginBottom: '0.25rem'
+                }}>{step.title}</h3>
+                <p style={{
+                  color: '#9ca3af',
+                  fontSize: '0.875rem'
+                }}>{step.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>

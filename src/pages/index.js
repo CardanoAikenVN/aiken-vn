@@ -8,6 +8,7 @@ export default function Home() {
   return (
     <Layout
       noFooter
+      noNavbar
       title="Aiken VN - Vietnamese Aiken Learning Resource"
       description="The first open-source Vietnamese curriculum helping developers master Aiken and smart contracts on Cardano">
       <LandingPage />

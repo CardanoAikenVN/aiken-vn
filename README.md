@@ -54,10 +54,20 @@ The output will be in the `build` directory.
 ### Project Structure
 
 *   `/docs`: Documentation content (Markdown) organized by chapters.
+    *   `/docs/00-ui-components`: Landing page component documentation and design patterns.
 *   `/src`: Source code for UI (React components, CSS).
-    *   `/src/components/LandingPage`: Landing page components.
+    *   `/src/components/LandingPage`: Landing page components (QuestTimeline, QuestCard, etc.).
 *   `docusaurus.config.js`: Main project configuration.
 *   `sidebars.js`: Sidebar configuration.
+
+### Documentation for Developers
+
+**UI Component Documentation** (`/docs/00-ui-components/`)
+- `index.md` - Overview of UI components
+- `quest-timeline-design.md` - Detailed Speedrun design pattern implementation
+- `component-api.md` - Complete API reference for all components
+- `responsive-guidelines.md` - Responsive design patterns and breakpoints
+- `CHANGELOG.md` - Version history and updates
 
 ### Contributing
 
@@ -120,10 +130,20 @@ Nội dung sẽ được tạo trong thư mục `build`.
 ### Cấu trúc dự án
 
 *   `/docs`: Chứa nội dung tài liệu (Markdown) theo các chương.
+    *   `/docs/00-ui-components`: Tài liệu thành phần giao diện và mẫu thiết kế.
 *   `/src`: Chứa mã nguồn giao diện (React components, CSS).
-    *   `/src/components/LandingPage`: Các component của trang chủ.
+    *   `/src/components/LandingPage`: Các component của trang chủ (QuestTimeline, QuestCard, v.v.).
 *   `docusaurus.config.js`: Cấu hình chính của dự án.
 *   `sidebars.js`: Cấu hình thanh bên (sidebar).
+
+### Tài liệu cho các Nhà phát triển
+
+**Tài liệu Thành phần UI** (`/docs/00-ui-components/`)
+- `index.md` - Tổng quan về các thành phần UI
+- `quest-timeline-design.md` - Chi tiết về mẫu thiết kế Speedrun
+- `component-api.md` - Tài liệu API đầy đủ cho tất cả các thành phần
+- `responsive-guidelines.md` - Mẫu thiết kế và điểm dừng phản hồi
+- `CHANGELOG.md` - Lịch sử phiên bản và cập nhật
 
 ### Đóng góp
 
