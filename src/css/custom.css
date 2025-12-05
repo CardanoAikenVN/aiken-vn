@@ -4,7 +4,209 @@
  * work well for content-centric websites.
  */
 
-/* You can override the default Infima variables here. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* Kept only for specific decorative use if needed, but main text is Arial */
+
+/* ============================================
+   ACCESSIBILITY: Screen Reader Only Utility
+   ============================================ */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.sr-only.focus\:not-sr-only:focus {
+	position: static;
+	width: auto;
+	height: auto;
+	padding: inherit;
+	margin: inherit;
+	overflow: visible;
+	clip: auto;
+	white-space: normal;
+}
+
+/* ============================================
+   ACCESSIBILITY: Focus Indicators
+   ============================================ */
+/* Ensure all interactive elements have visible focus */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 3px solid #B6F2B6;
+	outline-offset: 2px;
+}
+
+/* High contrast focus for links on purple background */
+.landing-page-wrapper a:focus-visible {
+	outline: 4px solid #B6F2B6;
+	outline-offset: 3px;
+	box-shadow: 0 0 0 6px rgba(182, 242, 182, 0.3);
+}
+
+/* ============================================
+   ACCESSIBILITY: Reduced Motion Support
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	/* Stop particle animations completely */
+	.particle,
+	.animate-float,
+	.animate-cloud-slow,
+	.animate-cloud-medium,
+	.animate-cloud-fast,
+	.animate-train,
+	.animate-bounce,
+	.animate-pulse-slow,
+	.animate-spin,
+	.animate-ping {
+		animation: none !important;
+	}
+}
+
+/* ============================================
+   Landing Page Animations & Helpers
+   ============================================ */
+.pixelated {
+	image-rendering: pixelated;
+}
+
+@keyframes float {
+
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+
+	50% {
+		transform: translateY(-10px);
+	}
+}
+
+.animate-float {
+	animation: float 4s ease-in-out infinite;
+}
+
+@keyframes cloud-move {
+	0% {
+		transform: translateX(-100%);
+	}
+
+	100% {
+		transform: translateX(100vw);
+	}
+}
+
+.animate-cloud-slow {
+	animation: cloud-move 60s linear infinite;
+}
+
+.animate-cloud-medium {
+	animation: cloud-move 40s linear infinite;
+}
+
+.animate-cloud-fast {
+	animation: cloud-move 25s linear infinite;
+}
+
+@keyframes train-move {
+	0% {
+		transform: translateX(-100%);
+	}
+
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+.animate-train {
+	animation: train-move 15s linear infinite;
+}
+
+.pixel-shadow {
+	box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.2);
+}
+
+.pixel-shadow-sm {
+	box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.2);
+}
+
+.pixel-border {
+	border: 2px solid white;
+}
+
+.text-shadow-retro {
+	text-shadow: 4px 4px 0px #034a52;
+}
+
+/* Landing Page Font Scoping */
+.landing-page-wrapper {
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: var(--bg-primary);
+	color: var(--text-heading);
+	overflow-x: hidden;
+}
+
+.landing-page-wrapper h1,
+.landing-page-wrapper h2,
+.landing-page-wrapper h3,
+.landing-page-wrapper h4,
+.landing-page-wrapper .pixel-font {
+	font-family: Arial, Helvetica, sans-serif;
+	font-family: var(--ifm-font-family-base);
+}
+
+/* ============================================
+   ACCESSIBILITY: Improved Color Contrast
+   ============================================ */
+/* Fix: White text on purple - boost to meet 4.5:1 */
+.landing-page-wrapper {
+	/* Retro Theme Background */
+	background-color: var(--bg-primary);
+	color: var(--text-heading);
+}
+
+/* Fix: Green accent text - use darker green for better contrast */
+.landing-page-wrapper .text-\[\#B6F2B6\] {
+	color: #F9D276 !important;
+	/* Retro Accent Yellow */
+}
+
+/* Fix: Increase opacity on low-opacity text */
+.opacity-70 {
+	opacity: 0.95 !important;
+}
+
+.opacity-90 {
+	opacity: 1 !important;
+}
+
+/* ============================================
+   Infima Variable Overrides
+   ============================================ */
 :root {
 	--ifm-color-primary: #2e8555;
 	--ifm-color-primary-dark: #29784c;
@@ -15,17 +217,25 @@
 	--ifm-color-primary-lightest: #3cad6e;
 	--ifm-code-font-size: 95%;
 	--docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-	/* Garantir navbar branca no modo claro */
 	--ifm-navbar-background-color: #ffffff;
+	--ifm-font-family-base: Arial, Helvetica, sans-serif;
+	/* Added for consistency */
 
-	/* Landing page custom colors */
-	--landing-background: #0a0a0a;
-	--landing-surface: #121212;
-	--landing-surface-highlight: #1E1E1E;
-	--landing-primary: #8B5CF6;
-	--landing-primary-glow: #a78bfa;
-	--landing-secondary: #3B82F6;
-	--landing-accent: #10B981;
+	/* Landing page custom colors - Version 1.0 */
+	--bg-primary: #0F1B2A;
+	--bg-secondary: #112030;
+	--bg-card: #13253A;
+	--color-cyan: #5CE1E6;
+	--color-cyan-dark: #2BBAC0;
+	--color-cyan-light: #A3DCE2;
+	--color-floor: #1A2738;
+	--text-heading: #FFFFFF;
+	--text-body: #DDE6ED;
+
+	--landing-background: var(--bg-primary);
+	--landing-surface: var(--bg-secondary);
+	--landing-primary: var(--color-cyan);
+	--landing-accent: var(--color-cyan);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -93,9 +303,9 @@
 /* Landing Page Styles */
 .landing-page {
 	min-height: 100vh;
-	background-color: var(--landing-background);
-	color: #e5e5e5;
-	font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	background-color: var(--bg-primary);
+	color: var(--text-heading);
+	font-family: var(--ifm-font-family-base);
 }
 
 .gradient-text {
@@ -125,9 +335,12 @@
 
 /* Pulse animation */
 @keyframes pulse-slow {
-	0%, 100% {
+
+	0%,
+	100% {
 		opacity: 1;
 	}
+
 	50% {
 		opacity: .5;
 	}
@@ -135,4 +348,108 @@
 
 .animate-pulse-slow {
 	animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Particle Effects */
+@keyframes particle-float {
+	0% {
+		transform: translateY(100vh) translateX(0) scale(0);
+		opacity: 0;
+	}
+
+	10% {
+		opacity: 1;
+	}
+
+	90% {
+		opacity: 1;
+	}
+
+	100% {
+		transform: translateY(-100vh) translateX(100px) scale(1);
+		opacity: 0;
+	}
+}
+
+.particle {
+	position: absolute;
+	width: 4px;
+	height: 4px;
+	background: rgba(182, 242, 182, 0.6);
+	border-radius: 2px;
+	animation: particle-float 15s infinite ease-in;
+}
+
+.particle-1 {
+	left: 10%;
+	animation-delay: 0s;
+	animation-duration: 12s;
+}
+
+.particle-2 {
+	left: 25%;
+	animation-delay: 2s;
+	animation-duration: 14s;
+	background: rgba(198, 168, 255, 0.6);
+}
+
+.particle-3 {
+	left: 50%;
+	animation-delay: 4s;
+	animation-duration: 16s;
+	background: rgba(255, 216, 168, 0.6);
+}
+
+.particle-4 {
+	left: 70%;
+	animation-delay: 1s;
+	animation-duration: 13s;
+}
+
+.particle-5 {
+	left: 85%;
+	animation-delay: 3s;
+	animation-duration: 15s;
+	background: rgba(198, 168, 255, 0.6);
+}
+
+.particle-6 {
+	left: 40%;
+	animation-delay: 5s;
+	animation-duration: 17s;
+	background: rgba(182, 242, 182, 0.6);
+}
+
+/* Pixel Character Styles */
+.pixel-character-left {
+	background: linear-gradient(to bottom,
+			transparent 0%, transparent 25%,
+			var(--color-cyan) 25%, var(--color-cyan) 50%,
+			var(--bg-card) 50%, var(--bg-card) 100%);
+	box-shadow:
+		0 0 0 2px #fff,
+		4px 0 0 2px #fff,
+		-4px 0 0 2px #fff;
+}
+
+.pixel-character-right {
+	background: linear-gradient(to bottom,
+			transparent 0%, transparent 25%,
+			var(--color-cyan-light) 25%, var(--color-cyan-light) 50%,
+			var(--bg-card) 50%, var(--bg-card) 100%);
+	box-shadow:
+		0 0 0 2px #fff,
+		4px 0 0 2px #fff,
+		-4px 0 0 2px #fff;
+}
+
+/* Cardano Blue Color Variables */
+:root {
+	--cardano-blue: #0033AD;
+	--cardano-blue-light: #3468D6;
+	--cardano-blue-dark: #001F6B;
+	--aiken-green: #8fd48f;
+	/* Updated for better contrast */
+	--aiken-purple: #7a2dd9;
+	/* Updated for better contrast */
 }

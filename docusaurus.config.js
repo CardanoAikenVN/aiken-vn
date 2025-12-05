@@ -18,7 +18,7 @@ const config = {
 	url: "https://uberhub-mentorias.github.io/",
 	// Set the /<baseUrl>/ pathname under which your site is served
 	// For GitHub pages deployment, it is often '/<projectName>/'
-	baseUrl: "/docusaurus/",
+	baseUrl: "/",
 
 	// GitHub pages deployment config.
 	organizationName: "uberhub-mentorias", // Usually your GitHub org/user name.
@@ -57,7 +57,19 @@ const config = {
 		],
 	],
 
-	plugins: [],
+	plugins: [
+		async function myPlugin(context, options) {
+			return {
+				name: "docusaurus-tailwindcss",
+				configurePostCss(postcssOptions) {
+					// Appends TailwindCSS and AutoPrefixer.
+					postcssOptions.plugins.push(require("tailwindcss"));
+					postcssOptions.plugins.push(require("autoprefixer"));
+					return postcssOptions;
+				},
+			};
+		},
+	],
 
 	themes: ["@docusaurus/theme-mermaid"],
 	markdown: { mermaid: true },
