@@ -18,91 +18,47 @@ const Curriculum: React.FC = () => {
   ];
 
   return (
-    <section id="curriculum" style={{
-      padding: '8rem 0',
-      borderTop: '1px solid rgba(255,255,255,0.05)',
-      borderBottom: '1px solid rgba(255,255,255,0.05)',
-      background: 'var(--bg-secondary)'
-    }}>
-      <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '0 1.5rem'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-          <h2 style={{
-            fontSize: 'clamp(1.875rem, 5vw, 3rem)',
-            fontWeight: 700,
-            marginBottom: '1rem'
-          }}>{t.curriculum.sectionTitle}</h2>
-          <p style={{ color: '#9ca3af' }}>{t.curriculum.sectionDescription}</p>
+    <section id="curriculum" className="py-32 border-y border-retro-border bg-retro-bg-secondary">
+      <div className="max-w-content mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-5xl font-bold mb-4">{t.curriculum.sectionTitle}</h2>
+          <p className="text-retro-text-muted">{t.curriculum.sectionDescription}</p>
         </div>
 
         {/* Desktop Flow */}
-        <div style={{
-          position: 'relative',
-          display: 'none',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 2.5rem'
-        }} className="curriculum-desktop">
+        <div className="hidden md:flex relative items-center justify-between px-10">
           {/* Connector Line */}
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: 0,
-            width: '2px', // Vertical line for desktop flow usually requires width not height if horizontal... wait, this is horizontal.
-            height: '2px',
-            background: '#5CE1E6',
-            zIndex: -10,
-            transform: 'translateY(-50%)'
-          }}></div>
+          <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-retro-color-cyan -z-10 -translate-y-1/2" />
 
-          {steps.map((step, index) => (
+          {steps.map((step) => (
             <motion.div
               key={step.id}
-              style={{
-                position: 'relative',
-                cursor: 'pointer'
-              }}
+              className="relative cursor-pointer"
               onHoverStart={() => setActiveStep(step.id)}
               onHoverEnd={() => setActiveStep(null)}
               whileHover={{ y: -5 }}
             >
               {/* Node Circle */}
-              <div style={{
-                width: '3rem',
-                height: '3rem',
-                borderRadius: '4px',
-                border: activeStep === step.id ? '2px solid #5CE1E6' : '2px solid #1A2738',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.875rem',
-                background: '#0a0a0a',
-                zIndex: 10,
-                transition: 'all 0.3s',
-                color: activeStep === step.id ? '#1E2A3A' : '#1E2A3A',
-                backgroundColor: activeStep === step.id ? '#5CE1E6' : '#13253A'
-              }}>
+              <div
+                className={`w-12 h-12 rounded border-2 flex items-center justify-center font-bold text-sm z-10 transition-all ${
+                  activeStep === step.id
+                    ? 'border-retro-color-cyan bg-retro-color-cyan text-retro-bg-card'
+                    : 'border-retro-color-floor bg-retro-bg-card text-retro-bg-card'
+                }`}
+                style={{ backgroundColor: activeStep === step.id ? '#5CE1E6' : '#13253A' }}
+              >
                 {step.id}
               </div>
 
               {/* Label */}
-              <div style={{
-                position: 'absolute',
-                top: '4rem',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                textAlign: 'center',
-                width: '8rem'
-              }}>
-                <h4 style={{
-                  fontWeight: 600,
-                  transition: 'color 0.3s',
-                  color: activeStep === step.id ? 'white' : '#6b7280'
-                }}>{step.title}</h4>
+              <div className="absolute top-16 left-1/2 -translate-x-1/2 text-center w-32">
+                <h4
+                  className={`font-semibold transition-colors ${
+                    activeStep === step.id ? 'text-white' : 'text-retro-text-subtle'
+                  }`}
+                >
+                  {step.title}
+                </h4>
               </div>
 
               {/* Tooltip Popup */}
@@ -112,34 +68,10 @@ const Curriculum: React.FC = () => {
                     initial={{ opacity: 0, y: 10, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
-                    style={{
-                      position: 'absolute',
-                      bottom: '100%',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      marginBottom: '1rem',
-                      width: '12rem',
-                      background: '#1E1E1E',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      padding: '0.75rem',
-                      borderRadius: '0.5rem',
-                      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                      textAlign: 'center',
-                      zIndex: 20
-                    }}
+                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-48 bg-retro-bg-tile border border-retro-border p-3 rounded-lg shadow-card text-center z-20"
                   >
-                    <p style={{ fontSize: '0.75rem', color: '#d1d5db' }}>{step.description}</p>
-                    <div style={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: '50%',
-                      transform: 'translateX(-50%) translateY(50%) rotate(45deg)',
-                      width: '0.75rem',
-                      height: '0.75rem',
-                      background: '#1E1E1E',
-                      borderRight: '1px solid rgba(255,255,255,0.1)',
-                      borderBottom: '1px solid rgba(255,255,255,0.1)'
-                    }}></div>
+                    <p className="text-xs text-gray-300">{step.description}</p>
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 rotate-45 w-3 h-3 bg-retro-bg-tile border-r border-b border-retro-border" />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -148,62 +80,20 @@ const Curriculum: React.FC = () => {
         </div>
 
         {/* Mobile Flow (Vertical) */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '2rem',
-          position: 'relative',
-          paddingLeft: '1.5rem',
-          borderLeft: '2px solid #1f2937',
-          marginLeft: '1rem'
-        }} className="curriculum-mobile">
+        <div className="flex md:hidden flex-col gap-8 relative pl-6 border-l-2 border-gray-800 ml-4">
           {steps.map((step) => (
-            <div key={step.id} style={{ position: 'relative' }}>
-              <div style={{
-                position: 'absolute',
-                left: '-1.8125rem',
-                top: 0,
-                width: '2rem',
-                height: '2rem',
-                borderRadius: '4px',
-                border: '2px solid #5CE1E6',
-                background: '#13253A',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '0.75rem',
-                color: '#5CE1E6'
-              }}>
+            <div key={step.id} className="relative">
+              <div className="absolute -left-[1.8125rem] top-0 w-8 h-8 rounded border-2 border-retro-color-cyan bg-retro-bg-card flex items-center justify-center text-xs text-retro-color-cyan">
                 {step.id}
               </div>
               <div>
-                <h3 style={{
-                  fontSize: '1.125rem',
-                  fontWeight: 700,
-                  color: 'white',
-                  marginBottom: '0.25rem'
-                }}>{step.title}</h3>
-                <p style={{
-                  color: '#9ca3af',
-                  fontSize: '0.875rem'
-                }}>{step.description}</p>
+                <h3 className="text-lg font-bold text-white mb-1">{step.title}</h3>
+                <p className="text-retro-text-muted text-sm">{step.description}</p>
               </div>
             </div>
           ))}
         </div>
-
       </div>
-
-      <style>{`
-        @media (min-width: 768px) {
-          .curriculum-desktop {
-            display: flex !important;
-          }
-          .curriculum-mobile {
-            display: none !important;
-          }
-        }
-      `}</style>
     </section>
   );
 };

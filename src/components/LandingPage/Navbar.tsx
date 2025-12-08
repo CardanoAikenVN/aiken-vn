@@ -22,69 +22,31 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 50,
-      transition: 'all 0.3s',
-      borderBottom: isScrolled ? '1px solid rgba(255,255,255,0.1)' : '1px solid transparent',
-      background: isScrolled ? 'rgba(10, 10, 10, 0.8)' : 'transparent',
-      backdropFilter: isScrolled ? 'blur(12px)' : 'none',
-      padding: isScrolled ? '0.75rem 0' : '1.25rem 0'
-    }}>
-      <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        padding: '0 1.5rem',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'border-b border-retro-border bg-retro-bg-dark/80 backdrop-blur-md py-3'
+          : 'border-b border-transparent bg-transparent py-5'
+      }`}
+    >
+      <div className="max-w-content mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          cursor: 'pointer'
-        }}>
+        <div className="flex items-center gap-2 cursor-pointer">
           <img
             src="img/logo.jpeg"
             alt="Vietnamese Aiken Logo"
-            style={{
-              width: '2rem',
-              height: '2rem',
-              borderRadius: '0.25rem',
-              objectFit: 'cover'
-            }}
+            className="w-8 h-8 rounded object-cover"
           />
-          <span style={{
-            fontSize: '1.25rem',
-            fontWeight: 700,
-            letterSpacing: '-0.025em'
-          }}>Aiken VN</span>
+          <span className="text-xl font-bold tracking-tight">Aiken VN</span>
         </div>
 
         {/* Desktop Nav */}
-        <div style={{
-          display: 'none',
-          alignItems: 'center',
-          gap: '2rem'
-        }} className="desktop-nav">
+        <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              style={{
-                fontSize: '0.875rem',
-                fontWeight: 500,
-                color: '#9ca3af',
-                textDecoration: 'none',
-                transition: 'color 0.3s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}
+              className="text-sm font-medium text-retro-text-muted hover:text-white transition-colors"
             >
               {link.label}
             </a>
@@ -92,50 +54,18 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Right Side Actions */}
-        <div style={{
-          display: 'none',
-          alignItems: 'center',
-          gap: '1rem'
-        }} className="desktop-actions">
+        <div className="hidden md:flex items-center gap-4">
           <a
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              fontSize: '0.75rem',
-              fontFamily: 'monospace',
-              color: '#9ca3af',
-              border: '1px solid rgba(255,255,255,0.1)',
-              padding: '0.375rem 0.75rem',
-              borderRadius: '9999px',
-              textDecoration: 'none',
-              transition: 'background 0.3s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            className="flex items-center gap-2 text-xs font-mono text-retro-text-muted border border-retro-border px-3 py-1.5 rounded-full hover:bg-white/5 transition-colors"
           >
             <Github size={14} />
             <span>1.2k</span>
           </a>
-          <Link to="/docs/moi-truong" style={{ textDecoration: 'none' }}>
-            <button style={{
-              background: 'white',
-              color: 'black',
-              padding: '0.5rem 1.25rem',
-              borderRadius: '9999px',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 0 15px rgba(255,255,255,0.2)',
-              transition: 'background 0.3s'
-            }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#e5e5e5'}
-              onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-            >
+          <Link to="/docs/moi-truong" className="no-underline">
+            <button className="bg-white text-black px-5 py-2 rounded-full text-sm font-semibold shadow-glow hover:bg-gray-200 transition-colors">
               Bắt đầu học
             </button>
           </Link>
@@ -143,15 +73,9 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Toggle */}
         <button
-          style={{
-            display: 'block',
-            color: '#d1d5db',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-          className="mobile-toggle"
+          className="block md:hidden text-gray-300 bg-transparent border-none cursor-pointer"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
         >
           {mobileMenuOpen ? <X /> : <Menu />}
         </button>
@@ -164,61 +88,28 @@ const Navbar: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            style={{
-              background: '#121212',
-              borderBottom: '1px solid rgba(255,255,255,0.1)',
-              overflow: 'hidden'
-            }}
-            className="mobile-menu"
+            className="md:hidden bg-[#121212] border-b border-retro-border overflow-hidden"
           >
-            <div style={{
-              padding: '1.5rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem'
-            }}>
+            <div className="p-6 flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  style={{
-                    color: '#d1d5db',
-                    fontWeight: 500,
-                    textDecoration: 'none',
-                    transition: 'color 0.3s'
-                  }}
+                  className="text-gray-300 font-medium hover:text-white transition-colors no-underline"
                   onClick={() => setMobileMenuOpen(false)}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#d1d5db'}
                 >
                   {link.label}
                 </a>
               ))}
-              <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '0.5rem 0' }} />
+              <hr className="border-t border-retro-border my-2" />
               <a
                 href="#"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  color: '#9ca3af',
-                  textDecoration: 'none'
-                }}
+                className="flex items-center gap-2 text-retro-text-muted no-underline"
               >
                 <Github size={16} /> GitHub Repo
               </a>
-              <Link to="/docs/moi-truong" style={{ textDecoration: 'none', width: '100%' }}>
-                <button style={{
-                  background: '#8B5CF6',
-                  width: '100%',
-                  padding: '0.75rem',
-                  borderRadius: '0.5rem',
-                  color: 'white',
-                  fontWeight: 600,
-                  marginTop: '0.5rem',
-                  border: 'none',
-                  cursor: 'pointer'
-                }}>
+              <Link to="/docs/moi-truong" className="no-underline w-full">
+                <button className="bg-accent-purple w-full py-3 rounded-lg text-white font-semibold mt-2">
                   Bắt đầu học
                 </button>
               </Link>
@@ -226,19 +117,6 @@ const Navbar: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <style>{`
-        @media (min-width: 768px) {
-          .desktop-nav,
-          .desktop-actions {
-            display: flex !important;
-          }
-          .mobile-toggle,
-          .mobile-menu {
-            display: none !important;
-          }
-        }
-      `}</style>
     </nav>
   );
 };
