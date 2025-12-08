@@ -6,14 +6,6 @@ const Footer: React.FC = () => {
     <footer className="w-full bg-[#0F1B2A] text-white pt-20 border-t border-[#1A2738]" role="contentinfo">
 
       {/* Dashed line connector from top */}
-      <div className="container mx-auto relative h-10 mb-10 hidden md:block" aria-hidden="true">
-        <div className="absolute left-[calc(1rem+43px)] -top-24 h-24 w-1 border-l-4 border-dashed border-[#AEC6CF]"></div>
-        <div className="absolute left-[calc(1rem+40px)] bottom-0 w-4 h-4 border-4 border-white bg-[#5CE1E6]"></div>
-        <div className="absolute left-[calc(1rem+42px)] bottom-2 w-[50%] h-1 border-t-4 border-dashed border-[#AEC6CF]"></div>
-        <div className="absolute left-[50%] top-2 w-4 h-4 border-4 border-white bg-[#5CE1E6]"></div>
-        <div className="absolute left-[calc(50%+2px)] top-4 h-10 w-1 border-l-4 border-dashed border-[#AEC6CF]"></div>
-      </div>
-
 
       <div className="container mx-auto px-4 max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-12 pb-32">
         {/* Aiken Learning Path */}
@@ -94,7 +86,6 @@ const Footer: React.FC = () => {
           Cardano Foundation
         </a>
         <span className="hidden md:inline opacity-70" aria-hidden="true">·</span>
-        <span className="opacity-90">Xây dựng bởi <span className="font-bold text-[#5CE1E6]">Cộng Đồng Cardano VN</span></span>
       </nav>
 
       {/* Accessibility: Removed non-functional toggle switch */}
