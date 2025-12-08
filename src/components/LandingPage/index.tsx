@@ -4,7 +4,7 @@ import QuestTimeline from './QuestTimeline';
 import OnboardingTrain from './OnboardingTrain';
 import Footer from './Footer';
 import Starfield from './Starfield';
-import { QUESTS_BATCH_1, QUESTS_BATCH_2 } from './constants';
+import { QUESTS } from './constants';
 
 const LandingPage: React.FC = () => {
   return (
@@ -39,20 +39,14 @@ const LandingPage: React.FC = () => {
       <Hero />
 
       <main id="main-content" className="flex-grow">
-        {/* Activities Phase 1 */}
-        <section aria-labelledby="phase-1-heading">
-          <h2 id="phase-1-heading" className="sr-only">Giai đoạn 1: Chuẩn bị nội dung</h2>
-          <QuestTimeline quests={QUESTS_BATCH_1} />
+        {/* Learning Path Sections */}
+        <section aria-labelledby="learning-path-heading">
+          <h2 id="learning-path-heading" className="sr-only">Lộ trình học Aiken</h2>
+          <QuestTimeline quests={QUESTS} />
         </section>
 
-        {/* Interlude */}
+        {/* Interlude - Train animation */}
         <OnboardingTrain />
-
-        {/* Activities Phase 2 */}
-        <section className="pt-20" aria-labelledby="phase-2-heading">
-          <h2 id="phase-2-heading" className="sr-only">Giai đoạn 2: Triển khai và tương tác</h2>
-          <QuestTimeline quests={QUESTS_BATCH_2} />
-        </section>
       </main>
 
       <Footer />
