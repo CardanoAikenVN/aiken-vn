@@ -8,50 +8,51 @@ interface QuestCardProps {
 }
 
 const QuestCard: React.FC<QuestCardProps> = ({ quest }) => {
-  // Helper to render title art based on type (simulated with CSS/Text)
+  // Helper to render title art based on section
   const renderTitleArt = () => {
     switch (quest.illustrationType) {
-      case 'token':
+      case 'token': // Section 1: The Aiken Foundation
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-5xl md:text-7xl leading-tight text-[#B6F2B6] text-shadow-retro mb-4">TOKEN<br />IZATION</div>
-            <div className="absolute -bottom-4 right-0 flex gap-2">
-              <div className="w-16 h-16 bg-yellow-400 rounded-full border-4 border-black pixel-shadow flex items-center justify-center text-black text-2xl font-bold">$</div>
-              <div className="w-12 h-12 bg-white rounded-md border-4 border-black pixel-shadow"></div>
-              <div className="w-14 h-14 bg-orange-300 rounded-md border-4 border-black pixel-shadow"></div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#B6F2B6] text-shadow-retro" aria-hidden="true">
+            AIKEN
+            <br />
+            FOUNDATION
           </div>
         );
-      case 'staking':
+      case 'staking': // Section 2: Cardano Architecture
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-5xl md:text-7xl leading-tight text-[#C6A8FF] text-shadow-retro mb-4">STAKING<br />APP</div>
-            <div className="absolute bottom-0 right-10 flex flex-col items-center">
-              <div className="w-20 h-12 bg-yellow-400 border-4 border-black mb-1"></div>
-              <div className="w-20 h-12 bg-yellow-400 border-4 border-black mb-1"></div>
-              <div className="w-20 h-12 bg-yellow-400 border-4 border-black"></div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#C6A8FF] text-shadow-retro" aria-hidden="true">
+            CARDANO
+            <br />
+            ARCHITECTURE
           </div>
         );
-      case 'vendor':
+      case 'vendor': // Section 3: Your First Validator
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-5xl md:text-7xl leading-tight text-[#FFD8A8] text-shadow-retro mb-4">TOKEN<br />VENDOR</div>
-            <div className="absolute -bottom-6 right-0 w-24 h-32 bg-gray-300 border-4 border-black flex flex-col items-center p-2">
-              <div className="w-full h-16 bg-blue-300 border-2 border-black mb-2"></div>
-              <div className="w-full h-4 bg-black/20"></div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#FFD8A8] text-shadow-retro" aria-hidden="true">
+            FIRST
+            <br />
+            VALIDATOR
           </div>
         );
-      case 'lending':
+      case 'nft': // Section 4: Minting Tokens & NFTs
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-5xl md:text-7xl leading-tight text-[#FFF79A] text-shadow-retro mb-4">OVER<br />LENDING</div>
-            <div className="absolute bottom-0 right-20 text-6xl" role="img" aria-label="Cá">🐠</div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#FFF79A] text-shadow-retro" aria-hidden="true">
+            MINTING
+            <br />
+            TOKENS
+          </div>
+        );
+      case 'lending': // Section 5: The Escrow Contract
+        return (
+          <div className="text-4xl md:text-6xl leading-tight text-[#B6F2B6] text-shadow-retro" aria-hidden="true">
+            ESCROW
+            <br />
+            CONTRACT
           </div>
         );
       default:
-        return <div className={`text-5xl md:text-6xl leading-tight ${quest.colorTheme} text-shadow-retro`} aria-hidden="true">{quest.title.toUpperCase()}</div>;
+        return <div className={`text-4xl md:text-5xl leading-tight ${quest.colorTheme} text-shadow-retro`} aria-hidden="true">{quest.title.toUpperCase()}</div>;
     }
   };
 
@@ -80,18 +81,6 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest }) => {
     }
   }
 
-  const getIconLabel = () => {
-    switch (quest.illustrationType) {
-      case 'token': return 'Token';
-      case 'staking': return 'Staking';
-      case 'vendor': return 'Vendor';
-      case 'lending': return 'Lending';
-      case 'wallet': return 'Ví';
-      case 'nft': return 'NFT';
-      default: return 'Challenge';
-    }
-  }
-
   return (
     <article className="relative py-16 md:py-24 group">
       {/* Timeline Node - positioned at left-1/3 to align with vertical line */}
@@ -108,27 +97,27 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest }) => {
         {/* Left: Content (takes 40% on desktop) */}
         <div className="w-full md:w-[40%] flex flex-col gap-6 items-start md:pr-12">
           <div>
-            <span className="font-['Press_Start_2P'] text-xs opacity-90 mb-2 block" aria-label={`Challenge số ${quest.number}`}>
-              Challenge #{quest.number}
+            <span className="font-['Press_Start_2P'] text-xs opacity-90 mb-2 block" aria-label={`Section ${quest.number}`}>
+              Section #{quest.number}
             </span>
             <h3 className="text-2xl md:text-3xl font-bold font-['DM_Sans'] tracking-tight">
               {quest.title}
             </h3>
           </div>
 
-          <p className="text-lg leading-relaxed opacity-90 font-light">
+          <p className="text-lg leading-relaxed opacity-90 font-light max-w-[35ch] text-justify">
             {quest.description}
           </p>
 
           <a
-            href={`#quest-${quest.id}`}
+            href={quest.link || `/docs/section-${quest.number}`}
             className="inline-block focus:outline-none focus:ring-4 focus:ring-[#B6F2B6] focus:ring-offset-2 focus:ring-offset-[#8f3aff] rounded-lg"
-            aria-label={`Bắt đầu ${quest.title} - Challenge ${quest.number}`}
+            aria-label={`Bắt đầu ${quest.title} - Section ${quest.number}`}
           >
             <PixelButton>
               <span className="flex items-center gap-2">
                 {getIcon()}
-                <span>BẮT ĐẦU {getIconLabel().toUpperCase()}</span>
+                <span>BẮT ĐẦU SECTION {quest.number}</span>
               </span>
             </PixelButton>
           </a>

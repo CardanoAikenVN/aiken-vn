@@ -27,10 +27,7 @@ const Hero: React.FC = () => {
       {/* Main Content */}
       <div className="z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center gap-8">
         <div className="flex flex-col items-center gap-4">
-          {/* <div className="animate-float" aria-hidden="true">
-            <span className="text-5xl md:text-6xl mb-4 block filter drop-shadow-lg" role="img" aria-label="Logo Cardano">🔷</span>
-          </div> */}
-          <p className="text-[#DDE6ED] font-[Arial] text-sm md:text-lg tracking-wide uppercase font-bold opacity-90 max-w-2xl">
+          <p className="text-retro-text-body font-sans text-sm md:text-lg tracking-wide uppercase font-bold opacity-90 max-w-2xl">
             Chương trình học <span className="text-[#A3DCE2] border-b-2 border-[#5CE1E6]">Tiếng Việt</span> đầu tiên về Aiken - ngôn ngữ smart contract của Cardano
           </p>
         </div>
@@ -63,7 +60,7 @@ const Hero: React.FC = () => {
           </div>
 
           <a
-            href="/docs/moi-truong"
+            href="/docs/nen-tang-aiken"
             className="inline-block focus:outline-none focus:ring-4 focus:ring-[#5CE1E6] focus:ring-offset-2 focus:ring-offset-[#0F1B2A] rounded-md"
             aria-label="Bắt đầu học Aiken ngay bây giờ"
           >
