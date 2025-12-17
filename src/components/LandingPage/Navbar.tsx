@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
             <Github size={14} />
             <span>1.2k</span>
           </a>
-          <Link to="/docs/moi-truong" className="no-underline">
+          <Link to="/docs/nen-tang-aiken" className="no-underline">
             <button className="bg-white text-black px-5 py-2 rounded-full text-sm font-semibold shadow-glow hover:bg-gray-200 transition-colors">
               Bắt đầu học
             </button>
@@ -108,7 +108,7 @@ const Navbar: React.FC = () => {
               >
                 <Github size={16} /> GitHub Repo
               </a>
-              <Link to="/docs/moi-truong" className="no-underline w-full">
+              <Link to="/docs/nen-tang-aiken" className="no-underline w-full">
                 <button className="bg-accent-purple w-full py-3 rounded-lg text-white font-semibold mt-2">
                   Bắt đầu học
                 </button>
