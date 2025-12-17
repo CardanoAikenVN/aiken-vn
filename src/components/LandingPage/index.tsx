@@ -28,7 +28,7 @@ const LandingPage: React.FC = () => {
           AIKEN VN
         </a>
         <a
-          href="/docs/nen-tang-aiken"
+          href="/docs/moi-truong"
           className="border-2 border-white text-white px-4 md:px-6 py-2 rounded-full hover:bg-white hover:text-[#8f3aff] transition-all font-bold text-xs md:text-sm hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#B6F2B6] focus:ring-offset-2 focus:ring-offset-[#8f3aff]"
           aria-label="Xem tài liệu học tập"
         >
