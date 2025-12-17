@@ -13,57 +13,42 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest }) => {
     switch (quest.illustrationType) {
       case 'token': // Section 1: The Aiken Foundation
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-4xl md:text-6xl leading-tight text-[#B6F2B6] text-shadow-retro mb-4">AIKEN<br />FOUNDATION</div>
-            <div className="absolute -bottom-4 right-0 flex gap-2">
-              <div className="w-14 h-14 bg-[#B6F2B6] rounded-lg border-4 border-black pixel-shadow flex items-center justify-center text-black text-xl font-bold font-mono">{'{}'}</div>
-              <div className="w-12 h-12 bg-white rounded-md border-4 border-black pixel-shadow flex items-center justify-center text-xs font-bold">CLI</div>
-              <div className="w-14 h-14 bg-purple-400 rounded-md border-4 border-black pixel-shadow flex items-center justify-center text-white text-lg">λ</div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#B6F2B6] text-shadow-retro" aria-hidden="true">
+            AIKEN
+            <br />
+            FOUNDATION
           </div>
         );
       case 'staking': // Section 2: Cardano Architecture
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-4xl md:text-6xl leading-tight text-[#C6A8FF] text-shadow-retro mb-4">CARDANO<br />ARCHITECTURE</div>
-            <div className="absolute bottom-0 right-10 flex flex-col items-center">
-              <div className="w-20 h-10 bg-[#C6A8FF] border-4 border-black mb-1 flex items-center justify-center text-xs font-bold">eUTxO</div>
-              <div className="w-20 h-10 bg-blue-400 border-4 border-black mb-1 flex items-center justify-center text-xs font-bold">DATUM</div>
-              <div className="w-20 h-10 bg-orange-400 border-4 border-black flex items-center justify-center text-xs font-bold">REDEEMER</div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#C6A8FF] text-shadow-retro" aria-hidden="true">
+            CARDANO
+            <br />
+            ARCHITECTURE
           </div>
         );
       case 'vendor': // Section 3: Your First Validator
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-4xl md:text-6xl leading-tight text-[#FFD8A8] text-shadow-retro mb-4">FIRST<br />VALIDATOR</div>
-            <div className="absolute -bottom-6 right-0 w-28 h-32 bg-gray-800 border-4 border-[#FFD8A8] rounded-lg flex flex-col items-center p-2">
-              <div className="w-full h-4 bg-[#FFD8A8]/30 mb-1 rounded"></div>
-              <div className="w-full h-4 bg-[#FFD8A8]/30 mb-1 rounded"></div>
-              <div className="w-3/4 h-4 bg-[#FFD8A8]/30 rounded"></div>
-              <div className="mt-auto text-[#B6F2B6] text-xs font-mono">✓ PASS</div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#FFD8A8] text-shadow-retro" aria-hidden="true">
+            FIRST
+            <br />
+            VALIDATOR
           </div>
         );
       case 'nft': // Section 4: Minting Tokens & NFTs
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-4xl md:text-6xl leading-tight text-[#FFF79A] text-shadow-retro mb-4">MINTING<br />TOKENS</div>
-            <div className="absolute -bottom-4 right-0 flex gap-2">
-              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full border-4 border-black pixel-shadow flex items-center justify-center text-black text-2xl">🪙</div>
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg border-4 border-black pixel-shadow flex items-center justify-center text-2xl">🎨</div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#FFF79A] text-shadow-retro" aria-hidden="true">
+            MINTING
+            <br />
+            TOKENS
           </div>
         );
       case 'lending': // Section 5: The Escrow Contract
         return (
-          <div className="relative" aria-hidden="true">
-            <div className="text-4xl md:text-6xl leading-tight text-[#B6F2B6] text-shadow-retro mb-4">ESCROW<br />CONTRACT</div>
-            <div className="absolute bottom-0 right-10 flex items-end gap-2">
-              <div className="w-12 h-16 bg-blue-500 border-4 border-black rounded-t-lg flex items-center justify-center text-white text-xs font-bold">BUY</div>
-              <div className="w-14 h-20 bg-[#B6F2B6] border-4 border-black rounded-t-lg flex items-center justify-center text-black text-xs font-bold">🔒</div>
-              <div className="w-12 h-16 bg-orange-500 border-4 border-black rounded-t-lg flex items-center justify-center text-white text-xs font-bold">SELL</div>
-            </div>
+          <div className="text-4xl md:text-6xl leading-tight text-[#B6F2B6] text-shadow-retro" aria-hidden="true">
+            ESCROW
+            <br />
+            CONTRACT
           </div>
         );
       default:
@@ -120,7 +105,7 @@ const QuestCard: React.FC<QuestCardProps> = ({ quest }) => {
             </h3>
           </div>
 
-          <p className="text-lg leading-relaxed opacity-90 font-light">
+          <p className="text-lg leading-relaxed opacity-90 font-light max-w-[35ch] text-justify">
             {quest.description}
           </p>
 
