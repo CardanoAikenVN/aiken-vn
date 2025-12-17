@@ -60,7 +60,7 @@ const Hero: React.FC = () => {
           </div>
 
           <a
-            href="/docs/moi-truong"
+            href="/docs/nen-tang-aiken"
             className="inline-block focus:outline-none focus:ring-4 focus:ring-[#5CE1E6] focus:ring-offset-2 focus:ring-offset-[#0F1B2A] rounded-md"
             aria-label="Bắt đầu học Aiken ngay bây giờ"
           >
