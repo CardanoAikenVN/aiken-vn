@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
             Khám phá các bài học từ cơ bản đến nâng cao về ngôn ngữ smart contract Aiken trên Cardano.
           </p>
           <a
-            href="/docs/moi-truong"
+            href="/docs/nen-tang-aiken"
             className="inline-block focus:outline-none focus:ring-4 focus:ring-[#5CE1E6] focus:ring-offset-2 focus:ring-offset-[#243447] mt-4"
             aria-label="Bắt đầu học Aiken"
           >
