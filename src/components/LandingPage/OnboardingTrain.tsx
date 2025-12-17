@@ -36,7 +36,7 @@ const OnboardingTrain: React.FC = () => {
 
           <div className="flex justify-center">
             <a
-              href="/docs/nen-tang-aiken"
+              href="/docs/moi-truong"
               className="inline-block focus:outline-none focus:ring-4 focus:ring-[#066C78] focus:ring-offset-2 focus:ring-offset-[#FFF79A] rounded-full"
               aria-label="Khám phá chương trình học Aiken"
             >
