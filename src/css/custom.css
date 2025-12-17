@@ -1,15 +1,11 @@
 /**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
+ * Global CSS for Vietnamese Aiken Documentation Site
+ * Uses Infima framework (bundled with Docusaurus) + Tailwind CSS
  */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-/* Kept only for specific decorative use if needed, but main text is Arial */
 
 /* ============================================
    ACCESSIBILITY: Screen Reader Only Utility
@@ -40,29 +36,26 @@
 /* ============================================
    ACCESSIBILITY: Focus Indicators
    ============================================ */
-/* Ensure all interactive elements have visible focus */
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-	outline: 3px solid #B6F2B6;
+	outline: 3px solid #5CE1E6;
 	outline-offset: 2px;
 }
 
-/* High contrast focus for links on purple background */
 .landing-page-wrapper a:focus-visible {
-	outline: 4px solid #B6F2B6;
+	outline: 4px solid #5CE1E6;
 	outline-offset: 3px;
-	box-shadow: 0 0 0 6px rgba(182, 242, 182, 0.3);
+	box-shadow: 0 0 0 6px rgba(92, 225, 230, 0.3);
 }
 
 /* ============================================
    ACCESSIBILITY: Reduced Motion Support
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
-
 	*,
 	*::before,
 	*::after {
@@ -72,7 +65,6 @@ textarea:focus-visible {
 		scroll-behavior: auto !important;
 	}
 
-	/* Stop particle animations completely */
 	.particle,
 	.animate-float,
 	.animate-cloud-slow,
@@ -80,30 +72,21 @@ textarea:focus-visible {
 	.animate-cloud-fast,
 	.animate-train,
 	.animate-bounce,
-	.animate-pulse-slow,
-	.animate-spin,
-	.animate-ping {
+	.animate-pulse-slow {
 		animation: none !important;
 	}
 }
 
 /* ============================================
-   Landing Page Animations & Helpers
+   Landing Page Animations
    ============================================ */
 .pixelated {
 	image-rendering: pixelated;
 }
 
 @keyframes float {
-
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-
-	50% {
-		transform: translateY(-10px);
-	}
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-10px); }
 }
 
 .animate-float {
@@ -111,58 +94,31 @@ textarea:focus-visible {
 }
 
 @keyframes cloud-move {
-	0% {
-		transform: translateX(-100%);
-	}
-
-	100% {
-		transform: translateX(100vw);
-	}
+	0% { transform: translateX(-100%); }
+	100% { transform: translateX(100vw); }
 }
 
-.animate-cloud-slow {
-	animation: cloud-move 60s linear infinite;
-}
-
-.animate-cloud-medium {
-	animation: cloud-move 40s linear infinite;
-}
-
-.animate-cloud-fast {
-	animation: cloud-move 25s linear infinite;
-}
+.animate-cloud-slow { animation: cloud-move 60s linear infinite; }
+.animate-cloud-medium { animation: cloud-move 40s linear infinite; }
+.animate-cloud-fast { animation: cloud-move 25s linear infinite; }
 
 @keyframes train-move {
-	0% {
-		transform: translateX(-100%);
-	}
-
-	100% {
-		transform: translateX(100%);
-	}
+	0% { transform: translateX(-100%); }
+	100% { transform: translateX(100%); }
 }
 
 .animate-train {
 	animation: train-move 15s linear infinite;
 }
 
-.pixel-shadow {
-	box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.2);
-}
+/* ============================================
+   Landing Page Visual Helpers
+   ============================================ */
+.pixel-shadow { box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 0.2); }
+.pixel-shadow-sm { box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.2); }
+.pixel-border { border: 2px solid white; }
+.text-shadow-retro { text-shadow: 4px 4px 0px #034a52; }
 
-.pixel-shadow-sm {
-	box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.2);
-}
-
-.pixel-border {
-	border: 2px solid white;
-}
-
-.text-shadow-retro {
-	text-shadow: 4px 4px 0px #034a52;
-}
-
-/* Landing Page Font Scoping */
 .landing-page-wrapper {
 	font-family: Arial, Helvetica, sans-serif;
 	background-color: var(--bg-primary);
@@ -173,35 +129,8 @@ textarea:focus-visible {
 .landing-page-wrapper h1,
 .landing-page-wrapper h2,
 .landing-page-wrapper h3,
-.landing-page-wrapper h4,
-.landing-page-wrapper .pixel-font {
-	font-family: Arial, Helvetica, sans-serif;
+.landing-page-wrapper h4 {
 	font-family: var(--ifm-font-family-base);
-}
-
-/* ============================================
-   ACCESSIBILITY: Improved Color Contrast
-   ============================================ */
-/* Fix: White text on purple - boost to meet 4.5:1 */
-.landing-page-wrapper {
-	/* Retro Theme Background */
-	background-color: var(--bg-primary);
-	color: var(--text-heading);
-}
-
-/* Fix: Green accent text - use darker green for better contrast */
-.landing-page-wrapper .text-\[\#B6F2B6\] {
-	color: #F9D276 !important;
-	/* Retro Accent Yellow */
-}
-
-/* Fix: Increase opacity on low-opacity text */
-.opacity-70 {
-	opacity: 0.95 !important;
-}
-
-.opacity-90 {
-	opacity: 1 !important;
 }
 
 /* ============================================
@@ -219,9 +148,8 @@ textarea:focus-visible {
 	--docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 	--ifm-navbar-background-color: #ffffff;
 	--ifm-font-family-base: Arial, Helvetica, sans-serif;
-	/* Added for consistency */
 
-	/* Landing page custom colors - Version 1.0 */
+	/* Landing page theme colors */
 	--bg-primary: #0F1B2A;
 	--bg-secondary: #112030;
 	--bg-card: #13253A;
@@ -231,14 +159,11 @@ textarea:focus-visible {
 	--color-floor: #1A2738;
 	--text-heading: #FFFFFF;
 	--text-body: #DDE6ED;
-
 	--landing-background: var(--bg-primary);
 	--landing-surface: var(--bg-secondary);
 	--landing-primary: var(--color-cyan);
-	--landing-accent: var(--color-cyan);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme="dark"] {
 	--ifm-color-primary: #25c2a0;
 	--ifm-color-primary-dark: #21af90;
@@ -250,35 +175,9 @@ textarea:focus-visible {
 	--docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-/* Estilos para o wrapper do botão na sidebar */
-.sidebar-toggle-wrapper {
-	padding: 8px 12px;
-	margin-bottom: 8px;
-	border-bottom: 1px solid var(--ifm-toc-border-color);
-	display: flex !important;
-	justify-content: flex-end;
-	align-items: center;
-	flex-shrink: 0;
-}
-
-/* Estilos para o botão na navbar (quando sidebar está escondido) */
-.navbar-sidebar-toggle {
-	display: flex !important;
-	align-items: center;
-	margin-right: 8px;
-	visibility: visible !important;
-	opacity: 1 !important;
-	position: relative;
-	z-index: 1000;
-}
-
-.navbar-sidebar-toggle button {
-	display: flex !important;
-	visibility: visible !important;
-	opacity: 1 !important;
-}
-
-/* Navbar Customization for Dark Theme Match */
+/* ============================================
+   Docusaurus Navbar Customization
+   ============================================ */
 .navbar {
 	background-color: var(--landing-background) !important;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -295,12 +194,40 @@ textarea:focus-visible {
 	color: var(--landing-primary) !important;
 }
 
-/* No modo escuro, usar a cor padrão do tema ou manter a customização */
 [data-theme="dark"] .navbar {
 	background-color: var(--landing-background) !important;
 }
 
-/* Landing Page Styles */
+/* Sidebar toggle styling */
+.sidebar-toggle-wrapper {
+	padding: 8px 12px;
+	margin-bottom: 8px;
+	border-bottom: 1px solid var(--ifm-toc-border-color);
+	display: flex !important;
+	justify-content: flex-end;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.navbar-sidebar-toggle {
+	display: flex !important;
+	align-items: center;
+	margin-right: 8px;
+	visibility: visible !important;
+	opacity: 1 !important;
+	position: relative;
+	z-index: 1000;
+}
+
+.navbar-sidebar-toggle button {
+	display: flex !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+
+/* ============================================
+   Landing Page Styles
+   ============================================ */
 .landing-page {
 	min-height: 100vh;
 	background-color: var(--bg-primary);
@@ -309,62 +236,28 @@ textarea:focus-visible {
 }
 
 .gradient-text {
-	background: linear-gradient(to right, var(--landing-primary), var(--landing-secondary));
+	background: linear-gradient(to right, var(--landing-primary), var(--color-cyan-dark));
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 	background-clip: text;
 }
 
-/* Custom Scrollbar for landing page */
-.landing-page::-webkit-scrollbar {
-	width: 8px;
-}
+/* Custom scrollbar */
+.landing-page::-webkit-scrollbar { width: 8px; }
+.landing-page::-webkit-scrollbar-track { background: var(--landing-background); }
+.landing-page::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+.landing-page::-webkit-scrollbar-thumb:hover { background: #555; }
 
-.landing-page::-webkit-scrollbar-track {
-	background: var(--landing-background);
-}
-
-.landing-page::-webkit-scrollbar-thumb {
-	background: #333;
-	border-radius: 4px;
-}
-
-.landing-page::-webkit-scrollbar-thumb:hover {
-	background: #555;
-}
-
-/* Pulse animation */
-@keyframes pulse-slow {
-
-	0%,
-	100% {
-		opacity: 1;
-	}
-
-	50% {
-		opacity: .5;
-	}
-}
-
-.animate-pulse-slow {
-	animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Particle Effects */
+/* ============================================
+   Particle Effects
+   ============================================ */
 @keyframes particle-float {
 	0% {
 		transform: translateY(100vh) translateX(0) scale(0);
 		opacity: 0;
 	}
-
-	10% {
-		opacity: 1;
-	}
-
-	90% {
-		opacity: 1;
-	}
-
+	10% { opacity: 1; }
+	90% { opacity: 1; }
 	100% {
 		transform: translateY(-100vh) translateX(100px) scale(1);
 		opacity: 0;
@@ -375,81 +268,33 @@ textarea:focus-visible {
 	position: absolute;
 	width: 4px;
 	height: 4px;
-	background: rgba(182, 242, 182, 0.6);
+	background: rgba(92, 225, 230, 0.6);
 	border-radius: 2px;
 	animation: particle-float 15s infinite ease-in;
 }
 
-.particle-1 {
-	left: 10%;
-	animation-delay: 0s;
-	animation-duration: 12s;
-}
+.particle-1 { left: 10%; animation-delay: 0s; animation-duration: 12s; }
+.particle-2 { left: 25%; animation-delay: 2s; animation-duration: 14s; background: rgba(198, 168, 255, 0.6); }
+.particle-3 { left: 50%; animation-delay: 4s; animation-duration: 16s; background: rgba(255, 216, 168, 0.6); }
+.particle-4 { left: 70%; animation-delay: 1s; animation-duration: 13s; }
+.particle-5 { left: 85%; animation-delay: 3s; animation-duration: 15s; background: rgba(198, 168, 255, 0.6); }
+.particle-6 { left: 40%; animation-delay: 5s; animation-duration: 17s; }
 
-.particle-2 {
-	left: 25%;
-	animation-delay: 2s;
-	animation-duration: 14s;
-	background: rgba(198, 168, 255, 0.6);
-}
-
-.particle-3 {
-	left: 50%;
-	animation-delay: 4s;
-	animation-duration: 16s;
-	background: rgba(255, 216, 168, 0.6);
-}
-
-.particle-4 {
-	left: 70%;
-	animation-delay: 1s;
-	animation-duration: 13s;
-}
-
-.particle-5 {
-	left: 85%;
-	animation-delay: 3s;
-	animation-duration: 15s;
-	background: rgba(198, 168, 255, 0.6);
-}
-
-.particle-6 {
-	left: 40%;
-	animation-delay: 5s;
-	animation-duration: 17s;
-	background: rgba(182, 242, 182, 0.6);
-}
-
-/* Pixel Character Styles */
+/* ============================================
+   Pixel Character Decorations
+   ============================================ */
 .pixel-character-left {
 	background: linear-gradient(to bottom,
-			transparent 0%, transparent 25%,
-			var(--color-cyan) 25%, var(--color-cyan) 50%,
-			var(--bg-card) 50%, var(--bg-card) 100%);
-	box-shadow:
-		0 0 0 2px #fff,
-		4px 0 0 2px #fff,
-		-4px 0 0 2px #fff;
+		transparent 0%, transparent 25%,
+		var(--color-cyan) 25%, var(--color-cyan) 50%,
+		var(--bg-card) 50%, var(--bg-card) 100%);
+	box-shadow: 0 0 0 2px #fff, 4px 0 0 2px #fff, -4px 0 0 2px #fff;
 }
 
 .pixel-character-right {
 	background: linear-gradient(to bottom,
-			transparent 0%, transparent 25%,
-			var(--color-cyan-light) 25%, var(--color-cyan-light) 50%,
-			var(--bg-card) 50%, var(--bg-card) 100%);
-	box-shadow:
-		0 0 0 2px #fff,
-		4px 0 0 2px #fff,
-		-4px 0 0 2px #fff;
-}
-
-/* Cardano Blue Color Variables */
-:root {
-	--cardano-blue: #0033AD;
-	--cardano-blue-light: #3468D6;
-	--cardano-blue-dark: #001F6B;
-	--aiken-green: #8fd48f;
-	/* Updated for better contrast */
-	--aiken-purple: #7a2dd9;
-	/* Updated for better contrast */
+		transparent 0%, transparent 25%,
+		var(--color-cyan-light) 25%, var(--color-cyan-light) 50%,
+		var(--bg-card) 50%, var(--bg-card) 100%);
+	box-shadow: 0 0 0 2px #fff, 4px 0 0 2px #fff, -4px 0 0 2px #fff;
 }

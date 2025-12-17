@@ -4,7 +4,7 @@ import QuestTimeline from './QuestTimeline';
 import OnboardingTrain from './OnboardingTrain';
 import Footer from './Footer';
 import Starfield from './Starfield';
-import { QUESTS_BATCH_1, QUESTS_BATCH_2 } from './constants';
+import { QUESTS } from './constants';
 
 const LandingPage: React.FC = () => {
   return (
@@ -28,7 +28,7 @@ const LandingPage: React.FC = () => {
           AIKEN VN
         </a>
         <a
-          href="/docs/moi-truong"
+          href="/docs/nen-tang-aiken"
           className="border-2 border-white text-white px-4 md:px-6 py-2 rounded-full hover:bg-white hover:text-[#8f3aff] transition-all font-bold text-xs md:text-sm hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#B6F2B6] focus:ring-offset-2 focus:ring-offset-[#8f3aff]"
           aria-label="Xem tài liệu học tập"
         >
@@ -39,20 +39,14 @@ const LandingPage: React.FC = () => {
       <Hero />
 
       <main id="main-content" className="flex-grow">
-        {/* Activities Phase 1 */}
-        <section aria-labelledby="phase-1-heading">
-          <h2 id="phase-1-heading" className="sr-only">Giai đoạn 1: Chuẩn bị nội dung</h2>
-          <QuestTimeline quests={QUESTS_BATCH_1} />
+        {/* Learning Path Sections */}
+        <section aria-labelledby="learning-path-heading">
+          <h2 id="learning-path-heading" className="sr-only">Lộ trình học Aiken</h2>
+          <QuestTimeline quests={QUESTS} />
         </section>
 
-        {/* Interlude */}
+        {/* Interlude - Train animation */}
         <OnboardingTrain />
-
-        {/* Activities Phase 2 */}
-        <section className="pt-20" aria-labelledby="phase-2-heading">
-          <h2 id="phase-2-heading" className="sr-only">Giai đoạn 2: Triển khai và tương tác</h2>
-          <QuestTimeline quests={QUESTS_BATCH_2} />
-        </section>
       </main>
 
       <Footer />
