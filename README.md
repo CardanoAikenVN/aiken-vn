@@ -16,12 +16,55 @@ Welcome to **Vietnamese Aiken** - The first open-source curriculum for mastering
 *   **Language**: 100% Vietnamese content.
 *   **Theme**: Default Dark Mode, optimized for reading.
 *   **Curriculum**: A complete learning path from basics to advanced:
-    1.  Setup (Môi trường)
-    2.  Syntax (Cú pháp)
-    3.  eUTxO Thinking (Tư duy eUTxO)
-    4.  First Smart Contract (Smart Contract đầu tiên)
-    5.  Testing
-    6.  Deployment
+
+#### Part 1: The Aiken Foundation
+| # | Lesson | Learning Goal | Stage |
+|---|--------|---------------|-------|
+| 01 | Installation | Set up programming environment and tools | Setup |
+| 02 | Introduction | Overview of Aiken | Setup |
+| 03 | Aiken CLI | Master command-line interface | Syntax |
+| 04 | Project Structure | Understand project organization | Syntax |
+| 05 | Variables & Constants | Define and use variables | Syntax |
+| 06 | Primitive Types | Work with basic data types | Syntax |
+| 07 | Custom Types | Define complex data structures | Syntax |
+| 08 | Control Flow | Implement conditional logic | Syntax |
+| 09 | Functions | Write reusable processing logic | Syntax |
+| 10 | Modules | Manage and modularize source code | Syntax |
+| 11 | Data | Understand data handling | Syntax |
+| 12 | Unit Testing | Ensure code correctness | Testing |
+| 13 | Troubleshooting | Debug and handle issues | Testing |
+
+#### Part 2: Cardano Architecture
+| Topic | Learning Goal | Stage |
+|-------|---------------|-------|
+| Introduction to Cardano | Understand blockchain fundamentals | Extra |
+| UTXO Model | Master Cardano's transaction model | Extra |
+| Datum & Redeemer | Learn smart contract data structures | Extra |
+
+#### Part 3: Your First Validator
+| Topic | Learning Goal | Stage |
+|-------|---------------|-------|
+| Building Spending Validator | Write validators to lock assets and set unlock conditions | Deployment |
+
+#### Part 4: Minting Tokens & NFTs
+| Topic | Learning Goal | Stage |
+|-------|---------------|-------|
+| FT & NFT Concepts | Understand token types | Deployment |
+| Minting Policies | Create token minting logic | Deployment |
+
+#### Part 5: The Escrow Contract
+| Topic | Learning Goal | Stage |
+|-------|---------------|-------|
+| Escrow Contract | Build secure transaction environment between buyer and seller | Deployment |
+
+#### Learning Path Summary
+| Stage | Core Objective | Lessons | Target Audience |
+|-------|----------------|---------|-----------------|
+| SETUP | Environment installation | 01 - 02 | Beginner |
+| SYNTAX | Language fundamentals | 03 - 11 | Beginner |
+| TESTING | Ensure code correctness | 12 - 13 | Beginner/Intermediate |
+| DEPLOYMENT | Deploy real Smart Contracts | Part 3, 4, 5 | Intermediate |
+| EXTRA | Cardano mechanisms & storage | Part 2 | Beginner/Intermediate |
 
 ### Installation & Running
 
@@ -92,12 +135,55 @@ Dự án này được xây dựng để giúp cộng đồng lập trình viên
 *   **Ngôn ngữ**: 100% Tiếng Việt.
 *   **Giao diện**: Dark mode mặc định, tối ưu cho việc đọc tài liệu.
 *   **Nội dung**: Lộ trình học tập từ cơ bản đến nâng cao:
-    1.  Môi trường (Setup)
-    2.  Cú pháp (Syntax)
-    3.  Tư duy eUTxO
-    4.  Smart Contract đầu tiên
-    5.  Testing
-    6.  Deployment
+
+#### 🏗 Phần 1: Nền Tảng (The Aiken Foundation)
+| # | Bài học | Mục tiêu học tập | Giai đoạn |
+|---|---------|------------------|-----------|
+| 01 | Cài đặt (Installation) | Thiết lập môi trường lập trình và công cụ | Setup |
+| 02 | Giới thiệu (Introduction) | Tổng quan về Aiken | Setup |
+| 03 | Aiken CLI | Làm chủ giao diện dòng lệnh | Syntax |
+| 04 | Cấu trúc dự án (Project Structure) | Hiểu cách tổ chức dự án | Syntax |
+| 05 | Biến & Hằng số (Variables & Constants) | Định nghĩa và sử dụng biến | Syntax |
+| 06 | Kiểu dữ liệu nguyên thủy (Primitive Types) | Làm việc với các kiểu dữ liệu cơ bản | Syntax |
+| 07 | Kiểu dữ liệu tùy chỉnh (Custom Types) | Định nghĩa cấu trúc dữ liệu phức tạp | Syntax |
+| 08 | Luồng điều khiển (Control Flow) | Triển khai logic điều kiện | Syntax |
+| 09 | Hàm (Functions) | Viết logic xử lý có khả năng tái sử dụng | Syntax |
+| 10 | Modules | Quản lý và chia nhỏ mã nguồn | Syntax |
+| 11 | Dữ liệu (Data) | Hiểu cách xử lý dữ liệu | Syntax |
+| 12 | Kiểm thử đơn vị (Unit Test) | Đảm bảo code chạy đúng | Testing |
+| 13 | Xử lý lỗi (Troubleshooting) | Kỹ thuật debug và xử lý vấn đề | Testing |
+
+#### 🏛 Phần 2: Kiến Trúc Cardano (Cardano Architecture)
+| Chủ đề | Mục tiêu học tập | Giai đoạn |
+|--------|------------------|-----------|
+| Giới thiệu về Cardano | Hiểu nền tảng blockchain | Extra |
+| Mô hình UTXO | Làm chủ mô hình giao dịch của Cardano | Extra |
+| Datum & Redeemer | Học cấu trúc dữ liệu smart contract | Extra |
+
+#### 🛡 Phần 3: Validator Đầu Tiên (Your First Validator)
+| Chủ đề | Mục tiêu học tập | Giai đoạn |
+|--------|------------------|-----------|
+| Xây dựng Spending Validator | Viết validator để khóa tài sản và thiết lập điều kiện mở khóa | Deployment |
+
+#### 💎 Phần 4: Phát Hành Token & NFT (Minting Tokens & NFTs)
+| Chủ đề | Mục tiêu học tập | Giai đoạn |
+|--------|------------------|-----------|
+| Khái niệm FT & NFT | Hiểu các loại token | Deployment |
+| Minting Policies | Tạo logic phát hành token | Deployment |
+
+#### ⚖ Phần 5: Hợp Đồng Escrow (The Escrow Contract)
+| Chủ đề | Mục tiêu học tập | Giai đoạn |
+|--------|------------------|-----------|
+| Hợp đồng ký quỹ (Escrow) | Xây dựng môi trường giao dịch an toàn giữa buyer và seller | Deployment |
+
+#### 📊 Tổng kết Lộ trình Học tập
+| Giai đoạn | Mục tiêu cốt lõi | Bài học | Đối tượng |
+|-----------|------------------|---------|-----------|
+| SETUP | Cài đặt môi trường | 01 - 02 | Beginner |
+| SYNTAX | Nền tảng ngôn ngữ | 03 - 11 | Beginner |
+| TESTING | Đảm bảo code chạy đúng | 12 - 13 | Beginner/Intermediate |
+| DEPLOYMENT | Triển khai Smart Contract thực tế | Phần 3, 4, 5 | Intermediate |
+| EXTRA | Cơ chế hoạt động và lưu trữ của Cardano | Phần 2 | Beginner/Intermediate |
 
 ### Cài đặt và Chạy dự án
 
