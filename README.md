@@ -1,120 +1,111 @@
 # Vietnamese Aiken
 
-[English](#english) | [Tiếng Việt](#tiếng-việt)
+[![CI](https://github.com/uberhub-mentorias/docusaurus/actions/workflows/ci.yml/badge.svg)](https://github.com/uberhub-mentorias/docusaurus/actions/workflows/ci.yml)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+[![Docusaurus](https://img.shields.io/badge/Docusaurus-3.9.2-blue)](https://docusaurus.io/)
+[![React](https://img.shields.io/badge/React-19-61dafb)](https://react.dev/)
+
+[English](#english) | [Tieng Viet](#tieng-viet)
 
 ---
 
-<a name="english"></a>
-
 ## English
 
-Welcome to **Vietnamese Aiken** - The first open-source curriculum for mastering Aiken and Smart Contracts on Cardano, tailored for Vietnamese developers.
-
+The first open-source curriculum for mastering **Aiken** and **Smart Contracts** on Cardano, tailored for Vietnamese developers.
 
 ### Features
 
-*   **Language**: 100% Vietnamese content.
-*   **Theme**: Default Dark Mode, optimized for reading.
-*   **Curriculum**: A complete learning path from basics to advanced:
+- **Language**: 100% Vietnamese content
+- **Theme**: Dark mode optimized for reading
+- **Curriculum**: Complete learning path from basics to deployment
+- **Accessibility**: WCAG-compliant interface
 
-#### Part 1: The Aiken Foundation
-| # | Lesson | Learning Goal | Stage |
-|---|--------|---------------|-------|
-| 01 | Installation | Set up programming environment and tools | Setup |
-| 02 | Introduction | Overview of Aiken | Setup |
-| 03 | Aiken CLI | Master command-line interface | Syntax |
-| 04 | Project Structure | Understand project organization | Syntax |
-| 05 | Variables & Constants | Define and use variables | Syntax |
-| 06 | Primitive Types | Work with basic data types | Syntax |
-| 07 | Custom Types | Define complex data structures | Syntax |
-| 08 | Control Flow | Implement conditional logic | Syntax |
-| 09 | Functions | Write reusable processing logic | Syntax |
-| 10 | Modules | Manage and modularize source code | Syntax |
-| 11 | Data | Understand data handling | Syntax |
-| 12 | Unit Testing | Ensure code correctness | Testing |
-| 13 | Troubleshooting | Debug and handle issues | Testing |
+### Quick Start
 
-#### Part 2: Cardano Architecture
-| Topic | Learning Goal | Stage |
-|-------|---------------|-------|
-| Introduction to Cardano | Understand blockchain fundamentals | Extra |
-| UTXO Model | Master Cardano's transaction model | Extra |
-| Datum & Redeemer | Learn smart contract data structures | Extra |
-
-#### Part 3: Your First Validator
-| Topic | Learning Goal | Stage |
-|-------|---------------|-------|
-| Building Spending Validator | Write validators to lock assets and set unlock conditions | Deployment |
-
-#### Part 4: Minting Tokens & NFTs
-| Topic | Learning Goal | Stage |
-|-------|---------------|-------|
-| FT & NFT Concepts | Understand token types | Deployment |
-| Minting Policies | Create token minting logic | Deployment |
-
-#### Part 5: The Escrow Contract
-| Topic | Learning Goal | Stage |
-|-------|---------------|-------|
-| Escrow Contract | Build secure transaction environment between buyer and seller | Deployment |
-
-#### Learning Path Summary
-| Stage | Core Objective | Lessons | Target Audience |
-|-------|----------------|---------|-----------------|
-| SETUP | Environment installation | 01 - 02 | Beginner |
-| SYNTAX | Language fundamentals | 03 - 11 | Beginner |
-| TESTING | Ensure code correctness | 12 - 13 | Beginner/Intermediate |
-| DEPLOYMENT | Deploy real Smart Contracts | Part 3, 4, 5 | Intermediate |
-| EXTRA | Cardano mechanisms & storage | Part 2 | Beginner/Intermediate |
-
-### Installation & Running
-
-Prerequisites: [Node.js](https://nodejs.org/en/download/) (version 18 or higher).
-
-1.  **Install dependencies**:
-
-    ```bash
-    npm install
-    ```
-
-2.  **Start development server**:
-
-    ```bash
-    npm start
-    ```
-
-    The website will open automatically at `http://localhost:3000`.
-
-### Build & Deploy
-
-To build the project for production (static files):
+**Prerequisites:** [Node.js](https://nodejs.org/) v20 or higher
 
 ```bash
-npm run build
+# Clone the repository
+git clone https://github.com/uberhub-mentorias/docusaurus.git
+cd docusaurus
+
+# Install dependencies
+npm install
+
+# Start development server
+npm start
 ```
 
-The output will be in the `build` directory.
+The site opens automatically at `http://localhost:3000`.
+
+### Development Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm start` | Start dev server with hot reload |
+| `npm run build` | Build for production |
+| `npm run serve` | Serve production build locally |
+| `npm run clear` | Clear Docusaurus cache |
+
+### Curriculum Overview
+
+| Part | Topic | Lessons | Status |
+|------|-------|---------|--------|
+| 1 | The Aiken Foundation | 13 | 53% |
+| 2 | Cardano Architecture | 3 | Planned |
+| 3 | Your First Validator | 1 | Planned |
+| 4 | Minting Tokens & NFTs | 2 | Planned |
+| 5 | Escrow Contract | 1 | Planned |
 
 ### Project Structure
 
-*   `/docs`: Documentation content (Markdown) organized by chapters.
-    *   `/docs/00-ui-components`: Landing page component documentation and design patterns.
-*   `/src`: Source code for UI (React components, CSS).
-    *   `/src/components/LandingPage`: Landing page components (QuestTimeline, QuestCard, etc.).
-*   `docusaurus.config.js`: Main project configuration.
-*   `sidebars.js`: Sidebar configuration.
+```
+aiken-vn/
+├── docs/                    # Documentation content (Markdown)
+│   ├── 01-the-aiken-foundation/  # Part 1: Aiken basics
+│   ├── 02-cardano-architecture/  # Part 2: Cardano concepts
+│   ├── 03-your-first-validator/  # Part 3: Validators
+│   ├── 04-minting-tokens-nfts/   # Part 4: Token minting
+│   └── 05-escrow-contract/       # Part 5: Escrow
+├── docs-project/            # Project documentation
+├── src/                     # Source code
+│   ├── components/          # React components
+│   ├── css/                 # Custom styles
+│   ├── lib/                 # Utilities (Firebase, tracking)
+│   └── pages/               # Custom pages
+├── docusaurus.config.js     # Main configuration
+├── sidebars.js              # Sidebar configuration
+└── tailwind.config.js       # Tailwind CSS config
+```
 
-### Documentation for Developers
+### Documentation
 
-**UI Component Documentation** (`/docs/00-ui-components/`)
-- `index.md` - Overview of UI components
-- `quest-timeline-design.md` - Detailed Speedrun design pattern implementation
-- `component-api.md` - Complete API reference for all components
-- `responsive-guidelines.md` - Responsive design patterns and breakpoints
-- `CHANGELOG.md` - Version history and updates
+Detailed project documentation is available in `docs-project/`:
+
+- [Project Overview & PDR](docs-project/project-overview-pdr.md) - Vision, goals, and requirements
+- [Codebase Summary](docs-project/codebase-summary.md) - Technical overview
+- [Code Standards](docs-project/code-standards.md) - Coding conventions
+- [System Architecture](docs-project/system-architecture.md) - Architecture diagrams
+
+### Technology Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Docusaurus 3.9.2 |
+| UI | React 19, TypeScript |
+| Styling | Tailwind CSS 3.4 |
+| Animations | Framer Motion |
+| Analytics | Firebase Firestore |
+| Diagrams | Mermaid |
 
 ### Contributing
 
-Contributions are welcome! Please create a Pull Request or open an Issue if you find any bugs or want to add content.
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Follow the [Code Standards](docs-project/code-standards.md)
+4. Submit a Pull Request
 
 ### License
 
@@ -122,122 +113,137 @@ This documentation is released under the [CC BY-4.0](https://creativecommons.org
 
 ---
 
-<a name="tiếng-việt"></a>
+## Tieng Viet
 
-## Tiếng Việt
+Cong thong tin tai lieu huong dan lap trinh **Aiken** va **Smart Contract** tren Cardano bang tieng Viet.
 
-Chào mừng đến với **Vietnamese Aiken** - Cổng thông tin tài liệu hướng dẫn lập trình Aiken và Smart Contract trên Cardano bằng tiếng Việt.
+### Tinh nang
 
-Dự án này được xây dựng để giúp cộng đồng lập trình viên Việt Nam dễ dàng tiếp cận công nghệ blockchain Cardano.
+- **Ngon ngu**: 100% Tieng Viet
+- **Giao dien**: Dark mode toi uu cho viec doc tai lieu
+- **Noi dung**: Lo trinh hoc tap tu co ban den nang cao
+- **Tro nang**: Giao dien tuan thu WCAG
 
-### Tính năng
+### Bat dau nhanh
 
-*   **Ngôn ngữ**: 100% Tiếng Việt.
-*   **Giao diện**: Dark mode mặc định, tối ưu cho việc đọc tài liệu.
-*   **Nội dung**: Lộ trình học tập từ cơ bản đến nâng cao:
-
-#### 🏗 Phần 1: Nền Tảng (The Aiken Foundation)
-| # | Bài học | Mục tiêu học tập | Giai đoạn |
-|---|---------|------------------|-----------|
-| 01 | Cài đặt (Installation) | Thiết lập môi trường lập trình và công cụ | Setup |
-| 02 | Giới thiệu (Introduction) | Tổng quan về Aiken | Setup |
-| 03 | Aiken CLI | Làm chủ giao diện dòng lệnh | Syntax |
-| 04 | Cấu trúc dự án (Project Structure) | Hiểu cách tổ chức dự án | Syntax |
-| 05 | Biến & Hằng số (Variables & Constants) | Định nghĩa và sử dụng biến | Syntax |
-| 06 | Kiểu dữ liệu nguyên thủy (Primitive Types) | Làm việc với các kiểu dữ liệu cơ bản | Syntax |
-| 07 | Kiểu dữ liệu tùy chỉnh (Custom Types) | Định nghĩa cấu trúc dữ liệu phức tạp | Syntax |
-| 08 | Luồng điều khiển (Control Flow) | Triển khai logic điều kiện | Syntax |
-| 09 | Hàm (Functions) | Viết logic xử lý có khả năng tái sử dụng | Syntax |
-| 10 | Modules | Quản lý và chia nhỏ mã nguồn | Syntax |
-| 11 | Dữ liệu (Data) | Hiểu cách xử lý dữ liệu | Syntax |
-| 12 | Kiểm thử đơn vị (Unit Test) | Đảm bảo code chạy đúng | Testing |
-| 13 | Xử lý lỗi (Troubleshooting) | Kỹ thuật debug và xử lý vấn đề | Testing |
-
-#### 🏛 Phần 2: Kiến Trúc Cardano (Cardano Architecture)
-| Chủ đề | Mục tiêu học tập | Giai đoạn |
-|--------|------------------|-----------|
-| Giới thiệu về Cardano | Hiểu nền tảng blockchain | Extra |
-| Mô hình UTXO | Làm chủ mô hình giao dịch của Cardano | Extra |
-| Datum & Redeemer | Học cấu trúc dữ liệu smart contract | Extra |
-
-#### 🛡 Phần 3: Validator Đầu Tiên (Your First Validator)
-| Chủ đề | Mục tiêu học tập | Giai đoạn |
-|--------|------------------|-----------|
-| Xây dựng Spending Validator | Viết validator để khóa tài sản và thiết lập điều kiện mở khóa | Deployment |
-
-#### 💎 Phần 4: Phát Hành Token & NFT (Minting Tokens & NFTs)
-| Chủ đề | Mục tiêu học tập | Giai đoạn |
-|--------|------------------|-----------|
-| Khái niệm FT & NFT | Hiểu các loại token | Deployment |
-| Minting Policies | Tạo logic phát hành token | Deployment |
-
-#### ⚖ Phần 5: Hợp Đồng Escrow (The Escrow Contract)
-| Chủ đề | Mục tiêu học tập | Giai đoạn |
-|--------|------------------|-----------|
-| Hợp đồng ký quỹ (Escrow) | Xây dựng môi trường giao dịch an toàn giữa buyer và seller | Deployment |
-
-#### 📊 Tổng kết Lộ trình Học tập
-| Giai đoạn | Mục tiêu cốt lõi | Bài học | Đối tượng |
-|-----------|------------------|---------|-----------|
-| SETUP | Cài đặt môi trường | 01 - 02 | Beginner |
-| SYNTAX | Nền tảng ngôn ngữ | 03 - 11 | Beginner |
-| TESTING | Đảm bảo code chạy đúng | 12 - 13 | Beginner/Intermediate |
-| DEPLOYMENT | Triển khai Smart Contract thực tế | Phần 3, 4, 5 | Intermediate |
-| EXTRA | Cơ chế hoạt động và lưu trữ của Cardano | Phần 2 | Beginner/Intermediate |
-
-### Cài đặt và Chạy dự án
-
-Yêu cầu: [Node.js](https://nodejs.org/en/download/) (phiên bản 18 trở lên).
-
-1.  **Cài đặt dependencies**:
-
-    ```bash
-    npm install
-    ```
-
-2.  **Chạy server phát triển**:
-
-    ```bash
-    npm start
-    ```
-
-    Trang web sẽ tự động mở tại `http://localhost:3000/docusaurus/`.
-
-### Build và Deploy
-
-Để build dự án ra file tĩnh (static files):
+**Yeu cau:** [Node.js](https://nodejs.org/) phien ban 20 tro len
 
 ```bash
-npm run build
+# Clone repository
+git clone https://github.com/uberhub-mentorias/docusaurus.git
+cd docusaurus
+
+# Cai dat dependencies
+npm install
+
+# Chay server phat trien
+npm start
 ```
 
-Nội dung sẽ được tạo trong thư mục `build`.
+Trang web se tu dong mo tai `http://localhost:3000`.
 
-### Cấu trúc dự án
+### Cac lenh phat trien
 
-*   `/docs`: Chứa nội dung tài liệu (Markdown) theo các chương.
-    *   `/docs/00-ui-components`: Tài liệu thành phần giao diện và mẫu thiết kế.
-*   `/src`: Chứa mã nguồn giao diện (React components, CSS).
-    *   `/src/components/LandingPage`: Các component của trang chủ (QuestTimeline, QuestCard, v.v.).
-*   `docusaurus.config.js`: Cấu hình chính của dự án.
-*   `sidebars.js`: Cấu hình thanh bên (sidebar).
+| Lenh | Mo ta |
+|------|-------|
+| `npm start` | Chay server phat trien voi hot reload |
+| `npm run build` | Build cho production |
+| `npm run serve` | Chay ban build production |
+| `npm run clear` | Xoa cache Docusaurus |
 
-### Tài liệu cho các Nhà phát triển
+### Tong quan chuong trinh hoc
 
-**Tài liệu Thành phần UI** (`/docs/00-ui-components/`)
-- `index.md` - Tổng quan về các thành phần UI
-- `quest-timeline-design.md` - Chi tiết về mẫu thiết kế Speedrun
-- `component-api.md` - Tài liệu API đầy đủ cho tất cả các thành phần
-- `responsive-guidelines.md` - Mẫu thiết kế và điểm dừng phản hồi
-- `CHANGELOG.md` - Lịch sử phiên bản và cập nhật
+| Phan | Chu de | Bai hoc | Trang thai |
+|------|--------|---------|------------|
+| 1 | Nen Tang Aiken | 13 | 53% |
+| 2 | Kien Truc Cardano | 3 | Du kien |
+| 3 | Validator Dau Tien | 1 | Du kien |
+| 4 | Phat Hanh Token & NFT | 2 | Du kien |
+| 5 | Hop Dong Escrow | 1 | Du kien |
 
-### Đóng góp
+### Chi tiet chuong trinh hoc
 
-Mọi đóng góp đều được hoan nghênh! Hãy tạo Pull Request hoặc mở Issue nếu bạn tìm thấy lỗi hoặc muốn bổ sung nội dung.
+#### Phan 1: Nen Tang Aiken
 
-### Giấy phép
+| # | Bai hoc | Muc tieu hoc tap | Trang thai |
+|---|---------|------------------|------------|
+| 01 | Cai Dat | Thiet lap moi truong lap trinh | Hoan thanh |
+| 02 | Gioi Thieu | Tong quan ve Aiken | Hoan thanh |
+| 03 | Aiken CLI | Lam chu giao dien dong lenh | Hoan thanh |
+| 04 | Cau Truc Du An | Hieu cach to chuc du an | Hoan thanh |
+| 05 | Bien & Hang So | Dinh nghia va su dung bien | Hoan thanh |
+| 06 | Kieu Du Lieu Co Ban | Lam viec voi cac kieu co ban | Hoan thanh |
+| 07 | Kieu Tuy Chinh | Dinh nghia cau truc du lieu phuc tap | Hoan thanh |
+| 08 | Luong Dieu Khien | Trien khai logic dieu kien | Dang viet |
+| 09 | Ham | Viet logic xu ly tai su dung | Dang viet |
+| 10 | Modules | Quan ly va chia nho ma nguon | Dang viet |
+| 11 | Du Lieu | Hieu cach xu ly du lieu | Dang viet |
+| 12 | Kiem Thu Don Vi | Dam bao code chay dung | Dang viet |
+| 13 | Xu Ly Loi | Ky thuat debug va xu ly van de | Dang viet |
 
-Tài liệu này được phát hành dưới giấy phép [CC BY-4.0](https://creativecommons.org/licenses/by/4.0/).
+### Cau truc du an
+
+```
+aiken-vn/
+├── docs/                    # Noi dung tai lieu (Markdown)
+│   ├── 01-the-aiken-foundation/  # Phan 1: Co ban Aiken
+│   ├── 02-cardano-architecture/  # Phan 2: Kien truc Cardano
+│   ├── 03-your-first-validator/  # Phan 3: Validators
+│   ├── 04-minting-tokens-nfts/   # Phan 4: Phat hanh token
+│   └── 05-escrow-contract/       # Phan 5: Escrow
+├── docs-project/            # Tai lieu du an
+├── src/                     # Ma nguon
+│   ├── components/          # React components
+│   ├── css/                 # CSS tuy chinh
+│   ├── lib/                 # Tien ich (Firebase, tracking)
+│   └── pages/               # Trang tuy chinh
+├── docusaurus.config.js     # Cau hinh chinh
+├── sidebars.js              # Cau hinh sidebar
+└── tailwind.config.js       # Cau hinh Tailwind CSS
+```
+
+### Tai lieu du an
+
+Tai lieu chi tiet co san trong `docs-project/`:
+
+- [Tong Quan Du An & PDR](docs-project/project-overview-pdr.md) - Tam nhin, muc tieu, yeu cau
+- [Tom Tat Ma Nguon](docs-project/codebase-summary.md) - Tong quan ky thuat
+- [Tieu Chuan Code](docs-project/code-standards.md) - Quy uoc lap trinh
+- [Kien Truc He Thong](docs-project/system-architecture.md) - So do kien truc
+
+### Cong nghe su dung
+
+| Loai | Cong nghe |
+|------|-----------|
+| Framework | Docusaurus 3.9.2 |
+| UI | React 19, TypeScript |
+| CSS | Tailwind CSS 3.4 |
+| Animations | Framer Motion |
+| Analytics | Firebase Firestore |
+| Diagrams | Mermaid |
+
+### Dong gop
+
+Moi dong gop deu duoc hoan nghenh! Vui long:
+
+1. Fork repository
+2. Tao nhanh tinh nang (`git checkout -b feature/tinh-nang`)
+3. Tuan theo [Tieu Chuan Code](docs-project/code-standards.md)
+4. Gui Pull Request
+
+### Giay phep
+
+Tai lieu nay duoc phat hanh theo giay phep [CC BY-4.0](https://creativecommons.org/licenses/by/4.0/).
 
 ---
+
+**Resources / Tai nguyen:**
+
+- [Aiken Official Docs](https://aiken-lang.org)
+- [Aiken Playground](https://play.aiken-lang.org)
+- [Cardano Developer Portal](https://developers.cardano.org)
+- [Discord Community](https://discord.gg/ub6atE94v4)
+
+---
+
 Built for the Cardano Vietnam Community.
