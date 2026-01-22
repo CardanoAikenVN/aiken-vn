@@ -1,0 +1,14 @@
+name = "aiken-vn/course-verification"
+version = "0.0.0"
+license = "Apache-2.0"
+description = "Aiken contracts for project 'aiken-vn/course-verification'"
+
+[repository]
+user = "aiken-vn"
+project = "course-verification"
+platform = "github"
+
+[[dependencies]]
+name = "aiken-lang/stdlib"
+version = "v2.2.0"
+source = "github"
