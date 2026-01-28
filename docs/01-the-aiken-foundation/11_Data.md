@@ -568,4 +568,4 @@ test serialization_deterministic() {
 
 ## Bài tiếp theo
 
-[Bài 12: Kiểm thử đơn vị](/docs/01-the-aiken-foundation/12_Unit_test)
+[Bài 12: Kiểm thử đơn vị](./12_Unit_test.md)

@@ -990,4 +990,4 @@ Them logic cho phep ca owner va beneficiary cung ky de cancel bat ky luc nao.
 
 ---
 
-**Phan tiep theo:** [Part 04: Phat Hanh Token & NFT](/docs/04-minting-tokens-nfts/01_ft_vs_nft)
+**Phan tiep theo:** [Part 04: Phat Hanh Token & NFT](../04-minting-tokens-nfts/01_ft_vs_nft.md)

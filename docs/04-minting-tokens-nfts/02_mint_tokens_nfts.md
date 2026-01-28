@@ -918,4 +918,4 @@ Deploy policy cua ban len Preview testnet:
 
 ---
 
-**Phan tiep theo:** [Part 05: Hop Dong Escrow](/docs/05-escrow-contract/01_build_escrow_contract)
+**Phan tiep theo:** [Part 05: Hop Dong Escrow](../05-escrow-contract/01_build_escrow_contract.md)

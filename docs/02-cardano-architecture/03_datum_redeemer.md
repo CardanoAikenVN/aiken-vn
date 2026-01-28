@@ -822,4 +822,4 @@ Ban da hoc duoc:
 - Mo hinh UTXO va eUTXO
 - Datum, Redeemer va Script Context
 
-**Tiep theo:** [Part 03: Validator Dau Tien](../03-your-first-validator/01_spending_validator.md)
+**Tiep theo:** [Part 03: Validator Dau Tien](../03-your-first-validator/01_build_first_validator.md)

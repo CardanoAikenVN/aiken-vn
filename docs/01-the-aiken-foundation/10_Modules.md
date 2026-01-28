@@ -555,7 +555,7 @@ use my_project/prelude.{
 | `aiken/collection/list` | List operations |
 | `aiken/collection/dict` | Key-value dictionary |
 | `aiken/collection/pairs` | Pair list operations |
-| `aiken/option` | Option<a> type |
+| `aiken/option` | `Option<a>` type |
 | `aiken/math` | Math functions |
 | `aiken/bytearray` | ByteArray operations |
 | `aiken/string` | String utilities |
@@ -808,4 +808,4 @@ Thiet ke public API cho mot token module:
 
 ---
 
-**Tiep theo**: [Bai 11 - Xu Ly Loi (Error Handling)](./11_Error_handling.md)
+**Tiep theo**: [Bai 11 - Du lieu (Data)](./11_Data.md)

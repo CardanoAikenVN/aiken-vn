@@ -534,4 +534,4 @@ Phan tich mot minting policy thuc te:
 
 ---
 
-**Bai tiep theo:** [02. Minting Policies](/docs/04-minting-tokens-nfts/02_mint_tokens_nfts)
+**Bai tiep theo:** [02. Minting Policies](./02_mint_tokens_nfts.md)

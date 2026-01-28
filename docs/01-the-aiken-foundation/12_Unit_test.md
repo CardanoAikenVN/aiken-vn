@@ -682,4 +682,4 @@ test must_have_value_fails_on_none() fail {
 
 ## Bài tiếp theo
 
-[Bài 13: Xử lý lỗi](/docs/01-the-aiken-foundation/13_Troubleshooting)
+[Bài 13: Xử lý lỗi](./13_Troubleshooting.md)

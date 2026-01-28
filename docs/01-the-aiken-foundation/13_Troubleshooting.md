@@ -585,4 +585,4 @@ Bạn đã học:
 
 ## Tiếp theo
 
-[Part 2: Kiến trúc Cardano](/docs/02-cardano-architecture/)
+[Part 2: Kiến trúc Cardano](../02-cardano-architecture/index.md)
