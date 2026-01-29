@@ -1,36 +1,36 @@
 ---
-title: "01. Khai Niem FT & NFT"
+title: "01. Khái Niệm FT & NFT"
 sidebar_position: 1
-description: "Hieu ve Fungible Tokens (FT) va Non-Fungible Tokens (NFT) tren Cardano, cach chung hoat dong voi Native Assets va Minting Policies."
+description: "Hiểu về Fungible Tokens (FT) và Non-Fungible Tokens (NFT) trên Cardano, cách chúng hoạt động với Native Assets và Minting Policies."
 ---
 
-# Bai 01: Khai Niem FT & NFT
+# Bài 01: Khái Niệm FT & NFT
 
-:::info Muc tieu
-Hieu ve Fungible Tokens (FT) va Non-Fungible Tokens (NFT) tren Cardano, cach chung hoat dong voi Native Assets va Minting Policies.
+:::info Mục tiêu
+Hiểu về Fungible Tokens (FT) và Non-Fungible Tokens (NFT) trên Cardano, cách chúng hoạt động với Native Assets và Minting Policies.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan Native Assets](#1-tong-quan-native-assets)
+1. [Tổng quan Native Assets](#1-tổng-quan-native-assets)
 2. [Fungible Tokens (FT)](#2-fungible-tokens-ft)
 3. [Non-Fungible Tokens (NFT)](#3-non-fungible-tokens-nft)
-4. [Policy ID va Asset Name](#4-policy-id-va-asset-name)
+4. [Policy ID và Asset Name](#4-policy-id-và-asset-name)
 5. [Minting vs Burning](#5-minting-vs-burning)
 6. [Token Metadata](#6-token-metadata)
 7. [Use Cases](#7-use-cases)
 
 ---
 
-## 1. Tong Quan Native Assets
+## 1. Tổng Quan Native Assets
 
-### Native Assets la gi?
+### Native Assets là gì?
 
-Cardano Native Assets la cac tokens duoc xu ly native boi ledger, khong can smart contract de transfer.
+Cardano Native Assets là các tokens được xử lý native bởi ledger, không cần smart contract để transfer.
 
-| Tinh nang | Ethereum | Cardano |
+| Tính năng | Ethereum | Cardano |
 |-----------|----------|---------|
 | Token Standard | ERC-20 Contract | Native Asset |
 | Implementation | Smart contract | Ledger native |
@@ -41,15 +41,15 @@ Cardano Native Assets la cac tokens duoc xu ly native boi ledger, khong can smar
 | Metadata | On-chain (costly) | Flexible |
 
 **Key Benefits:**
-- Khong can smart contract cho transfers
-- Bao mat nhu ADA
-- Phi thap hon
-- De lam viec hon
+- Không cần smart contract cho transfers
+- Bảo mật như ADA
+- Phí thấp hơn
+- Dễ làm việc hơn
 - Multi-asset UTXOs
 
 ### Multi-Asset UTXO
 
-Mot UTXO co the chua NHIEU loai assets:
+Một UTXO có thể chứa NHIỀU loại assets:
 
 ```
 UTXO
@@ -63,48 +63,48 @@ UTXO
         └── "MyNFT": 1
 ```
 
-:::warning Luu y
-Moi UTXO can minimum ADA de ton tai (tuy thuoc vao so luong assets va datum size).
+:::warning Lưu ý
+Mỗi UTXO cần minimum ADA để tồn tại (tùy thuộc vào số lượng assets và datum size).
 :::
 
 ### Asset Identification
 
-Moi asset duoc identify boi:
+Mỗi asset được identify bởi:
 
-| Thanh phan | Mo ta | Vi du |
+| Thành phần | Mô tả | Ví dụ |
 |------------|-------|-------|
-| Policy ID | Hash cua minting policy script (28 bytes) | "abc123def456..." |
-| Asset Name | User-defined name (0-32 bytes) | "MyToken" hoac "" |
+| Policy ID | Hash của minting policy script (28 bytes) | "abc123def456..." |
+| Asset Name | User-defined name (0-32 bytes) | "MyToken" hoặc "" |
 | Asset ID | PolicyID + AssetName | "abc123def456.MyToken" |
 
-**Truong hop dac biet - ADA:**
+**Trường hợp đặc biệt - ADA:**
 - Policy ID: "" (empty)
 - Asset Name: "" (empty)
-- La asset duy nhat co empty policy
+- Là asset duy nhất có empty policy
 
 ---
 
 ## 2. Fungible Tokens (FT)
 
-### FT la gi?
+### FT là gì?
 
-Fungible = Co the thay the lan nhau.
+Fungible = Có thể thay thế lẫn nhau.
 
-**Vi du thuc te:**
-- 1 dong $100 = 1 dong $100 khac
-- 1 gram vang = 1 gram vang khac
-- 1 Bitcoin = 1 Bitcoin khac
+**Ví dụ thực tế:**
+- 1 đồng $100 = 1 đồng $100 khác
+- 1 gram vàng = 1 gram vàng khác
+- 1 Bitcoin = 1 Bitcoin khác
 
-**Dac diem:**
+**Đặc điểm:**
 
-| Thuoc tinh | Mo ta |
+| Thuộc tính | Mô tả |
 |------------|-------|
-| Divisible | Chia nho duoc |
-| Interchangeable | Thay the duoc |
-| Same value per unit | Moi don vi co gia tri nhu nhau |
-| Multiple units exist | Ton tai nhieu don vi |
+| Divisible | Chia nhỏ được |
+| Interchangeable | Thay thế được |
+| Same value per unit | Mỗi đơn vị có giá trị như nhau |
+| Multiple units exist | Tồn tại nhiều đơn vị |
 
-**Use Cases tren Cardano:**
+**Use Cases trên Cardano:**
 - Stablecoins (DJED, iUSD)
 - Utility tokens (project tokens)
 - Governance tokens (voting)
@@ -162,25 +162,25 @@ fn all_negative(tokens: Dict<AssetName, Int>) -> Bool {
 
 ## 3. Non-Fungible Tokens (NFT)
 
-### NFT la gi?
+### NFT là gì?
 
-Non-Fungible = Khong the thay the.
+Non-Fungible = Không thể thay thế.
 
-**Vi du thuc te:**
-- Buc tranh Mona Lisa (chi co 1)
-- Can nha (moi can unique)
-- Ve may bay (specific seat, flight)
+**Ví dụ thực tế:**
+- Bức tranh Mona Lisa (chỉ có 1)
+- Căn nhà (mỗi căn unique)
+- Vé máy bay (specific seat, flight)
 
-**Dac diem:**
+**Đặc điểm:**
 
-| Thuoc tinh | Mo ta |
+| Thuộc tính | Mô tả |
 |------------|-------|
-| Unique | Doc nhat |
-| Indivisible | Khong chia nho duoc |
-| Quantity = 1 | Chi co 1 unit |
-| Verifiable ownership | Xac minh quyen so huu |
+| Unique | Độc nhất |
+| Indivisible | Không chia nhỏ được |
+| Quantity = 1 | Chỉ có 1 unit |
+| Verifiable ownership | Xác minh quyền sở hữu |
 
-**Use Cases tren Cardano:**
+**Use Cases trên Cardano:**
 - Digital art
 - Gaming items
 - Identity/credentials
@@ -190,24 +190,24 @@ Non-Fungible = Khong the thay the.
 
 ### NFT Uniqueness
 
-Lam sao dam bao NFT chi co 1?
+Làm sao đảm bảo NFT chỉ có 1?
 
 **Method 1: One-Shot Minting Policy**
 
-Policy yeu cau consuming mot SPECIFIC UTXO:
+Policy yêu cầu consuming một SPECIFIC UTXO:
 
 ```
 UTXO X#0 (unique) --consume--> Can mint NFT
 ```
 
-Sau khi UTXO X#0 duoc spent:
-- Khong the mint lai
+Sau khi UTXO X#0 được spent:
+- Không thể mint lại
 - Policy "expired"
-- NFT mai mai unique
+- NFT mãi mãi unique
 
 **Method 2: Time-Limited Policy**
 
-Policy chi valid cho den deadline. (It an toan hon - co the mint nhieu truoc deadline)
+Policy chỉ valid cho đến deadline. (Ít an toàn hơn - có thể mint nhiều trước deadline)
 
 **Method 3: Counter/Registry**
 
@@ -248,11 +248,11 @@ validator nft_policy(utxo_ref: OutputReference) {
 
 ---
 
-## 4. Policy ID va Asset Name
+## 4. Policy ID và Asset Name
 
 ### Policy ID Deep Dive
 
-Policy ID = Hash cua Minting Policy Script.
+Policy ID = Hash của Minting Policy Script.
 
 ```mermaid
 flowchart TD
@@ -262,7 +262,7 @@ flowchart TD
 
 **Properties:**
 - Deterministic: same script -> same policy ID
-- Immutable: khong the thay doi sau khi tao
+- Immutable: không thể thay đổi sau khi tạo
 - Unique: different scripts -> different policy IDs
 
 **Parameterized Policies:**
@@ -280,7 +280,7 @@ validator my_policy(param1, param2) { ... }
 
 Asset Name = User-defined identifier (0-32 bytes).
 
-| Loai Token | Convention | Vi du |
+| Loại Token | Convention | Ví dụ |
 |------------|------------|-------|
 | FT | Single name per policy, human-readable | "DJED", "iUSD", "MILK" |
 | FT | Empty name | "" (policy itself is the token) |
@@ -289,14 +289,14 @@ Asset Name = User-defined identifier (0-32 bytes).
 
 **CIP-67/68 Standard (NFT naming):**
 
-| Prefix | Loai |
+| Prefix | Loại |
 |--------|------|
 | (100) | Reference NFT |
 | (222) | NFT |
 | (333) | FT |
 | (444) | Rich FT |
 
-Vi du: `(222)SpaceBud0001`
+Ví dụ: `(222)SpaceBud0001`
 
 ---
 
@@ -304,7 +304,7 @@ Vi du: `(222)SpaceBud0001`
 
 ### Minting Process
 
-Minting = Tao moi tokens (positive mint value).
+Minting = Tạo mới tokens (positive mint value).
 
 ```mermaid
 flowchart LR
@@ -326,7 +326,7 @@ inputs + mint = outputs + fee
 
 ### Burning Process
 
-Burning = Huy tokens (negative mint value).
+Burning = Hủy tokens (negative mint value).
 
 ```mermaid
 flowchart LR
@@ -346,8 +346,8 @@ inputs + mint = outputs + fee
 (10 ADA + 1000 Token) + (-1000 Token) = 9.8 ADA + 0.2 fee
 ```
 
-:::warning Luu y
-Tokens bi DESTROYED, khong the recover!
+:::warning Lưu ý
+Tokens bị DESTROYED, không thể recover!
 :::
 
 ### Mint Field in Aiken
@@ -426,8 +426,8 @@ flowchart LR
     B --> C["Datum: {metadata: {...}, version: 1}"]
 ```
 
-:::tip Loi ich
-CIP-68 cho phep updateable metadata!
+:::tip Lợi ích
+CIP-68 cho phép updateable metadata!
 :::
 
 ### FT Token Registry
@@ -469,7 +469,7 @@ JSON Entry:
 
 **FUNGIBLE TOKENS (FT):**
 
-| Loai | Vi du |
+| Loại | Ví dụ |
 |------|-------|
 | Stablecoins | DJED (algorithmic), iUSD (over-collateralized), USDM (fiat-backed) |
 | Utility tokens | In-game currencies, Platform credits, Access tokens |
@@ -478,7 +478,7 @@ JSON Entry:
 
 **NON-FUNGIBLE TOKENS (NFT):**
 
-| Loai | Vi du |
+| Loại | Ví dụ |
 |------|-------|
 | Digital art | Profile pictures (PFPs), Generative art, 1/1 pieces |
 | Gaming | In-game items, Characters/avatars, Land/property |
@@ -488,44 +488,7 @@ JSON Entry:
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Token Design
-
-Design mot FT cho project cua ban:
-- Ten token, ticker, decimals
-- Total supply (fixed or unlimited?)
-- Minting rules (who can mint?)
-
-### Bai 2: NFT Collection
-
-Design mot NFT collection:
-- Theme/concept
-- Total supply
-- Metadata structure
-- Rarity tiers
-
-### Bai 3: Policy Analysis
-
-Phan tich mot minting policy thuc te:
-- Tim policy ID cua DJED hoac mot NFT collection
-- Xem metadata tren explorer
-- Hieu cach policy hoat dong
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu Native Assets tren Cardano
-- [ ] Phan biet FT va NFT
-- [ ] Hieu Policy ID va Asset Name
-- [ ] Biet cach mint va burn tokens
-- [ ] Nam cac metadata standards (CIP-25, CIP-68)
-- [ ] Biet cac use cases pho bien
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [CIP-25: NFT Metadata Standard](https://cips.cardano.org/cip/CIP-25)
 - [CIP-68: Datum Metadata Standard](https://cips.cardano.org/cip/CIP-68)
@@ -534,4 +497,4 @@ Phan tich mot minting policy thuc te:
 
 ---
 
-**Bai tiep theo:** [02. Minting Policies](./02_mint_tokens_nfts.md)
+**Bài tiếp theo:** [02. Minting Policies](./02_mint_tokens_nfts.md)

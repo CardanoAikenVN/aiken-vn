@@ -410,48 +410,6 @@ Cardano có nhiều lợi thế về bảo mật:
 
 ---
 
-## Bài Tập Thực Hành
-
-### Bài 1: Explore Cardano
-
-1. Truy cập Cardano explorer (cardanoscan.io)
-2. Tìm một transaction và identify:
-   - Inputs (UTXOs consumed)
-   - Outputs (UTXOs created)
-   - Fee
-   - Metadata (nếu có)
-
-### Bài 2: Understand Addresses
-
-1. Xem một Cardano address trên explorer
-2. Identify:
-   - Address type (base, enterprise, etc.)
-   - UTXOs owned
-   - Tokens held
-   - Stake delegation
-
-### Bài 3: Compare Transactions
-
-1. So sánh một Ethereum transaction và Cardano transaction
-2. Note các differences về:
-   - Structure
-   - State changes
-   - Fee model
-
----
-
-## Checklist Hoàn Thành
-
-- [ ] Hiểu Cardano là blockchain thế hệ 3
-- [ ] Nắm được layered architecture
-- [ ] Biết các thành phần chính (ADA, addresses, scripts)
-- [ ] Hiểu evolution qua các eras
-- [ ] Biết về native assets
-- [ ] So sánh được với Ethereum
-- [ ] Biết các development tools
-
----
-
 ## Tài Liệu Tham Khảo
 
 - [Cardano Documentation](https://docs.cardano.org)

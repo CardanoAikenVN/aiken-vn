@@ -1,22 +1,22 @@
 ---
 title: "10. Modules"
 sidebar_position: 10
-description: "Hieu he thong module trong Aiken: cach to chuc code, import/export, visibility, va best practices cho cau truc du an."
+description: "Hiểu hệ thống module trong Aiken: cách tổ chức code, import/export, visibility, và best practices cho cấu trúc dự án."
 ---
 
 # Modules
 
-:::info Muc tieu
-Hieu he thong module trong Aiken: cach to chuc code, import/export, visibility, va best practices cho cau truc du an.
+:::info Mục tiêu
+Hiểu hệ thống module trong Aiken: cách tổ chức code, import/export, visibility, và best practices cho cấu trúc dự án.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan Module System](#1-tong-quan-module-system)
-2. [Dinh nghia Module](#2-dinh-nghia-module)
-3. [Import va Use](#3-import-va-use)
+1. [Tổng quan Module System](#1-tổng-quan-module-system)
+2. [Định nghĩa Module](#2-định-nghĩa-module)
+3. [Import và Use](#3-import-và-use)
 4. [Visibility (pub/private)](#4-visibility-pubprivate)
 5. [Module Organization](#5-module-organization)
 6. [Standard Library Modules](#6-standard-library-modules)
@@ -24,17 +24,17 @@ Hieu he thong module trong Aiken: cach to chuc code, import/export, visibility, 
 
 ---
 
-## 1. Tong Quan Module System
+## 1. Tổng Quan Module System
 
 ### Module System trong Aiken
 
 **Module = File**
 
-- Moi file `.ak` la mot module
-- Ten module = duong dan file tu `lib/`
-- Tu dong namespace
+- Mỗi file `.ak` là một module
+- Tên module = đường dẫn file từ `lib/`
+- Tự động namespace
 
-**Vi du:**
+**Ví dụ:**
 
 | File | Module | Import |
 |------|--------|--------|
@@ -42,14 +42,14 @@ Hieu he thong module trong Aiken: cach to chuc code, import/export, visibility, 
 
 **Visibility:**
 
-| Keyword | Mo ta |
+| Keyword | Mô tả |
 |---------|-------|
 | `pub fn` | Exported (public) |
 | `fn` | Internal (private) |
 | `pub type` | Exported type |
 | `type` | Internal type |
 
-### So sanh voi cac ngon ngu khac
+### So sánh với các ngôn ngữ khác
 
 | Aiken | Rust | JavaScript | Python |
 |-------|------|------------|--------|
@@ -60,9 +60,9 @@ Hieu he thong module trong Aiken: cach to chuc code, import/export, visibility, 
 
 ---
 
-## 2. Dinh Nghia Module
+## 2. Định Nghĩa Module
 
-### Cau truc co ban
+### Cấu trúc cơ bản
 
 ```aiken
 // lib/my_project/math.ak
@@ -70,12 +70,12 @@ Hieu he thong module trong Aiken: cach to chuc code, import/export, visibility, 
 
 // ========== PUBLIC EXPORTS ==========
 
-/// Cong hai so
+/// Cộng hai số
 pub fn add(a: Int, b: Int) -> Int {
   a + b
 }
 
-/// Nhan hai so
+/// Nhân hai số
 pub fn multiply(a: Int, b: Int) -> Int {
   a * b
 }
@@ -88,7 +88,7 @@ pub type Point {
 
 // ========== PRIVATE (INTERNAL) ==========
 
-// Chi dung trong module nay
+// Chỉ dùng trong module này
 fn helper_function(x: Int) -> Int {
   x * 2
 }
@@ -100,7 +100,7 @@ type InternalState {
 }
 ```
 
-### Module tu File Structure
+### Module từ File Structure
 
 ```
 lib/
@@ -114,7 +114,7 @@ lib/
         +-- common.ak      -> Module: my_project/validators/common
 ```
 
-### Vi du Module hoan chinh
+### Ví dụ Module hoàn chỉnh
 
 ```aiken
 // lib/my_project/types.ak
@@ -160,32 +160,32 @@ pub fn new_token(policy: ByteArray, name: ByteArray, qty: Int) -> Token {
 
 ---
 
-## 3. Import va Use
+## 3. Import và Use
 
-### Cu phap Use
+### Cú pháp Use
 
 ```aiken
-// Import toan bo module
+// Import toàn bộ module
 use my_project/types
 
 // Import specific items
 use my_project/types.{VestingDatum, VestingRedeemer, AssetClass}
 
-// Import voi alias
+// Import với alias
 use my_project/utils/math as m
 
-// Import tu standard library
+// Import từ standard library
 use aiken/collection/list
 use aiken/option.{Some, None}
 use aiken/bytearray
 ```
 
-### Cac cach su dung
+### Các cách sử dụng
 
 ```aiken
 // File: validators/vesting.ak
 
-// Method 1: Import module, dung prefix
+// Method 1: Import module, dùng prefix
 use my_project/types
 
 fn example1() {
@@ -209,7 +209,7 @@ fn example2() {
   let action = Claim  // VestingRedeemer variant
 }
 
-// Method 3: Import voi alias (cho ten dai)
+// Method 3: Import với alias (cho tên dài)
 use my_project/validators/common as vc
 
 fn example3() {
@@ -217,7 +217,7 @@ fn example3() {
 }
 ```
 
-### Import tu Dependencies
+### Import từ Dependencies
 
 ```aiken
 // Standard library imports
@@ -254,7 +254,7 @@ fn handle_redeemer(redeemer: VestingRedeemer) {
   }
 }
 
-// Import type + constructors cung luc
+// Import type + constructors cùng lúc
 use aiken/option.{Option, Some, None}
 
 fn safe_div(a: Int, b: Int) -> Option<Int> {
@@ -282,27 +282,27 @@ fn process(numbers: List<Int>) -> Int {
 
 ### Access Modifiers
 
-| Keyword | Mo ta |
+| Keyword | Mô tả |
 |---------|-------|
-| `pub fn function()` | Co the import tu module khac |
-| `fn function()` | Chi dung trong module hien tai |
-| `pub type MyType` | Type co the import |
-| `type MyType` | Type chi dung internal |
-| `pub const VALUE` | Constant co the import |
-| `const VALUE` | Constant chi dung internal |
+| `pub fn function()` | Có thể import từ module khác |
+| `fn function()` | Chỉ dùng trong module hiện tại |
+| `pub type MyType` | Type có thể import |
+| `type MyType` | Type chỉ dùng internal |
+| `pub const VALUE` | Constant có thể import |
+| `const VALUE` | Constant chỉ dùng internal |
 
-:::warning Luu y ve Constructor variants
-Neu type la `pub`, constructors cung `pub`. Khong the hide constructors cua pub type.
+:::warning Lưu ý về Constructor variants
+Nếu type là `pub`, constructors cũng `pub`. Không thể hide constructors của pub type.
 :::
 
-### Vi du Visibility
+### Ví dụ Visibility
 
 ```aiken
 // lib/my_project/token.ak
 
 // ========== PUBLIC API ==========
 
-/// Public type - co the import
+/// Public type - có thể import
 pub type Token {
   policy_id: ByteArray,
   asset_name: ByteArray,
@@ -331,7 +331,7 @@ pub fn total_value(tokens: List<Token>) -> Int {
 
 // ========== PRIVATE IMPLEMENTATION ==========
 
-// Private type - khong the import
+// Private type - không thể import
 type ValidationResult {
   valid: Bool,
   message: ByteArray,
@@ -550,7 +550,7 @@ use my_project/prelude.{
 
 **aiken/ modules:**
 
-| Module | Mo ta |
+| Module | Mô tả |
 |--------|-------|
 | `aiken/collection/list` | List operations |
 | `aiken/collection/dict` | Key-value dictionary |
@@ -566,7 +566,7 @@ use my_project/prelude.{
 
 **cardano/ modules:**
 
-| Module | Mo ta |
+| Module | Mô tả |
 |--------|-------|
 | `cardano/transaction` | Transaction type |
 | `cardano/address` | Address types |
@@ -662,24 +662,24 @@ fn sum_policy_tokens(value: Value, policy: PolicyId) -> Int {
 
 ## 7. Best Practices
 
-### Do's va Don'ts
+### Do's và Don'ts
 
-**Nen lam:**
+**Nên làm:**
 
-- To chuc types vao module rieng
-- Export chi nhung gi can thiet (minimal API)
-- Dung descriptive module names
-- Group related functions cung module
-- Tao prelude module cho common imports
+- Tổ chức types vào module riêng
+- Export chỉ những gì cần thiết (minimal API)
+- Dùng descriptive module names
+- Group related functions cùng module
+- Tạo prelude module cho common imports
 - Document public functions
 
-**Khong nen lam:**
+**Không nên làm:**
 
 - Export internal implementation details
-- Circular dependencies giua modules
-- Module qua lon (>500 lines)
-- Ten module khong ro rang (utils1, helpers2)
-- Import tat ca khi chi can mot vai items
+- Circular dependencies giữa modules
+- Module quá lớn (>500 lines)
+- Tên module không rõ ràng (utils1, helpers2)
+- Import tất cả khi chỉ cần một vài items
 
 ### Module Design Guidelines
 
@@ -739,73 +739,11 @@ fn extract_lower_bound(tx: Transaction) -> Option<Int> {
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Create Module Structure
-
-Tao cau truc module cho mot NFT marketplace:
-
-```
-lib/nft_market/
-+-- types/
-|   +-- listing.ak     -> ListingDatum, ListingRedeemer
-|   +-- offer.ak       -> OfferDatum, OfferRedeemer
-+-- utils/
-|   +-- validation.ak  -> validate_signature, validate_payment
-|   +-- royalty.ak     -> calculate_royalty, split_payment
-+-- constants.ak       -> platform_fee, min_price
-```
-
-### Bai 2: Fix Import Errors
-
-```aiken
-// Fix the imports in this code:
-
-use types.{MyDatum}  // Wrong path
-use aiken/list       // Wrong module name
-
-fn example() {
-  let nums = [1, 2, 3]
-  list.map(nums, fn(x) { x * 2 })  // Won't work
-}
-```
-
-### Bai 3: Design Public API
-
-Thiet ke public API cho mot token module:
-
-```aiken
-// lib/my_project/token.ak
-
-// TODO: Define types (pub or private?)
-// TODO: Define constructor functions
-// TODO: Define helper functions
-// TODO: Decide what to export
-
-// Requirements:
-// - Users can create tokens
-// - Users cannot create invalid tokens (negative amount)
-// - Internal validation logic should be hidden
-```
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu module system trong Aiken
-- [ ] Biet cach import/use modules
-- [ ] Hieu visibility (pub/private)
-- [ ] To chuc module structure hieu qua
-- [ ] Su dung standard library modules
-- [ ] Ap dung best practices
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Language Tour - Modules](https://aiken-lang.org/language-tour/modules)
 - [Aiken Standard Library](https://aiken-lang.github.io/stdlib/)
 
 ---
 
-**Tiep theo**: [Bai 11 - Du lieu (Data)](./11_Data.md)
+**Tiếp theo**: [Bài 11 - Dữ liệu (Data)](./11_Data.md)

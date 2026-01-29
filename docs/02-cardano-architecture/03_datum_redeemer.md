@@ -533,7 +533,7 @@ fn is_script_address(addr: Address) -> Bool {
 
 ---
 
-## 5. Thiet Ke Datum & Redeemer
+## 5. Thiết Kế Datum & Redeemer
 
 ### Design Principles
 
@@ -595,7 +595,7 @@ type BadRedeemer {
 
 ---
 
-## 6. Patterns Pho Bien
+## 6. Patterns Phổ Biến
 
 ### Common Patterns
 
@@ -722,9 +722,9 @@ fn validate_payment(tx: Transaction) -> Bool {
 
 ## 7. Best Practices
 
-### Do's va Don'ts
+### Nên và Không Nên
 
-:::tip DO's - DATUM
+:::tip Nên làm - DATUM
 - Keep datum minimal (affects min ADA)
 - Use inline datums for new contracts
 - Include version field for upgrades
@@ -732,34 +732,34 @@ fn validate_payment(tx: Transaction) -> Bool {
 - Validate output datum for state machines
 :::
 
-:::tip DO's - REDEEMER
+:::tip Nên làm - REDEEMER
 - Use descriptive action names
 - Include all necessary parameters
 - Handle all cases exhaustively
 - Keep redeemer data minimal
 :::
 
-:::tip DO's - VALIDATION
+:::tip Nên làm - VALIDATION
 - Check datum exists before using
 - Use trace for debugging
 - Test all redeemer paths
 - Verify all context fields needed
 :::
 
-:::warning DON'Ts - DATUM
+:::warning Không nên làm - DATUM
 - Store unnecessary data
 - Use unbounded lists
 - Store sensitive data in plain text
 - Rely on datum hash without backup
 :::
 
-:::warning DON'Ts - REDEEMER
+:::warning Không nên làm - REDEEMER
 - Use catch-all patterns (Other, Default)
 - Hardcode values that should be parameters
 - Create ambiguous action names
 :::
 
-:::warning DON'Ts - VALIDATION
+:::warning Không nên làm - VALIDATION
 - Assume datum exists without checking
 - Ignore edge cases
 - Skip time validation when needed
@@ -767,45 +767,7 @@ fn validate_payment(tx: Transaction) -> Bool {
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bài 1: Design Datum & Redeemer
-
-Design datum và redeemer cho một **Subscription Service**:
-- Users pay monthly
-- Service can be cancelled
-- Auto-renewal option
-- Grace period for late payment
-
-### Bài 2: Implement Validator
-
-Implement validator logic cho **Simple Auction**:
-- Anyone can bid (higher than current)
-- Seller can close after deadline
-- Winner gets the item
-- Losers get refunds
-
-### Bài 3: State Machine
-
-Design a **Lending Protocol** state machine:
-- States: Open, Borrowed, Repaid, Liquidated
-- Actions: Borrow, Repay, Liquidate, Close
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hiểu vai trò của Datum và Redeemer
-- [ ] Biết các loại datum (inline, hash)
-- [ ] Thiết kế được datum hiệu quả
-- [ ] Tạo redeemer với actions rõ ràng
-- [ ] Sử dụng Script Context đúng cách
-- [ ] Áp dụng được các patterns phổ biến
-- [ ] Tuân thủ best practices
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Language Tour](https://aiken-lang.org/language-tour)
 - [Cardano Plutus Documentation](https://plutus.readthedocs.io/)
@@ -813,13 +775,13 @@ Design a **Lending Protocol** state machine:
 
 ---
 
-## Hoan Thanh Part 02: Cardano Architecture!
+## Hoàn Thành Part 02: Cardano Architecture!
 
-Chuc mung ban da hoan thanh phan Kien Truc Cardano!
+Chúc mừng bạn đã hoàn thành phần Kiến Trúc Cardano!
 
-Ban da hoc duoc:
-- Tong quan ve Cardano blockchain
-- Mo hinh UTXO va eUTXO
-- Datum, Redeemer va Script Context
+Bạn đã học được:
+- Tổng quan về Cardano blockchain
+- Mô hình UTXO và eUTXO
+- Datum, Redeemer và Script Context
 
-**Tiep theo:** [Part 03: Validator Dau Tien](../03-your-first-validator/01_build_first_validator.md)
+**Tiếp theo:** [Part 03: Validator Đầu Tiên](../03-your-first-validator/01_build_first_validator.md)

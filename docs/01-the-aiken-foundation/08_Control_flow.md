@@ -1,60 +1,60 @@
 ---
-title: "08. Luong Dieu Khien (Control Flow)"
+title: "08. Luồng Điều Khiển (Control Flow)"
 sidebar_position: 8
-description: "Thanh thao cac cau truc dieu khien trong Aiken: if/else, when/is pattern matching, va cac ky thuat xu ly logic phuc tap."
+description: "Thành thạo các cấu trúc điều khiển trong Aiken: if/else, when/is pattern matching, và các kỹ thuật xử lý logic phức tạp."
 ---
 
-# Luong Dieu Khien (Control Flow)
+# Luồng Điều Khiển (Control Flow)
 
-:::info Muc tieu
-Thanh thao cac cau truc dieu khien trong Aiken: if/else, when/is pattern matching, va cac ky thuat xu ly logic phuc tap.
+:::info Mục tiêu
+Thành thạo các cấu trúc điều khiển trong Aiken: if/else, when/is pattern matching, và các kỹ thuật xử lý logic phức tạp.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan Control Flow](#1-tong-quan-control-flow)
+1. [Tổng quan Control Flow](#1-tổng-quan-control-flow)
 2. [If/Else Expression](#2-ifelse-expression)
 3. [When/Is Pattern Matching](#3-whenis-pattern-matching)
-4. [Pattern Matching nang cao](#4-pattern-matching-nang-cao)
-5. [Guards va Conditions](#5-guards-va-conditions)
-6. [Ket hop patterns](#6-ket-hop-patterns)
+4. [Pattern Matching nâng cao](#4-pattern-matching-nâng-cao)
+5. [Guards và Conditions](#5-guards-và-conditions)
+6. [Kết hợp patterns](#6-kết-hợp-patterns)
 7. [Best Practices](#7-best-practices)
 
 ---
 
-## 1. Tong Quan Control Flow
+## 1. Tổng Quan Control Flow
 
 ### Control Flow trong Functional Programming
 
-| Khia canh | Imperative (Java, Python) | Functional (Aiken) |
+| Khía cạnh | Imperative (Java, Python) | Functional (Aiken) |
 |-----------|---------------------------|-------------------|
-| Dieu kien | `if (x > 0) { return "positive"; } else { return "non-positive"; }` | `if x > 0 { "positive" } else { "non-positive" }` |
+| Điều kiện | `if (x > 0) { return "positive"; } else { return "non-positive"; }` | `if x > 0 { "positive" } else { "non-positive" }` |
 | Switch/Case | `switch (action) { case "buy": ... case "sell": ... }` | `when action is { Buy -> ... Sell -> ... }` |
 
-:::warning Quan trong
-- Moi expression deu tra ve gia tri
-- Khong co "statements", chi co "expressions"
-- Pattern matching thay the switch/case
+:::warning Quan trọng
+- Mọi expression đều trả về giá trị
+- Không có "statements", chỉ có "expressions"
+- Pattern matching thay thế switch/case
 :::
 
-### So sanh cac cau truc
+### So sánh các cấu trúc
 
-| Cau truc | Khi nao dung | Vi du |
+| Cấu trúc | Khi nào dùng | Ví dụ |
 |----------|--------------|-------|
-| `if/else` | Dieu kien Boolean don gian | `if x > 0 { ... } else { ... }` |
-| `when/is` | Pattern matching tren types | `when action is { Buy -> ... }` |
-| Guards | Dieu kien phuc tap trong patterns | `when x is { n if n > 0 -> ... }` |
+| `if/else` | Điều kiện Boolean đơn giản | `if x > 0 { ... } else { ... }` |
+| `when/is` | Pattern matching trên types | `when action is { Buy -> ... }` |
+| Guards | Điều kiện phức tạp trong patterns | `when x is { n if n > 0 -> ... }` |
 
 ---
 
 ## 2. If/Else Expression
 
-### Cu phap co ban
+### Cú pháp cơ bản
 
 ```aiken
-// If/else la EXPRESSION - luon tra ve gia tri
+// If/else là EXPRESSION - luôn trả về giá trị
 let result = if condition {
   value_if_true
 } else {
@@ -62,10 +62,10 @@ let result = if condition {
 }
 ```
 
-### Vi du chi tiet
+### Ví dụ chi tiết
 
 ```aiken
-/// Kiem tra so duong
+/// Kiểm tra số dương
 fn check_positive(n: Int) -> String {
   if n > 0 {
     "Positive"
@@ -76,7 +76,7 @@ fn check_positive(n: Int) -> String {
   }
 }
 
-/// Tinh gia tri tuyet doi
+/// Tính giá trị tuyệt đối
 fn abs(n: Int) -> Int {
   if n >= 0 {
     n
@@ -85,12 +85,12 @@ fn abs(n: Int) -> Int {
   }
 }
 
-/// Tim so lon nhat
+/// Tìm số lớn nhất
 fn max(a: Int, b: Int) -> Int {
   if a > b { a } else { b }
 }
 
-/// Tim so nho nhat trong 3 so
+/// Tìm số nhỏ nhất trong 3 số
 fn min3(a: Int, b: Int, c: Int) -> Int {
   if a <= b && a <= c {
     a
@@ -102,19 +102,19 @@ fn min3(a: Int, b: Int, c: Int) -> Int {
 }
 ```
 
-### Quy tac quan trong
+### Quy tắc quan trọng
 
-| Quy tac | Dung | Sai |
+| Quy tắc | Đúng | Sai |
 |---------|------|-----|
-| Phai co else branch | `if x > 0 { "yes" } else { "no" }` | `if x > 0 { "yes" }` (Loi: thieu else) |
-| Ca hai branch phai cung type | `if x > 0 { 1 } else { 0 }` (Ca hai la Int) | `if x > 0 { 1 } else { "zero" }` (Int vs String) |
-| Condition phai la Bool | `if x > 0 { ... }` (x > 0 la Bool) | `if x { ... }` (x phai la Bool) |
-| Nen dung when/is cho enum types | `when option is { Some(x) -> x, None -> 0 }` | `if option == Some(1) { ... }` (It ro rang) |
+| Phải có else branch | `if x > 0 { "yes" } else { "no" }` | `if x > 0 { "yes" }` (Lỗi: thiếu else) |
+| Cả hai branch phải cùng type | `if x > 0 { 1 } else { 0 }` (Cả hai là Int) | `if x > 0 { 1 } else { "zero" }` (Int vs String) |
+| Condition phải là Bool | `if x > 0 { ... }` (x > 0 là Bool) | `if x { ... }` (x phải là Bool) |
+| Nên dùng when/is cho enum types | `when option is { Some(x) -> x, None -> 0 }` | `if option == Some(1) { ... }` (Ít rõ ràng) |
 
 ### Nested if/else
 
 ```aiken
-/// Phan loai diem so
+/// Phân loại điểm số
 fn grade(score: Int) -> String {
   if score >= 90 {
     "A"
@@ -129,7 +129,7 @@ fn grade(score: Int) -> String {
   }
 }
 
-/// Kiem tra nam nhuan
+/// Kiểm tra năm nhuận
 fn is_leap_year(year: Int) -> Bool {
   if year % 400 == 0 {
     True
@@ -147,7 +147,7 @@ fn is_leap_year(year: Int) -> Bool {
 
 ## 3. When/Is Pattern Matching
 
-### Cu phap co ban
+### Cú pháp cơ bản
 
 ```aiken
 when value is {
@@ -157,7 +157,7 @@ when value is {
 }
 ```
 
-### Pattern Matching voi Enum Types
+### Pattern Matching với Enum Types
 
 ```aiken
 /// Action type cho trading
@@ -168,12 +168,12 @@ type TradeAction {
   Cancel { reason: String }
 }
 
-/// Xu ly trade action
+/// Xử lý trade action
 fn process_trade(action: TradeAction) -> String {
   when action is {
     Buy { amount, price } -> {
       let total = amount * price
-      "Buying for total: " // Trong thuc te se format so
+      "Buying for total: " // Trong thực tế sẽ format số
     }
     Sell { amount, price } -> {
       let total = amount * price
@@ -184,21 +184,21 @@ fn process_trade(action: TradeAction) -> String {
   }
 }
 
-/// Tinh phi giao dich
+/// Tính phí giao dịch
 fn calculate_fee(action: TradeAction) -> Int {
   when action is {
-    Buy { amount, .. } -> amount * 1 / 100  // 1% phi mua
-    Sell { amount, .. } -> amount * 2 / 100 // 2% phi ban
+    Buy { amount, .. } -> amount * 1 / 100  // 1% phí mua
+    Sell { amount, .. } -> amount * 2 / 100 // 2% phí bán
     Hold -> 0
-    Cancel { .. } -> 50  // Phi huy co dinh
+    Cancel { .. } -> 50  // Phí hủy cố định
   }
 }
 ```
 
-### Pattern Matching voi Primitive Types
+### Pattern Matching với Primitive Types
 
 ```aiken
-/// Chuyen so thanh chu
+/// Chuyển số thành chữ
 fn number_to_word(n: Int) -> String {
   when n is {
     0 -> "zero"
@@ -209,7 +209,7 @@ fn number_to_word(n: Int) -> String {
   }
 }
 
-/// Kiem tra ngay trong tuan
+/// Kiểm tra ngày trong tuần
 fn is_weekend(day: Int) -> Bool {
   when day is {
     6 -> True   // Saturday
@@ -219,12 +219,12 @@ fn is_weekend(day: Int) -> Bool {
 }
 ```
 
-### Pattern Matching voi Option
+### Pattern Matching với Option
 
 ```aiken
 use aiken/option
 
-/// Safe division voi Option
+/// Safe division với Option
 fn safe_divide(a: Int, b: Int) -> Option<Int> {
   if b == 0 {
     None
@@ -233,7 +233,7 @@ fn safe_divide(a: Int, b: Int) -> Option<Int> {
   }
 }
 
-/// Xu ly ket qua Option
+/// Xử lý kết quả Option
 fn process_division(a: Int, b: Int) -> Int {
   when safe_divide(a, b) is {
     Some(result) -> result
@@ -241,7 +241,7 @@ fn process_division(a: Int, b: Int) -> Int {
   }
 }
 
-/// Unwrap voi default
+/// Unwrap với default
 fn unwrap_or_default(opt: Option<Int>, default: Int) -> Int {
   when opt is {
     Some(value) -> value
@@ -250,10 +250,10 @@ fn unwrap_or_default(opt: Option<Int>, default: Int) -> Int {
 }
 ```
 
-### Pattern Matching voi List
+### Pattern Matching với List
 
 ```aiken
-/// Lay phan tu dau tien
+/// Lấy phần tử đầu tiên
 fn head(list: List<a>) -> Option<a> {
   when list is {
     [] -> None
@@ -261,7 +261,7 @@ fn head(list: List<a>) -> Option<a> {
   }
 }
 
-/// Lay phan con lai (tail)
+/// Lấy phần còn lại (tail)
 fn tail(list: List<a>) -> List<a> {
   when list is {
     [] -> []
@@ -269,7 +269,7 @@ fn tail(list: List<a>) -> List<a> {
   }
 }
 
-/// Kiem tra do dai
+/// Kiểm tra độ dài
 fn length_category(list: List<a>) -> String {
   when list is {
     [] -> "empty"
@@ -280,7 +280,7 @@ fn length_category(list: List<a>) -> String {
   }
 }
 
-/// Tinh tong list
+/// Tính tổng list
 fn sum(list: List<Int>) -> Int {
   when list is {
     [] -> 0
@@ -289,10 +289,10 @@ fn sum(list: List<Int>) -> Int {
 }
 ```
 
-### Pattern Matching voi Tuple
+### Pattern Matching với Tuple
 
 ```aiken
-/// So sanh hai so
+/// So sánh hai số
 fn compare(pair: (Int, Int)) -> String {
   when pair is {
     (a, b) if a > b -> "first is greater"
@@ -301,7 +301,7 @@ fn compare(pair: (Int, Int)) -> String {
   }
 }
 
-/// Xu ly coordinates
+/// Xử lý coordinates
 fn quadrant(point: (Int, Int)) -> String {
   when point is {
     (0, 0) -> "origin"
@@ -319,7 +319,7 @@ fn quadrant(point: (Int, Int)) -> String {
 
 ---
 
-## 4. Pattern Matching Nang Cao
+## 4. Pattern Matching Nâng Cao
 
 ### Destructuring trong Patterns
 
@@ -353,7 +353,7 @@ fn get_customer_city(order: Order) -> ByteArray {
   city
 }
 
-/// Voi when/is
+/// Với when/is
 fn process_order(order: Order) -> Int {
   when order is {
     Order { items: [], .. } -> 0  // Empty order
@@ -374,7 +374,7 @@ fn calculate_total(items: List<Item>) -> Int {
 ### As Patterns (Alias)
 
 ```aiken
-/// Giu reference den toan bo value
+/// Giữ reference đến toàn bộ value
 fn process_with_original(opt: Option<Int>) -> (Option<Int>, Int) {
   when opt is {
     Some(n) as original -> (original, n * 2)
@@ -382,7 +382,7 @@ fn process_with_original(opt: Option<Int>) -> (Option<Int>, Int) {
   }
 }
 
-/// Huu ich khi can ca destructured parts va whole value
+/// Hữu ích khi cần cả destructured parts và whole value
 type Transaction {
   sender: ByteArray,
   receiver: ByteArray,
@@ -392,7 +392,7 @@ type Transaction {
 fn validate_and_log(tx: Transaction) -> Bool {
   when tx is {
     Transaction { amount, .. } as full_tx if amount > 0 -> {
-      // Co the dung ca `amount` va `full_tx`
+      // Có thể dùng cả `amount` và `full_tx`
       trace @"Processing valid transaction"
       True
     }
@@ -404,9 +404,9 @@ fn validate_and_log(tx: Transaction) -> Bool {
 ### Or Patterns
 
 ```aiken
-/// Nhom nhieu patterns
+/// Nhóm nhiều patterns
 fn is_vowel(char: Int) -> Bool {
-  // Gia su char la ASCII code
+  // Giả sử char là ASCII code
   when char is {
     97 | 101 | 105 | 111 | 117 -> True  // a, e, i, o, u
     65 | 69 | 73 | 79 | 85 -> True      // A, E, I, O, U
@@ -414,7 +414,7 @@ fn is_vowel(char: Int) -> Bool {
   }
 }
 
-/// Voi enum types
+/// Với enum types
 type Status {
   Pending
   Processing
@@ -440,12 +440,12 @@ fn is_active(status: Status) -> Bool {
 
 ---
 
-## 5. Guards va Conditions
+## 5. Guards và Conditions
 
 ### Guard Clauses
 
 ```aiken
-/// Guards cho dieu kien phuc tap
+/// Guards cho điều kiện phức tạp
 fn categorize_age(age: Int) -> String {
   when age is {
     n if n < 0 -> "invalid"
@@ -468,7 +468,7 @@ fn shipping_cost(weight: Int, distance: Int) -> Int {
 }
 ```
 
-### Combining Patterns voi Guards
+### Combining Patterns với Guards
 
 ```aiken
 type PaymentMethod {
@@ -479,17 +479,17 @@ type PaymentMethod {
 
 fn process_payment(payment: PaymentMethod, required: Int) -> Bool {
   when payment is {
-    // Du tien mat
+    // Đủ tiền mặt
     Cash { amount } if amount >= required -> True
 
-    // Card voi so hop le va du tien
+    // Card với số hợp lệ và đủ tiền
     Card { card_number, amount }
       if builtin.length_of_bytearray(card_number) == 16 && amount >= required -> True
 
-    // Crypto (gia su co premium 10%)
+    // Crypto (giả sử có premium 10%)
     Crypto { amount, .. } if amount >= required * 110 / 100 -> True
 
-    // Tat ca truong hop khac
+    // Tất cả trường hợp khác
     _ -> False
   }
 }
@@ -498,10 +498,10 @@ fn process_payment(payment: PaymentMethod, required: Int) -> Bool {
 ### Short-circuit Evaluation
 
 ```aiken
-/// Guards duoc evaluate tu tren xuong
+/// Guards được evaluate từ trên xuống
 fn validate_transaction(amount: Int, balance: Int, limit: Int) -> String {
   when (amount, balance, limit) is {
-    // Check theo thu tu uu tien
+    // Check theo thứ tự ưu tiên
     (a, _, _) if a <= 0 -> "Invalid amount"
     (a, b, _) if a > b -> "Insufficient balance"
     (a, _, l) if a > l -> "Exceeds daily limit"
@@ -512,7 +512,7 @@ fn validate_transaction(amount: Int, balance: Int, limit: Int) -> String {
 
 ---
 
-## 6. Ket Hop Patterns
+## 6. Kết Hợp Patterns
 
 ### Real-world Examples
 
@@ -656,24 +656,24 @@ fn can_transition(state: OrderState, action: OrderAction) -> Bool {
 
 ## 7. Best Practices
 
-### Do's va Don'ts
+### Do's và Don'ts
 
-**Nen lam:**
+**Nên làm:**
 
-- Dung when/is cho enum types thay vi if/else chains
-- Xu ly tat ca cases (exhaustive matching)
-- Dat specific patterns truoc, general patterns sau
-- Dung guards cho dieu kien phuc tap
-- Su dung destructuring de extract data
-- Dung `_` cho values khong can
+- Dùng when/is cho enum types thay vì if/else chains
+- Xử lý tất cả cases (exhaustive matching)
+- Đặt specific patterns trước, general patterns sau
+- Dùng guards cho điều kiện phức tạp
+- Sử dụng destructuring để extract data
+- Dùng `_` cho values không cần
 
-**Khong nen lam:**
+**Không nên làm:**
 
-- Khong dung if/else dai cho enums
-- Khong quen case (non-exhaustive match)
-- Khong dat `_` wildcard dau tien (unreachable patterns)
-- Khong nested when qua sau (kho doc)
-- Khong duplicate logic giua cac branches
+- Không dùng if/else dài cho enums
+- Không quên case (non-exhaustive match)
+- Không đặt `_` wildcard đầu tiên (unreachable patterns)
+- Không nested when quá sâu (khó đọc)
+- Không duplicate logic giữa các branches
 
 ### Pattern Order
 
@@ -720,83 +720,18 @@ fn color_code(c: Color) -> Int {
 fn color_code_risky(c: Color) -> Int {
   when c is {
     Red -> 1
-    _ -> 0  // Neu them Yellow sau, se khong co warning!
+    _ -> 0  // Nếu thêm Yellow sau, sẽ không có warning!
   }
 }
 ```
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Traffic Light
-
-```aiken
-type TrafficLight {
-  Red
-  Yellow
-  Green
-}
-
-// TODO: Implement
-fn next_light(current: TrafficLight) -> TrafficLight {
-  // Red -> Green -> Yellow -> Red
-  todo
-}
-
-fn can_go(light: TrafficLight) -> Bool {
-  todo
-}
-```
-
-### Bai 2: Calculator
-
-```aiken
-type Operation {
-  Add
-  Subtract
-  Multiply
-  Divide
-}
-
-// TODO: Implement
-fn calculate(a: Int, b: Int, op: Operation) -> Option<Int> {
-  // Handle division by zero!
-  todo
-}
-```
-
-### Bai 3: Fizz Buzz
-
-```aiken
-// TODO: Implement
-fn fizz_buzz(n: Int) -> String {
-  // n divisible by 3 -> "Fizz"
-  // n divisible by 5 -> "Buzz"
-  // n divisible by both -> "FizzBuzz"
-  // otherwise -> show number
-  todo
-}
-```
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu if/else expression va quy tac
-- [ ] Thanh thao when/is pattern matching
-- [ ] Biet destructuring trong patterns
-- [ ] Su dung guards cho dieu kien phuc tap
-- [ ] Hieu pattern order va exhaustiveness
-- [ ] Ap dung best practices
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Language Tour - Control Flow](https://aiken-lang.org/language-tour/control-flow)
 - [Pattern Matching in Aiken](https://aiken-lang.org/language-tour/custom-types#pattern-matching)
 
 ---
 
-**Tiep theo**: [Bai 09 - Ham (Functions)](./09_Function.md)
+**Tiếp theo**: [Bài 09 - Hàm (Functions)](./09_Function.md)

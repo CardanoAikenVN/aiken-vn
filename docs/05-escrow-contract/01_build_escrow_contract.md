@@ -1,34 +1,34 @@
 ---
-title: "01. Xay Dung Hop Dong Ky Quy (Escrow Contract)"
+title: "01. Xây Dựng Hợp Đồng Ký Quỹ (Escrow Contract)"
 sidebar_position: 1
-description: "Tao moi truong giao dich an toan giua buyer va seller voi Escrow smart contract - mot trong nhung use cases pho bien nhat cua smart contracts."
+description: "Tạo môi trường giao dịch an toàn giữa buyer và seller với Escrow smart contract - một trong những use cases phổ biến nhất của smart contracts."
 ---
 
-# Bai 01: Xay Dung Hop Dong Ky Quy (Escrow Contract)
+# Bài 01: Xây Dựng Hợp Đồng Ký Quỹ (Escrow Contract)
 
-:::info Muc tieu
-Tao moi truong giao dich an toan giua buyer va seller voi Escrow smart contract - mot trong nhung use cases pho bien nhat cua smart contracts.
+:::info Mục tiêu
+Tạo môi trường giao dịch an toàn giữa buyer và seller với Escrow smart contract - một trong những use cases phổ biến nhất của smart contracts.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan Escrow](#1-tong-quan-escrow)
-2. [Thiet ke Contract](#2-thiet-ke-contract)
+1. [Tổng quan Escrow](#1-tổng-quan-escrow)
+2. [Thiết kế Contract](#2-thiết-kế-contract)
 3. [Implement Escrow Validator](#3-implement-escrow-validator)
-4. [Viet Tests](#4-viet-tests)
+4. [Viết Tests](#4-viết-tests)
 5. [Advanced Features](#5-advanced-features)
-6. [Deploy va Tuong tac](#6-deploy-va-tuong-tac)
+6. [Deploy và Tương tác](#6-deploy-và-tương-tác)
 7. [Security Considerations](#7-security-considerations)
 
 ---
 
-## 1. Tong Quan Escrow
+## 1. Tổng Quan Escrow
 
-### Escrow la gi?
+### Escrow là gì?
 
-Escrow = Ben thu 3 giu tien cho den khi dieu kien thoa man.
+Escrow = Bên thứ 3 giữ tiền cho đến khi điều kiện thỏa mãn.
 
 **Traditional Escrow:**
 ```
@@ -72,17 +72,17 @@ flowchart TD
     E --> H[Split or Award]
 ```
 
-| Giai doan | Mo ta |
+| Giai đoạn | Mô tả |
 |-----------|-------|
-| CREATE | Buyer deposits funds voi datum: buyer, seller, amount, deadline |
-| ACTIVE | Waiting for: Buyer release, Seller refund, Deadline pass, hoac Dispute |
+| CREATE | Buyer deposits funds với datum: buyer, seller, amount, deadline |
+| ACTIVE | Waiting for: Buyer release, Seller refund, Deadline pass, hoặc Dispute |
 | RELEASE | Buyer satisfied, funds to seller |
 | REFUND | Seller agrees to refund buyer |
 | DISPUTE | Arbiter decides split or award |
 
 ---
 
-## 2. Thiet Ke Contract
+## 2. Thiết Kế Contract
 
 ### Project Structure
 
@@ -174,7 +174,7 @@ stateDiagram-v2
     CANCELLED --> [*]
 ```
 
-| Action | Ai thuc hien | Dieu kien | Ket qua |
+| Action | Ai thực hiện | Điều kiện | Kết quả |
 |--------|--------------|-----------|---------|
 | Release | Buyer | - | Funds to Seller |
 | Refund | Seller | - | Funds to Buyer |
@@ -530,7 +530,7 @@ fn is_pubkey_output(output: Output, pkh: ByteArray) -> Bool {
 
 ---
 
-## 4. Viet Tests
+## 4. Viết Tests
 
 ### Comprehensive Test Suite
 
@@ -950,7 +950,7 @@ type RecurringRedeemer {
 
 ---
 
-## 6. Deploy va Tuong Tac
+## 6. Deploy và Tương Tác
 
 ### Off-Chain: Create Escrow (TypeScript)
 
@@ -1075,7 +1075,7 @@ async function resolveDispute(
 
 ### Security Checklist
 
-:::tip DA IMPLEMENT
+:::tip ĐÃ IMPLEMENT
 - Signature verification for all actions
 - Deadline enforcement
 - Payment verification
@@ -1083,7 +1083,7 @@ async function resolveDispute(
 - Mutual consent for cancellation
 :::
 
-:::warning CAN XEM XET THEM
+:::warning CẦN XEM XÉT THÊM
 
 **1. FRONT-RUNNING**
 - Mempool visibility could allow interception
@@ -1130,42 +1130,7 @@ type SecureEscrowDatum {
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Basic Escrow
-
-Implement va test basic escrow voi:
-- Release by buyer
-- Refund by seller
-- Timeout claim
-
-### Bai 2: Multi-Sig Arbitration
-
-Extend escrow voi panel of arbiters:
-- 3 arbiters, 2 required to resolve
-- Weighted voting
-
-### Bai 3: Token Escrow
-
-Modify escrow de support:
-- NFT trades
-- Multi-token swaps
-- Fee collection
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu escrow concept
-- [ ] Design datum va redeemer
-- [ ] Implement core validator logic
-- [ ] Write comprehensive tests
-- [ ] Understand security considerations
-- [ ] Deploy va interact voi contract
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Example: Gift Card](https://aiken-lang.org/example--gift-card)
 - [Cardano Escrow Patterns](https://docs.cardano.org)
@@ -1173,22 +1138,22 @@ Modify escrow de support:
 
 ---
 
-## Hoan Thanh Bootcamp!
+## Hoàn Thành Bootcamp!
 
-Chuc mung ban da hoan thanh Aiken Bootcamp!
+Chúc mừng bạn đã hoàn thành Aiken Bootcamp!
 
-Ban da hoc:
-- Part 1: Nen tang Aiken
-- Part 2: Kien truc Cardano
+Bạn đã học:
+- Part 1: Nền tảng Aiken
+- Part 2: Kiến trúc Cardano
 - Part 3: Spending Validators (Vesting)
 - Part 4: Minting Policies (FT & NFT)
 - Part 5: Escrow Contract
 
-### Buoc Tiep Theo
+### Bước Tiếp Theo
 
-:::tip Goi y
-- Deploy contracts len testnet
-- Build full DApp voi frontend
+:::tip Gợi ý
+- Deploy contracts lên testnet
+- Build full DApp với frontend
 - Explore advanced patterns (DEX, lending, etc.)
 - Join Aiken community
 :::
