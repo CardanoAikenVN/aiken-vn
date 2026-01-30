@@ -1,45 +1,45 @@
 ---
-title: "01. Xay Dung Spending Validator"
+title: "01. Xây Dựng Spending Validator"
 sidebar_position: 1
-description: "Viet validator (smart contract) dau tien de khoa tai san va thiet lap dieu kien de mo khoa tai san - Vesting Contract."
+description: "Viết validator (smart contract) đầu tiên để khóa tài sản và thiết lập điều kiện để mở khóa tài sản - Vesting Contract."
 ---
 
-# Bai 01: Xay Dung Spending Validator
+# Bài 01: Xây Dựng Spending Validator
 
-:::info Muc tieu
-Viet validator (smart contract) dau tien de khoa tai san va thiet lap dieu kien de mo khoa tai san - Vesting Contract.
+:::info Mục tiêu
+Viết validator (smart contract) đầu tiên để khóa tài sản và thiết lập điều kiện để mở khóa tài sản - Vesting Contract.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan Spending Validator](#1-tong-quan-spending-validator)
-2. [Thiet ke Vesting Contract](#2-thiet-ke-vesting-contract)
+1. [Tổng quan Spending Validator](#1-tổng-quan-spending-validator)
+2. [Thiết kế Vesting Contract](#2-thiết-kế-vesting-contract)
 3. [Implement Validator](#3-implement-validator)
-4. [Viet Tests](#4-viet-tests)
-5. [Build va Deploy](#5-build-va-deploy)
-6. [Tuong tac voi Contract](#6-tuong-tac-voi-contract)
-7. [Mo rong va Cai tien](#7-mo-rong-va-cai-tien)
+4. [Viết Tests](#4-viết-tests)
+5. [Build và Deploy](#5-build-và-deploy)
+6. [Tương tác với Contract](#6-tương-tác-với-contract)
+7. [Mở rộng và Cải tiến](#7-mở-rộng-và-cải-tiến)
 
 ---
 
-## 1. Tong Quan Spending Validator
+## 1. Tổng Quan Spending Validator
 
-### Spending Validator la gi?
+### Spending Validator là gì?
 
-Spending Validator la smart contract kiem soat viec tieu (spend) UTXOs tren Cardano.
+Spending Validator là smart contract kiểm soát việc tiêu (spend) UTXOs trên Cardano.
 
-| Thanh phan | Mo ta |
+| Thành phần | Mô tả |
 |------------|-------|
-| Lock funds | Gui tien den SCRIPT ADDRESS |
-| UTXO | Chua Value, Address (script_hash), va Datum (conditions) |
-| Validator | Kiem tra Datum, Redeemer, Context va tra ve True/False |
+| Lock funds | Gửi tiền đến SCRIPT ADDRESS |
+| UTXO | Chứa Value, Address (script_hash), và Datum (conditions) |
+| Validator | Kiểm tra Datum, Redeemer, Context và trả về True/False |
 
-**Quy trinh hoat dong:**
+**Quy trình hoạt động:**
 
-1. **Lock funds tai SCRIPT ADDRESS**: UTXO chua gia tri (VD: 100 ADA), dia chi script_hash, va datum chua cac dieu kien
-2. **De SPEND, phai thoa man VALIDATOR**: Validator kiem tra Datum (stored state), Redeemer (action), Context (tx info) va tra ve True hoac False
+1. **Lock funds tại SCRIPT ADDRESS**: UTXO chứa giá trị (VD: 100 ADA), địa chỉ script_hash, và datum chứa các điều kiện
+2. **Để SPEND, phải thỏa mãn VALIDATOR**: Validator kiểm tra Datum (stored state), Redeemer (action), Context (tx info) và trả về True hoặc False
 
 **Use cases:**
 - Vesting (time-locked funds)
@@ -51,7 +51,7 @@ Spending Validator la smart contract kiem soat viec tieu (spend) UTXOs tren Card
 ### Validator Signature
 
 ```aiken
-// Spending validator trong Aiken co signature:
+// Spending validator trong Aiken có signature:
 
 validator my_validator {
   spend(
@@ -68,28 +68,28 @@ validator my_validator {
 
 ---
 
-## 2. Thiet Ke Vesting Contract
+## 2. Thiết Kế Vesting Contract
 
-### Vesting Contract la gi?
+### Vesting Contract là gì?
 
-Vesting la viec khoa funds voi dieu kien thoi gian.
+Vesting là việc khóa funds với điều kiện thời gian.
 
 **Scenario:**
 - Alice (Owner) locks 1000 ADA for Bob (Beneficiary)
 - Deadline: January 1, 2025
 
 **Rules:**
-- TRUOC deadline: Alice co the CANCEL
-- SAU deadline: Bob co the CLAIM
+- TRƯỚC deadline: Alice có thể CANCEL
+- SAU deadline: Bob có thể CLAIM
 
 ```mermaid
 timeline
     title Vesting Timeline
-    Lock : Owner khoa funds
+    Lock : Owner khóa funds
     section Before Deadline
-        CANCEL : Owner co the huy
+        CANCEL : Owner có thể hủy
     section After Deadline
-        CLAIM : Beneficiary co the nhan
+        CLAIM : Beneficiary có thể nhận
 ```
 
 ### Data Structures
@@ -98,13 +98,13 @@ timeline
 // ========== DATUM ==========
 // Stored with UTXO, defines the vesting conditions
 
-/// Vesting datum - luu tru thong tin vesting
+/// Vesting datum - lưu trữ thông tin vesting
 type VestingDatum {
-  /// Owner - nguoi tao vesting, co the cancel
+  /// Owner - người tạo vesting, có thể cancel
   owner: VerificationKeyHash,
-  /// Beneficiary - nguoi nhan, co the claim sau deadline
+  /// Beneficiary - người nhận, có thể claim sau deadline
   beneficiary: VerificationKeyHash,
-  /// Deadline - thoi diem unlock (POSIX milliseconds)
+  /// Deadline - thời điểm unlock (POSIX milliseconds)
   deadline: POSIXTime,
 }
 
@@ -139,12 +139,12 @@ stateDiagram-v2
     CLAIM --> [*]: Funds to Beneficiary
 ```
 
-| State | Dieu kien | Ket qua |
+| State | Điều kiện | Kết quả |
 |-------|-----------|---------|
-| LOCKED | UTXO ton tai | Cho xu ly |
-| CANCEL | Owner ky + Truoc deadline | Funds ve Owner |
-| CLAIM | Beneficiary ky + Sau deadline | Funds ve Beneficiary |
-| SPENT | UTXO da duoc tieu | Ket thuc |
+| LOCKED | UTXO tồn tại | Chờ xử lý |
+| CANCEL | Owner ký + Trước deadline | Funds về Owner |
+| CLAIM | Beneficiary ký + Sau deadline | Funds về Beneficiary |
+| SPENT | UTXO đã được tiêu | Kết thúc |
 
 ---
 
@@ -344,12 +344,12 @@ validator vesting {
 
 ---
 
-## 4. Viet Tests
+## 4. Viết Tests
 
 ### Comprehensive Tests
 
 ```aiken
-// Them vao cuoi file validators/vesting.ak
+// Thêm vào cuối file validators/vesting.ak
 
 use aiken/interval.{Finite, Interval, IntervalBound, PositiveInfinity, NegativeInfinity}
 use cardano/assets
@@ -598,10 +598,10 @@ test no_datum_fails() fail {
 }
 ```
 
-### Chay Tests
+### Chạy Tests
 
 ```bash
-# Chay tat ca tests
+# Chạy tất cả tests
 aiken check
 
 # Output expected:
@@ -620,16 +620,16 @@ aiken check
 #    │ ... (more tests)
 #    ┕━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12 tests | 12 passed | 0 failed
 
-# Chay voi verbose traces
+# Chạy với verbose traces
 aiken check --trace-level verbose
 
-# Chay specific test
+# Chạy specific test
 aiken check -m "claim_succeeds"
 ```
 
 ---
 
-## 5. Build va Deploy
+## 5. Build và Deploy
 
 ### Build Contract
 
@@ -762,7 +762,7 @@ console.log("Lock tx submitted:", txHash);
 
 ---
 
-## 6. Tuong Tac voi Contract
+## 6. Tương Tác với Contract
 
 ### Claim (Beneficiary)
 
@@ -824,7 +824,7 @@ console.log("Cancel tx:", txHash);
 
 ---
 
-## 7. Mo Rong va Cai Tien
+## 7. Mở Rộng và Cải Tiến
 
 ### Version 2: Partial Vesting
 
@@ -953,35 +953,7 @@ validator multi_vesting {
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Add Time Extension
-
-Them redeemer `Extend { new_deadline: Int }` cho phep owner keo dai deadline.
-
-### Bai 2: Add Minimum Amount
-
-Them `min_claim: Int` vao datum de yeu cau claim toi thieu mot so luong.
-
-### Bai 3: Add Emergency Cancel
-
-Them logic cho phep ca owner va beneficiary cung ky de cancel bat ky luc nao.
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu cau truc spending validator
-- [ ] Thiet ke duoc datum va redeemer
-- [ ] Implement validator logic
-- [ ] Viet comprehensive tests
-- [ ] Build va deploy contract
-- [ ] Tuong tac voi contract (lock, claim, cancel)
-- [ ] Hieu cach mo rong contract
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Validators](https://aiken-lang.org/language-tour/validators)
 - [Cardano Spending Scripts](https://docs.cardano.org/plutus/spending-scripts)
@@ -990,4 +962,4 @@ Them logic cho phep ca owner va beneficiary cung ky de cancel bat ky luc nao.
 
 ---
 
-**Phan tiep theo:** [Part 04: Phat Hanh Token & NFT](../04-minting-tokens-nfts/01_ft_vs_nft.md)
+**Phần tiếp theo:** [Part 04: Phát Hành Token & NFT](../04-minting-tokens-nfts/01_ft_vs_nft.md)

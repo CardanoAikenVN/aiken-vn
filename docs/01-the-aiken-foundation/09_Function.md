@@ -1,61 +1,61 @@
 ---
-title: "09. Ham (Functions)"
+title: "09. Hàm (Functions)"
 sidebar_position: 9
-description: "Thanh thao cach dinh nghia, su dung ham trong Aiken: named functions, anonymous functions, higher-order functions, va currying."
+description: "Thành thạo cách định nghĩa, sử dụng hàm trong Aiken: named functions, anonymous functions, higher-order functions, và currying."
 ---
 
-# Ham (Functions)
+# Hàm (Functions)
 
-:::info Muc tieu
-Thanh thao cach dinh nghia, su dung ham trong Aiken: named functions, anonymous functions, higher-order functions, va currying.
+:::info Mục tiêu
+Thành thạo cách định nghĩa, sử dụng hàm trong Aiken: named functions, anonymous functions, higher-order functions, và currying.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan ve Functions](#1-tong-quan-ve-functions)
-2. [Dinh nghia Functions](#2-dinh-nghia-functions)
+1. [Tổng quan về Functions](#1-tổng-quan-về-functions)
+2. [Định nghĩa Functions](#2-định-nghĩa-functions)
 3. [Anonymous Functions (Lambdas)](#3-anonymous-functions-lambdas)
 4. [Higher-Order Functions](#4-higher-order-functions)
-5. [Currying va Partial Application](#5-currying-va-partial-application)
+5. [Currying và Partial Application](#5-currying-và-partial-application)
 6. [Recursion](#6-recursion)
 7. [Function Composition](#7-function-composition)
 8. [Best Practices](#8-best-practices)
 
 ---
 
-## 1. Tong Quan ve Functions
+## 1. Tổng Quan về Functions
 
 ### Functions trong Functional Programming
 
-**Dac diem Functions trong Aiken:**
+**Đặc điểm Functions trong Aiken:**
 
-| Dac diem | Mo ta |
+| Đặc điểm | Mô tả |
 |----------|-------|
-| Pure Functions | Cung input tra ve cung output (deterministic), khong side effects |
-| First-Class Citizens | Co the assign vao variables, pass lam arguments, return tu functions khac |
-| Immutable | Khong the modify arguments, return new values thay vi mutate |
+| Pure Functions | Cùng input trả về cùng output (deterministic), không side effects |
+| First-Class Citizens | Có thể assign vào variables, pass làm arguments, return từ functions khác |
+| Immutable | Không thể modify arguments, return new values thay vì mutate |
 
-### Cac loai Functions
+### Các loại Functions
 
-| Loai | Mo ta | Vi du |
+| Loại | Mô tả | Ví dụ |
 |------|-------|-------|
-| Named Function | Ham co ten, dinh nghia voi `fn` | `fn add(a, b) { a + b }` |
-| Anonymous Function | Lambda, khong co ten | `fn(x) { x * 2 }` |
-| Higher-Order | Nhan/tra ve function | `fn apply(f, x) { f(x) }` |
-| Recursive | Goi chinh no | `fn fact(n) { ... fact(n-1) }` |
+| Named Function | Hàm có tên, định nghĩa với `fn` | `fn add(a, b) { a + b }` |
+| Anonymous Function | Lambda, không có tên | `fn(x) { x * 2 }` |
+| Higher-Order | Nhận/trả về function | `fn apply(f, x) { f(x) }` |
+| Recursive | Gọi chính nó | `fn fact(n) { ... fact(n-1) }` |
 
 ---
 
-## 2. Dinh Nghia Functions
+## 2. Định Nghĩa Functions
 
-### Cu phap co ban
+### Cú pháp cơ bản
 
 ```aiken
 // Public function (exported)
 pub fn function_name(param1: Type1, param2: Type2) -> ReturnType {
-  // body - expression cuoi cung la return value
+  // body - expression cuối cùng là return value
   expression
 }
 
@@ -65,25 +65,25 @@ fn helper_function(x: Int) -> Int {
 }
 ```
 
-### Vi du chi tiet
+### Ví dụ chi tiết
 
 ```aiken
-/// Cong hai so
+/// Cộng hai số
 pub fn add(a: Int, b: Int) -> Int {
   a + b
 }
 
-/// Tinh dien tich hinh chu nhat
+/// Tính diện tích hình chữ nhật
 pub fn rectangle_area(width: Int, height: Int) -> Int {
   width * height
 }
 
-/// Kiem tra so chan
+/// Kiểm tra số chẵn
 pub fn is_even(n: Int) -> Bool {
   n % 2 == 0
 }
 
-/// Tim so lon nhat trong 3 so
+/// Tìm số lớn nhất trong 3 số
 pub fn max3(a: Int, b: Int, c: Int) -> Int {
   let max_ab = if a > b { a } else { b }
   if max_ab > c { max_ab } else { c }
@@ -93,7 +93,7 @@ pub fn max3(a: Int, b: Int, c: Int) -> Int {
 ### Type Annotations
 
 ```aiken
-// Explicit type annotations (khuyen nghi cho public functions)
+// Explicit type annotations (khuyến nghị cho public functions)
 pub fn divide(dividend: Int, divisor: Int) -> Option<Int> {
   if divisor == 0 {
     None
@@ -118,7 +118,7 @@ pub fn swap<a, b>(pair: (a, b)) -> (b, a) {
 }
 ```
 
-### Functions voi Records
+### Functions với Records
 
 ```aiken
 type Person {
@@ -127,22 +127,22 @@ type Person {
   email: ByteArray,
 }
 
-/// Tao Person moi
+/// Tạo Person mới
 pub fn new_person(name: ByteArray, age: Int, email: ByteArray) -> Person {
   Person { name, age, email }
 }
 
-/// Lay tuoi
+/// Lấy tuổi
 pub fn get_age(person: Person) -> Int {
   person.age
 }
 
-/// Cap nhat tuoi (tra ve Person moi)
+/// Cập nhật tuổi (trả về Person mới)
 pub fn with_age(person: Person, new_age: Int) -> Person {
   Person { ..person, age: new_age }
 }
 
-/// Co du tuoi khong
+/// Có đủ tuổi không
 pub fn is_adult(person: Person) -> Bool {
   person.age >= 18
 }
@@ -151,14 +151,14 @@ pub fn is_adult(person: Person) -> Bool {
 ### Multiple Return Values (Tuples)
 
 ```aiken
-/// Chia va lay phan du
+/// Chia và lấy phần dư
 pub fn div_mod(a: Int, b: Int) -> (Int, Int) {
   let quotient = a / b
   let remainder = a % b
   (quotient, remainder)
 }
 
-/// Min va Max
+/// Min và Max
 pub fn min_max(a: Int, b: Int) -> (Int, Int) {
   if a < b {
     (a, b)
@@ -167,7 +167,7 @@ pub fn min_max(a: Int, b: Int) -> (Int, Int) {
   }
 }
 
-// Su dung
+// Sử dụng
 fn example() {
   let (min, max) = min_max(5, 3)
   // min = 3, max = 5
@@ -178,45 +178,45 @@ fn example() {
 
 ## 3. Anonymous Functions (Lambdas)
 
-### Cu phap
+### Cú pháp
 
 ```aiken
-// Cu phap day du
+// Cú pháp đầy đủ
 fn(param1: Type1, param2: Type2) -> ReturnType { body }
 
-// Voi type inference
+// Với type inference
 fn(x, y) { x + y }
 
 // Single parameter
 fn(x) { x * 2 }
 ```
 
-### Vi du su dung
+### Ví dụ sử dụng
 
 ```aiken
 use aiken/collection/list
 
 fn examples() {
-  // Lambda don gian
+  // Lambda đơn giản
   let double = fn(x) { x * 2 }
   let result = double(5)  // 10
 
-  // Lambda voi multiple parameters
+  // Lambda với multiple parameters
   let add = fn(a, b) { a + b }
   let sum = add(3, 4)  // 7
 
   // Lambda trong list operations
   let numbers = [1, 2, 3, 4, 5]
 
-  // Map: nhan doi moi phan tu
+  // Map: nhân đôi mọi phần tử
   let doubled = list.map(numbers, fn(x) { x * 2 })
   // [2, 4, 6, 8, 10]
 
-  // Filter: loc so chan
+  // Filter: lọc số chẵn
   let evens = list.filter(numbers, fn(x) { x % 2 == 0 })
   // [2, 4]
 
-  // Fold: tinh tong
+  // Fold: tính tổng
   let total = list.foldl(numbers, 0, fn(acc, x) { acc + x })
   // 15
 }
@@ -225,9 +225,9 @@ fn examples() {
 ### Closures
 
 ```aiken
-/// Closures capture variables tu outer scope
+/// Closures capture variables từ outer scope
 fn make_adder(n: Int) -> fn(Int) -> Int {
-  // Lambda nay "captures" n
+  // Lambda này "captures" n
   fn(x) { x + n }
 }
 
@@ -257,19 +257,19 @@ fn multiplier_example() {
 
 ## 4. Higher-Order Functions
 
-### Khai niem
+### Khái niệm
 
-Higher-Order Function (HOF) la function ma:
+Higher-Order Function (HOF) là function mà:
 
-1. **Nhan function lam argument**: HOF nhan vao mot function va data, tra ve result
-2. **Tra ve function**: HOF nhan vao arguments va tra ve mot function moi
+1. **Nhận function làm argument**: HOF nhận vào một function và data, trả về result
+2. **Trả về function**: HOF nhận vào arguments và trả về một function mới
 
 ### Common HOFs trong Aiken
 
 ```aiken
 use aiken/collection/list
 
-/// MAP: Transform moi phan tu
+/// MAP: Transform mọi phần tử
 fn map_example() {
   let numbers = [1, 2, 3, 4, 5]
 
@@ -283,7 +283,7 @@ fn map_example() {
   // ["odd", "even", "odd", "even", "odd"]
 }
 
-/// FILTER: Loc theo dieu kien
+/// FILTER: Lọc theo điều kiện
 fn filter_example() {
   let numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
@@ -295,27 +295,27 @@ fn filter_example() {
   // [6, 7, 8, 9, 10]
 }
 
-/// FOLD: Reduce list thanh single value
+/// FOLD: Reduce list thành single value
 fn fold_example() {
   let numbers = [1, 2, 3, 4, 5]
 
   // Signature: foldl(list, initial, fn(acc, elem) -> acc) -> acc
 
-  // Tinh tong
+  // Tính tổng
   let sum = list.foldl(numbers, 0, fn(acc, x) { acc + x })
   // 15
 
-  // Tinh tich
+  // Tính tích
   let product = list.foldl(numbers, 1, fn(acc, x) { acc * x })
   // 120
 
-  // Tim max
+  // Tìm max
   let max = list.foldl(numbers, 0, fn(acc, x) {
     if x > acc { x } else { acc }
   })
   // 5
 
-  // Dem so chan
+  // Đếm số chẵn
   let even_count = list.foldl(numbers, 0, fn(acc, x) {
     if x % 2 == 0 { acc + 1 } else { acc }
   })
@@ -323,7 +323,7 @@ fn fold_example() {
 }
 ```
 
-### Tu implement HOFs
+### Tự implement HOFs
 
 ```aiken
 /// Custom map
@@ -403,17 +403,17 @@ pub fn pipe<a, b, c>(f: fn(a) -> b, g: fn(b) -> c) -> fn(a) -> c {
 
 ---
 
-## 5. Currying va Partial Application
+## 5. Currying và Partial Application
 
-### Khai niem
+### Khái niệm
 
-**Currying:** Chuyen function nhieu arguments thanh chuoi functions moi function nhan 1 argument
+**Currying:** Chuyển function nhiều arguments thành chuỗi functions mỗi function nhận 1 argument
 
-| Dang | Vi du |
+| Dạng | Ví dụ |
 |------|-------|
-| Uncurried | `add(a, b) = a + b` va `add(2, 3) = 5` |
-| Curried | `add(a)(b) = a + b` va `add(2)(3) = 5` |
-| Partial Application | `let add2 = add(2)` sau do `add2(3) = 5` va `add2(5) = 7` |
+| Uncurried | `add(a, b) = a + b` và `add(2, 3) = 5` |
+| Curried | `add(a)(b) = a + b` và `add(2)(3) = 5` |
+| Partial Application | `let add2 = add(2)` sau đó `add2(3) = 5` và `add2(5) = 7` |
 
 ### Curried Functions
 
@@ -478,7 +478,7 @@ fn pipeline_example() {
 
   // Build pipeline
   // [1,2,3,4,5] -> [11,12,13,14,15] -> [22,24,26,28,30] -> [26,28,30]
-  // Aiken khong co pipe operator, dung nested calls:
+  // Aiken không có pipe operator, dùng nested calls:
   let result = filter_above(25)(multiply_each(2)(add_to_each(10)(numbers)))
 }
 ```
@@ -487,18 +487,18 @@ fn pipeline_example() {
 
 ## 6. Recursion
 
-### Co ban ve Recursion
+### Cơ bản về Recursion
 
-**Recursion = Function goi chinh no**
+**Recursion = Function gọi chính nó**
 
-Cau truc:
+Cấu trúc:
 
-1. **Base case**: Dieu kien dung
-2. **Recursive case**: Goi lai voi input nho hon
+1. **Base case**: Điều kiện dừng
+2. **Recursive case**: Gọi lại với input nhỏ hơn
 
-Vi du: `factorial(5) = 5 * 4! = 5 * 4 * 3! = 5 * 4 * 3 * 2! = ... = 120`
+Ví dụ: `factorial(5) = 5 * 4! = 5 * 4 * 3! = 5 * 4 * 3 * 2! = ... = 120`
 
-### Vi du Recursion
+### Ví dụ Recursion
 
 ```aiken
 /// Factorial
@@ -550,9 +550,9 @@ fn reverse_helper(list: List<a>, acc: List<a>) -> List<a> {
 
 ### Tail Recursion
 
-**Tail Call:** Recursive call la operation cuoi cung
+**Tail Call:** Recursive call là operation cuối cùng
 
-| Loai | Mo ta | Vi du |
+| Loại | Mô tả | Ví dụ |
 |------|-------|-------|
 | Non-tail recursive | Stack grows | `fn sum(list) = head + sum(tail)` |
 | Tail recursive | Constant stack | `fn sum(list, acc) = sum(tail, acc + head)` |
@@ -662,7 +662,7 @@ pub fn then<a, b, c>(f: fn(a) -> b, g: fn(b) -> c) -> fn(a) -> c {
 
 /// Process data through pipeline
 fn process_numbers(numbers: List<Int>) -> Int {
-  // Gia lap pipeline: filter -> map -> sum
+  // Giả lập pipeline: filter -> map -> sum
   let filtered = list.filter(numbers, fn(x) { x > 0 })
   let doubled = list.map(filtered, fn(x) { x * 2 })
   let total = list.foldl(doubled, 0, fn(acc, x) { acc + x })
@@ -671,7 +671,7 @@ fn process_numbers(numbers: List<Int>) -> Int {
 
 /// Using composition
 fn process_with_compose() {
-  // Aiken khong co |> operator, phai viet nested:
+  // Aiken không có |> operator, phải viết nested:
   let process = fn(numbers: List<Int>) -> Int {
     list.foldl(
       list.map(
@@ -689,24 +689,24 @@ fn process_with_compose() {
 
 ## 8. Best Practices
 
-### Do's va Don'ts
+### Do's và Don'ts
 
-**Nen lam:**
+**Nên làm:**
 
 - Type annotate public functions
-- Su dung descriptive names
+- Sử dụng descriptive names
 - Prefer tail recursion cho large lists
-- Keep functions small va focused
-- Use helper functions de break down complexity
-- Document voi `///` comments
+- Keep functions small và focused
+- Use helper functions để break down complexity
+- Document với `///` comments
 
-**Khong nen lam:**
+**Không nên làm:**
 
-- Deep recursion khong tail-optimized
-- Functions qua dai (>50 lines)
-- Qua nhieu parameters (>5)
-- Nested lambdas qua sau
-- Thieu base case trong recursion
+- Deep recursion không tail-optimized
+- Functions quá dài (>50 lines)
+- Quá nhiều parameters (>5)
+- Nested lambdas quá sâu
+- Thiếu base case trong recursion
 
 ### Function Design Guidelines
 
@@ -755,86 +755,11 @@ fn calculate_prices(order: Order) -> Result<Order, Error> {
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Higher-Order Functions
-
-```aiken
-// TODO: Implement these HOFs
-
-/// Apply function to each element, keep only Some results
-pub fn filter_map(list: List<a>, f: fn(a) -> Option<b>) -> List<b> {
-  todo
-}
-
-/// Find first element matching predicate
-pub fn find(list: List<a>, predicate: fn(a) -> Bool) -> Option<a> {
-  todo
-}
-
-/// Check if all elements match predicate
-pub fn all(list: List<a>, predicate: fn(a) -> Bool) -> Bool {
-  todo
-}
-
-/// Check if any element matches predicate
-pub fn any(list: List<a>, predicate: fn(a) -> Bool) -> Bool {
-  todo
-}
-```
-
-### Bai 2: Currying Practice
-
-```aiken
-// TODO: Create curried versions
-
-/// Curried between checker
-pub fn is_between(min: Int) -> fn(Int) -> fn(Int) -> Bool {
-  // is_between(1)(10)(5) == True
-  todo
-}
-
-/// Curried string formatter
-pub fn format_with_prefix(prefix: ByteArray) -> fn(ByteArray) -> ByteArray {
-  todo
-}
-```
-
-### Bai 3: Tail Recursion
-
-```aiken
-// TODO: Convert to tail recursive
-
-/// Count occurrences of element in list (make it tail recursive)
-pub fn count(list: List<a>, target: a) -> Int {
-  todo
-}
-
-/// Find maximum in list (tail recursive)
-pub fn maximum(list: List<Int>) -> Option<Int> {
-  todo
-}
-```
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu cach dinh nghia functions
-- [ ] Su dung anonymous functions (lambdas)
-- [ ] Hieu va ap dung higher-order functions
-- [ ] Biet currying va partial application
-- [ ] Viet tail recursive functions
-- [ ] Ap dung function composition
-- [ ] Tuan thu best practices
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Language Tour - Functions](https://aiken-lang.org/language-tour/functions)
 - [Aiken Standard Library - List](https://aiken-lang.github.io/stdlib/aiken/collection/list.html)
 
 ---
 
-**Tiep theo**: [Bai 10 - Modules](./10_Modules.md)
+**Tiếp theo**: [Bài 10 - Modules](./10_Modules.md)

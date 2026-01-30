@@ -1,38 +1,38 @@
 ---
 title: "02. Minting Policies"
 sidebar_position: 2
-description: "Xay dung Minting Policies de phat hanh tokens va NFTs tren Cardano - tu simple policies den one-shot NFT minting."
+description: "Xây dựng Minting Policies để phát hành tokens và NFTs trên Cardano - từ simple policies đến one-shot NFT minting."
 ---
 
-# Bai 02: Minting Policies
+# Bài 02: Minting Policies
 
-:::info Muc tieu
-Xay dung Minting Policies de phat hanh tokens va NFTs tren Cardano - tu simple policies den one-shot NFT minting.
+:::info Mục tiêu
+Xây dựng Minting Policies để phát hành tokens và NFTs trên Cardano - từ simple policies đến one-shot NFT minting.
 :::
 
 ---
 
-## Muc Luc
+## Mục Lục
 
-1. [Tong quan Minting Policy](#1-tong-quan-minting-policy)
+1. [Tổng quan Minting Policy](#1-tổng-quan-minting-policy)
 2. [Simple Minting Policy](#2-simple-minting-policy)
 3. [Time-Locked Policy](#3-time-locked-policy)
 4. [One-Shot NFT Policy](#4-one-shot-nft-policy)
 5. [Multi-Asset Policy](#5-multi-asset-policy)
-6. [Deploy va Mint](#6-deploy-va-mint)
+6. [Deploy và Mint](#6-deploy-và-mint)
 7. [Best Practices](#7-best-practices)
 
 ---
 
-## 1. Tong Quan Minting Policy
+## 1. Tổng Quan Minting Policy
 
-### Minting Policy la gi?
+### Minting Policy là gì?
 
-Minting Policy = Script kiem soat viec tao/huy tokens.
+Minting Policy = Script kiểm soát việc tạo/hủy tokens.
 
-**Quy trinh hoat dong:**
+**Quy trình hoạt động:**
 
-Khi transaction co mint field khac 0:
+Khi transaction có mint field khác 0:
 1. For EACH policy_id in mint: Execute minting policy
 2. Policy returns True/False
 3. ALL policies must return True for transaction to be valid
@@ -53,9 +53,9 @@ validator my_policy {
 
 ### Policy Types
 
-| Loai | Mo ta | Use case |
+| Loại | Mô tả | Use case |
 |------|-------|----------|
-| ALWAYS TRUE | Anyone can mint anytime | Chi dung cho testing |
+| ALWAYS TRUE | Anyone can mint anytime | Chỉ dùng cho testing |
 | SIGNATURE-BASED | Require specific signature(s) | Common cho FTs |
 | TIME-LOCKED | Can only mint before/after deadline | Limited-time mints, NFT drops |
 | ONE-SHOT | Can only mint once, requires specific UTXO | Perfect cho NFTs |
@@ -650,9 +650,9 @@ fn is_script_credential(address: Address, script_hash: ByteArray) -> Bool {
 
 ---
 
-## 6. Deploy va Mint
+## 6. Deploy và Mint
 
-### Build va Generate Blueprint
+### Build và Generate Blueprint
 
 ```bash
 # Build the project
@@ -830,9 +830,9 @@ async function burnTokens() {
 
 ## 7. Best Practices
 
-### Do's va Don'ts
+### Do's và Don'ts
 
-:::tip NEN LAM
+:::tip NÊN LÀM
 - Use one-shot for NFTs (guarantees uniqueness)
 - Validate all mint amounts (positive for mint, negative burn)
 - Add time locks for limited mints
@@ -842,7 +842,7 @@ async function burnTokens() {
 - Document your policy's rules clearly
 :::
 
-:::warning KHONG NEN LAM
+:::warning KHÔNG NÊN LÀM
 - Never use "always true" in production
 - Don't forget to restrict minting (who can mint?)
 - Don't allow unlimited minting without checks
@@ -872,44 +872,7 @@ flowchart TD
 
 ---
 
-## Bai Tap Thuc Hanh
-
-### Bai 1: Create FT Policy
-
-Tao mot FT minting policy voi:
-- Admin-only minting
-- Max supply 1,000,000 tokens
-- Burn allowed for anyone
-
-### Bai 2: Create NFT Collection
-
-Tao mot NFT collection policy:
-- Collection name prefix
-- One-shot per NFT
-- Metadata validation
-
-### Bai 3: Deploy to Testnet
-
-Deploy policy cua ban len Preview testnet:
-- Build va get policy ID
-- Mint test tokens
-- Verify on explorer
-
----
-
-## Checklist Hoan Thanh
-
-- [ ] Hieu cau truc minting policy
-- [ ] Implement signature-based policy
-- [ ] Implement time-locked policy
-- [ ] Implement one-shot NFT policy
-- [ ] Handle multi-asset minting
-- [ ] Deploy va mint tokens
-- [ ] Tuan thu best practices
-
----
-
-## Tai Lieu Tham Khao
+## Tài Liệu Tham Khảo
 
 - [Aiken Minting Policies](https://aiken-lang.org/example--gift-card)
 - [CIP-25: NFT Metadata](https://cips.cardano.org/cip/CIP-25)
@@ -918,4 +881,4 @@ Deploy policy cua ban len Preview testnet:
 
 ---
 
-**Phan tiep theo:** [Part 05: Hop Dong Escrow](../05-escrow-contract/01_build_escrow_contract.md)
+**Phần tiếp theo:** [Part 05: Hợp Đồng Escrow](../05-escrow-contract/01_build_escrow_contract.md)

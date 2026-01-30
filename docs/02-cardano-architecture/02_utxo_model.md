@@ -488,7 +488,7 @@ fn get_validity_start(tx: Transaction) -> Int {
 
 ### Best Practices
 
-:::tip DO's (Nen lam)
+:::tip Nên làm
 - Validate ALL inputs thoroughly
 - Check datum exists before using
 - Verify continuing outputs for state machines
@@ -497,7 +497,7 @@ fn get_validity_start(tx: Transaction) -> Int {
 - Test with various UTXO configurations
 :::
 
-:::warning DON'Ts (Khong nen lam)
+:::warning Không nên làm
 - Assume single UTXO per address
 - Ignore min UTXO requirements
 - Forget change outputs
@@ -505,50 +505,6 @@ fn get_validity_start(tx: Transaction) -> Int {
 - Create too small UTXOs (dust)
 - Ignore concurrent access issues
 :::
-
----
-
-## Bài Tập Thực Hành
-
-### Bài 1: Analyze Transaction
-
-1. Tìm một transaction trên cardanoscan.io
-2. Identify:
-   - Inputs (UTXOs consumed)
-   - Outputs (UTXOs created)
-   - Change output
-   - Fee
-
-### Bài 2: UTXO Selection
-
-Given UTXOs: [100, 50, 30, 20, 10, 5] ADA
-
-Calculate optimal selection for sending:
-- 45 ADA
-- 80 ADA
-- 15 ADA
-
-### Bài 3: Trace Script Execution
-
-```aiken
-// Walk through this validator manually:
-// Datum: { owner: "alice", deadline: 1000 }
-// Redeemer: Claim
-// Context: { signatories: ["bob"], time: 1500 }
-// What happens?
-```
-
----
-
-## Checklist Hoàn Thành
-
-- [ ] Hiểu UTXO concept và lifecycle
-- [ ] So sánh được Account vs UTXO model
-- [ ] Nắm vững eUTXO extensions (datum, redeemer)
-- [ ] Hiểu transaction structure
-- [ ] Biết UTXO selection strategies
-- [ ] Hiểu script execution flow
-- [ ] Biết common patterns và best practices
 
 ---
 
