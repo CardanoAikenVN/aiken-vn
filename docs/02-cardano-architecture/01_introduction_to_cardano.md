@@ -191,7 +191,7 @@ Cardano hỗ trợ native assets (tokens) mà không cần smart contract:
 
 ## Tại sao Cardano phù hợp cho Smart Contracts?
 
-### 1. Tính xác định (Determinism)
+### 1. Determinism
 
 ```aiken
 // Trong Aiken/Cardano, kết quả validator LUÔN xác định
@@ -269,100 +269,6 @@ Smart contracts trên Cardano chạy dưới dạng UPLC (Untyped Plutus Core):
 │                        ▼                                   │
 │                   Cùng đích: UPLC                          │
 │                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Aiken và Cardano types
-
-Aiken cung cấp các types tương ứng với Cardano:
-
-```aiken
-use cardano/address.{Address, Credential}
-use cardano/assets.{AssetName, PolicyId, Value}
-use cardano/transaction.{Transaction, Input, Output}
-
-// Address - Địa chỉ Cardano
-// pub type Address {
-//   payment_credential: Credential,
-//   stake_credential: Option<Credential>,
-// }
-
-// Value - Bundle of assets
-// Chứa ADA và native tokens
-
-// Transaction - Giao dịch hoàn chỉnh
-// Inputs, outputs, fee, validity range, etc.
-```
-
-## Lovelace và ADA
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    ADA DENOMINATION                         │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   1 ADA = 1,000,000 Lovelace                               │
-│                                                             │
-│   ┌──────────────────────────────────────┐                 │
-│   │ Unit          │ Lovelace             │                 │
-│   ├───────────────┼──────────────────────┤                 │
-│   │ 1 Lovelace    │ 1                    │                 │
-│   │ 1 ADA         │ 1,000,000            │                 │
-│   │ Min UTxO      │ ~1,000,000           │                 │
-│   │ Typical Fee   │ ~200,000             │                 │
-│   └──────────────────────────────────────┘                 │
-│                                                             │
-│   Trong Aiken, luôn làm việc với Lovelace:                 │
-│                                                             │
-│   let one_ada = 1_000_000                                  │
-│   let min_utxo = 1_000_000                                 │
-│   let ten_ada = 10_000_000                                 │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Ví dụ: Đọc thông tin từ Transaction
-
-```aiken title="lib/tx_info.ak"
-use cardano/transaction.{Transaction, Input, Output}
-use cardano/assets.{Value, lovelace_of}
-use aiken/collection/list
-
-/// Tính tổng ADA trong outputs
-pub fn total_output_lovelace(tx: Transaction) -> Int {
-  tx.outputs
-    |> list.map(fn(output) { lovelace_of(output.value) })
-    |> list.foldr(0, fn(a, b) { a + b })
-}
-
-/// Đếm số lượng inputs
-pub fn input_count(tx: Transaction) -> Int {
-  list.length(tx.inputs)
-}
-
-/// Đếm số lượng outputs
-pub fn output_count(tx: Transaction) -> Int {
-  list.length(tx.outputs)
-}
-
-/// Kiểm tra có ít nhất n outputs
-pub fn has_min_outputs(tx: Transaction, n: Int) -> Bool {
-  output_count(tx) >= n
-}
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. Cardano = Blockchain Gen 3 với nghiên cứu học thuật    │
-│  2. Ouroboros = PoS consensus đầu tiên được chứng minh     │
-│  3. Native Assets = Tokens không cần smart contract        │
-│  4. Determinism = Kết quả biết trước, phí dự đoán được     │
-│  5. eUTxO = Parallel processing, scalability               │
-│  6. Aiken compiles to UPLC = Chạy trên Plutus platform    │
 └─────────────────────────────────────────────────────────────┘
 ```
 

@@ -110,7 +110,7 @@ gift_contract/
 
 ## Bước 2: Định nghĩa Types
 
-```aiken title="lib/gift_contract/types.ak"
+```rust title="lib/gift_contract/types.ak"
 //// Types cho Gift Contract
 
 use aiken/crypto.{Blake2b_224, Hash}
@@ -132,7 +132,7 @@ pub type GiftRedeemer {
 
 ## Bước 3: Viết Validator
 
-```aiken title="validators/gift.ak"
+```rust title="validators/gift.ak"
 //// Gift Contract Validator
 //// Cho phép ai có password đúng có thể claim ADA
 
@@ -172,7 +172,7 @@ validator gift {
 
 ## Bước 4: Viết Tests
 
-```aiken title="lib/gift_contract/gift_test.ak"
+```rust title="lib/gift_contract/gift_test.ak"
 //// Tests cho Gift Contract
 
 use aiken/crypto.{blake2b_256}
@@ -354,7 +354,7 @@ Sau khi build, file `plutus.json` chứa blueprint của validator:
 
 Phiên bản nâng cao với owner có thể cancel gift:
 
-```aiken title="validators/gift_v2.ak"
+```rust title="validators/gift_v2.ak"
 //// Gift Contract V2 - Với owner có thể cancel
 
 use aiken/crypto.{blake2b_256}
@@ -406,7 +406,7 @@ validator gift_v2 {
 
 ### Tests cho V2
 
-```aiken title="lib/gift_contract/gift_v2_test.ak"
+```rust title="lib/gift_contract/gift_v2_test.ak"
 use aiken/crypto.{blake2b_256}
 use aiken/collection/list
 
@@ -468,7 +468,7 @@ test test_cancel_by_non_owner() {
 
 Thêm điều kiện thời gian:
 
-```aiken title="validators/gift_v3.ak"
+```rust title="validators/gift_v3.ak"
 //// Gift Contract V3 - Time-locked
 
 use aiken/crypto.{blake2b_256}
@@ -627,53 +627,17 @@ const signedUnlockTx = await unlockTx.sign().complete();
 const unlockTxHash = await signedUnlockTx.submit();
 ```
 
-## Security Considerations
+## Code mẫu
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│              SECURITY CONSIDERATIONS                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   ⚠️  WARNING: Gift Contract cho mục đích học tập!         │
-│                                                             │
-│   Vấn đề bảo mật:                                          │
-│                                                             │
-│   1. Password exposure                                      │
-│      • Redeemer visible on-chain sau khi claim             │
-│      • Ai cũng có thể thấy password plaintext              │
-│                                                             │
-│   2. Front-running                                          │
-│      • Attacker có thể thấy TX trong mempool               │
-│      • Copy redeemer và submit TX với fee cao hơn          │
-│                                                             │
-│   3. Brute-force attacks                                    │
-│      • Nếu password ngắn, có thể brute-force               │
-│      • Khuyến nghị: Dùng random bytes dài                  │
-│                                                             │
-│   Giải pháp trong production:                               │
-│   ✅ Dùng public key thay vì password                      │
-│   ✅ Yêu cầu signature của recipient                       │
-│   ✅ Commit-reveal scheme                                  │
-│   ✅ Time-lock để prevent front-running                    │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+Xem code mẫu đầy đủ trong thư mục `examples/`:
 
-## Tóm tắt
+- **validators/gift.ak** - Gift Contract validator hoàn chỉnh
+- **lib/gift_test.ak** - 7 test cases cho Gift Contract
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. Spending Validator = Quyết định ai được spend UTxO     │
-│  2. validator name { spend(...) } = Syntax của validator   │
-│  3. Datum = State lưu on-chain                             │
-│  4. Redeemer = Action từ user                              │
-│  5. aiken build = Compile to UPLC                          │
-│  6. plutus.json = Blueprint chứa compiled script           │
-│  7. Always test thoroughly before mainnet                  │
-│  8. Consider security implications                         │
-└─────────────────────────────────────────────────────────────┘
+```bash
+# Chạy tests
+cd examples
+aiken check -m "gift_test"
 ```
 
 ## Hoàn thành Part 3

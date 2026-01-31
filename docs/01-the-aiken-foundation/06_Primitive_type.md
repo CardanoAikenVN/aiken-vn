@@ -15,14 +15,14 @@ Bài học này giới thiệu 6 kiểu dữ liệu nguyên thủy cốt lõi tr
 
 ## Tổng quan các kiểu
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                  PRIMITIVE TYPES IN AIKEN                   │
 ├─────────────────────────────────────────────────────────────┤
 │  Bool       │  True / False                                 │
 │  Int        │  Số nguyên không giới hạn                     │
 │  ByteArray  │  Mảng bytes                                   │
-│  String     │  Chuỗi UTF-8 (chỉ dùng cho trace)            │
+│  String     │  Chuỗi UTF-8 (chỉ dùng cho trace)             │
 │  List       │  Danh sách đồng nhất                          │
 │  Tuple      │  Nhóm giá trị cố định                         │
 └─────────────────────────────────────────────────────────────┘
@@ -32,7 +32,7 @@ Bài học này giới thiệu 6 kiểu dữ liệu nguyên thủy cốt lõi tr
 
 Chỉ có 2 giá trị: `True` và `False`
 
-```aiken title="lib/bool_demo.ak"
+```rust title="lib/bool_demo.ak"
 fn bool_examples() {
   // Giá trị boolean
   let is_valid = True
@@ -57,7 +57,7 @@ fn bool_examples() {
 
 Khi có nhiều điều kiện, dùng block cho rõ ràng:
 
-```aiken
+```rust
 fn complex_condition() -> Bool {
   and {
     is_signed_by_owner(),
@@ -74,7 +74,7 @@ fn complex_condition() -> Bool {
 
 Số nguyên **không giới hạn** - không lo overflow:
 
-```aiken title="lib/int_demo.ak"
+```rust title="lib/int_demo.ak"
 fn int_examples() {
   // Số thập phân
   let normal = 42
@@ -101,27 +101,11 @@ fn int_examples() {
 }
 ```
 
-### Ví dụ thực tế: Tính toán lovelace
-
-```aiken
-/// 1 ADA = 1,000,000 lovelace
-const ada_to_lovelace = 1_000_000
-
-fn calculate_fee(amount: Int) -> Int {
-  // Phí = 0.17 ADA + 0.00044 ADA per byte
-  let base_fee = 170_000
-  let per_byte = 440
-  let tx_size = 300  // bytes
-
-  base_fee + per_byte * tx_size
-}
-```
-
 ## ByteArray - Mảng bytes
 
 Kiểu quan trọng nhất cho blockchain - lưu hash, public keys, signatures:
 
-```aiken title="lib/bytearray_demo.ak"
+```rust title="lib/bytearray_demo.ak"
 fn bytearray_examples() {
   // Cú pháp array literal
   let bytes = #[10, 255, 0, 128]
@@ -139,22 +123,11 @@ fn bytearray_examples() {
 }
 ```
 
-### Ví dụ: Xác thực chữ ký
-
-```aiken
-use aiken/crypto
-
-/// Kiểm tra public key hash
-fn verify_owner(signer: ByteArray, expected_owner: ByteArray) -> Bool {
-  crypto.blake2b_256(signer) == expected_owner
-}
-```
-
 ## String - Chuỗi văn bản
 
 **Lưu ý quan trọng**: String chỉ dùng cho `trace` debugging, **không dùng** trong validator logic:
 
-```aiken title="lib/string_demo.ak"
+```rust title="lib/string_demo.ak"
 fn string_examples() {
   // Khai báo String (prefix @)
   let message = @"Hello, Aiken!"
@@ -174,7 +147,7 @@ fn string_examples() {
 
 Danh sách **đồng nhất** - tất cả phần tử cùng kiểu:
 
-```aiken title="lib/list_demo.ak"
+```rust title="lib/list_demo.ak"
 use aiken/collection/list
 
 fn list_examples() {
@@ -227,7 +200,7 @@ fn list_operations() {
 
 ### Pattern matching với List
 
-```aiken
+```rust
 fn process_list(items: List<Int>) -> Int {
   when items is {
     [] -> 0                           // List rỗng
@@ -242,7 +215,7 @@ fn process_list(items: List<Int>) -> Int {
 
 Nhóm giá trị cố định với các kiểu khác nhau:
 
-```aiken title="lib/tuple_demo.ak"
+```rust title="lib/tuple_demo.ak"
 fn tuple_examples() {
   // Pair (2 phần tử)
   let point = (10, 20)
@@ -273,7 +246,7 @@ fn swap(pair: (Int, Int)) -> (Int, Int) {
 
 ### Option - Giá trị tùy chọn
 
-```aiken
+```rust
 fn option_examples() {
   let some_value: Option<Int> = Some(42)
   let no_value: Option<Int> = None
@@ -290,7 +263,7 @@ fn option_examples() {
 
 ### Void - Không có giá trị
 
-```aiken
+```rust
 fn void_example() {
   let nothing: Void = Void
 
@@ -301,7 +274,7 @@ fn void_example() {
 
 ### Data - Kiểu tổng quát
 
-```aiken
+```rust
 fn data_example() {
   // Bất kỳ giá trị nào cũng có thể upcast sang Data
   let as_data: Data = 42
@@ -322,94 +295,17 @@ fn data_example() {
 | `List<a>` | `[1, 2, 3]` | Collections |
 | `(a, b)` | `(10, 20)` | Grouped values |
 
-## Ví dụ tổng hợp
+## Code mẫu
 
-### Code: lib/transaction.ak
+Xem code mẫu đầy đủ trong thư mục `examples/`:
 
-```aiken title="lib/transaction.ak"
-use aiken/collection/list
+- **lib/syntax.ak** - Demo tất cả kiểu dữ liệu: Bool, Int, ByteArray, List, Tuple, Option, Custom types
+- **lib/syntax_test.ak** - 53 test cases cho các kiểu dữ liệu
 
-/// Thông tin output
-pub type TxOutput {
-  address: ByteArray,
-  amount: Int,
-}
-
-/// Kiểm tra giao dịch hợp lệ
-pub fn validate_outputs(outputs: List<TxOutput>, min_amount: Int) -> Bool {
-  list.all(
-    outputs,
-    fn(output) { output.amount >= min_amount },
-  )
-}
-
-/// Tính tổng amount
-pub fn total_amount(outputs: List<TxOutput>) -> Int {
-  list.foldr(outputs, 0, fn(output, acc) { output.amount + acc })
-}
-
-/// Lọc outputs theo địa chỉ
-pub fn filter_by_address(
-  outputs: List<TxOutput>,
-  target: ByteArray,
-) -> List<TxOutput> {
-  list.filter(outputs, fn(output) { output.address == target })
-}
-```
-
-### Test: lib/transaction_test.ak
-
-```aiken title="lib/transaction_test.ak"
-use transaction.{TxOutput, validate_outputs, total_amount, filter_by_address}
-
-test test_validate_outputs_pass() {
-  let outputs = [
-    TxOutput { address: #"aaa", amount: 1_000_000 },
-    TxOutput { address: #"bbb", amount: 2_000_000 },
-  ]
-  validate_outputs(outputs, 500_000) == True
-}
-
-test test_validate_outputs_fail() {
-  let outputs = [
-    TxOutput { address: #"aaa", amount: 100_000 },
-    TxOutput { address: #"bbb", amount: 2_000_000 },
-  ]
-  validate_outputs(outputs, 500_000) == False
-}
-
-test test_total_amount() {
-  let outputs = [
-    TxOutput { address: #"aaa", amount: 1_000_000 },
-    TxOutput { address: #"bbb", amount: 2_000_000 },
-  ]
-  total_amount(outputs) == 3_000_000
-}
-
-test test_filter_by_address() {
-  let outputs = [
-    TxOutput { address: #"aaa", amount: 1_000_000 },
-    TxOutput { address: #"bbb", amount: 2_000_000 },
-    TxOutput { address: #"aaa", amount: 500_000 },
-  ]
-  let filtered = filter_by_address(outputs, #"aaa")
-  list.length(filtered) == 2
-}
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. Bool = True/False, dùng &&, ||, !                      │
-│  2. Int = Số nguyên không giới hạn, hỗ trợ hex/bin/oct     │
-│  3. ByteArray = #"hex" hoặc "utf8", quan trọng nhất       │
-│  4. String = @"text", CHỈ dùng cho trace                   │
-│  5. List = Danh sách đồng nhất, prepend O(1)               │
-│  6. Tuple = Nhóm cố định, truy cập .1st, .2nd              │
-└─────────────────────────────────────────────────────────────┘
+```bash
+# Chạy tests
+cd examples
+aiken check
 ```
 
 ## Bước tiếp theo

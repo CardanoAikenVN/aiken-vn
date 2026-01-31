@@ -17,7 +17,7 @@ Bài học này hướng dẫn cách khai báo và sử dụng biến, hằng s�
 
 Trong Aiken, biến được khai báo với từ khóa `let`:
 
-```aiken title="lib/main.ak"
+```rust title="lib/main.ak"
 fn example() {
   // Khai báo biến cơ bản
   let name = "Cardano"
@@ -36,7 +36,7 @@ fn example() {
 
 **Quan trọng**: Biến trong Aiken là **bất biến** - không thể thay đổi sau khi gán:
 
-```aiken
+```rust
 fn immutability_demo() {
   let x = 5
   // x = 10  // ❌ Lỗi! Không thể gán lại
@@ -51,7 +51,7 @@ fn immutability_demo() {
 
 Bạn có thể khai báo biến mới cùng tên (shadowing):
 
-```aiken
+```rust
 fn shadowing_demo() {
   let value = 10
   let value = value * 2  // Shadow biến cũ
@@ -61,17 +61,17 @@ fn shadowing_demo() {
 }
 ```
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
-│                    SHADOWING FLOW                           │
+│                     SHADOWING FLOW                          │
 │                                                             │
-│   let value = 10        →  value = 10                      │
+│   let value = 10        →  value = 10                       │
 │         │                                                   │
 │         ▼                                                   │
-│   let value = value * 2 →  value = 20 (shadow)             │
+│   let value = value * 2 →  value = 20 (shadow)              │
 │         │                                                   │
 │         ▼                                                   │
-│   let value = value + 5 →  value = 25 (shadow)             │
+│   let value = value + 5 →  value = 25 (shadow)              │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -80,7 +80,7 @@ fn shadowing_demo() {
 
 Hằng số được khai báo ở cấp module với `const`:
 
-```aiken title="lib/constants.ak"
+```rust title="lib/constants.ak"
 /// Số lovelace trong 1 ADA
 pub const lovelace_per_ada = 1_000_000
 
@@ -117,71 +117,11 @@ fn is_admin(pkh: ByteArray) -> Bool {
 | Export | Không | Có (với `pub`) |
 | Giá trị | Bất kỳ | Literals only |
 
-## Destructuring - Phân rã cấu trúc
-
-### Với Tuple
-
-```aiken
-fn tuple_destructure() {
-  let point = (10, 20, 30)
-
-  // Lấy từng phần tử
-  let (x, y, z) = point
-
-  // Bỏ qua phần tử với _
-  let (first, _, third) = point
-
-  x + y + z  // 60
-}
-```
-
-### Với List
-
-```aiken
-fn list_destructure() {
-  let numbers = [1, 2, 3, 4, 5]
-
-  // Lấy head và tail
-  let [head, ..tail] = numbers
-  // head = 1, tail = [2, 3, 4, 5]
-
-  // Lấy nhiều phần tử đầu
-  let [first, second, ..rest] = numbers
-  // first = 1, second = 2, rest = [3, 4, 5]
-
-  head
-}
-```
-
-### Với Custom Types
-
-```aiken
-type Person {
-  name: ByteArray,
-  age: Int,
-}
-
-fn record_destructure() {
-  let person = Person { name: "Alice", age: 25 }
-
-  // Destructure tất cả fields
-  let Person { name, age } = person
-
-  // Đổi tên khi destructure
-  let Person { name: person_name, age: person_age } = person
-
-  // Chỉ lấy một số fields
-  let Person { name, .. } = person
-
-  name
-}
-```
-
 ## Expect - Khai báo với assertion
 
 `expect` giống `let` nhưng sẽ **fail** nếu pattern không match:
 
-```aiken
+```rust
 fn expect_demo() {
   let maybe_value = Some(42)
 
@@ -194,7 +134,7 @@ fn expect_demo() {
 
 ### So sánh let vs expect
 
-```aiken
+```rust
 fn comparison() {
   let result = Some(100)
 
@@ -278,39 +218,17 @@ test test_has_sufficient_funds_false() {
 }
 ```
 
-## Pattern trong thực tế
+## Code mẫu
 
-### Configuration với const
+Xem code mẫu đầy đủ trong thư mục `examples/`:
 
-```aiken
-// env/mainnet.ak
-pub const network_magic = 764824073
-pub const min_utxo = 1_000_000
-pub const max_tx_size = 16384
+- **lib/syntax.ak** - Demo các kiểu dữ liệu và hàm cơ bản
+- **lib/syntax_test.ak** - Test cases cho syntax
 
-// validators/spend.ak
-use env
-
-validator my_validator {
-  spend(_, _, _, tx) {
-    // Sử dụng constants
-    get_tx_size(tx) <= env.max_tx_size
-  }
-}
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. let = Khai báo biến bất biến trong function            │
-│  2. const = Hằng số compile-time ở module level            │
-│  3. Biến không thể gán lại, dùng shadowing thay thế        │
-│  4. Destructuring giúp trích xuất dữ liệu dễ dàng          │
-│  5. expect = let + assertion (fail nếu không match)        │
-└─────────────────────────────────────────────────────────────┘
+```bash
+# Chạy tests
+cd examples
+aiken check
 ```
 
 ## Bước tiếp theo

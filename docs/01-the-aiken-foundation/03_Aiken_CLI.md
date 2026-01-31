@@ -41,12 +41,12 @@ aiken new <owner>/<project-name>
 ### Ví dụ
 
 ```bash
-aiken new cardano-vn/hello-world
+aiken new aiken-vn/hello-world
 ```
 
 Output:
 ```
-     Created cardano-vn/hello-world
+     Created aiken-vn/hello-world
 ```
 
 ### Cấu trúc được tạo
@@ -84,7 +84,7 @@ aiken build --out-dir ./dist
 ### Output
 
 ```
-    Compiling cardano-vn/hello-world 0.0.0
+    Compiling aiken-vn/hello-world 0.0.0
     Finished compilation in 0.15s
 
     Wrote plutus.json
@@ -100,7 +100,7 @@ aiken check
 
 Output mẫu:
 ```
-    Compiling cardano-vn/hello-world 0.0.0
+    Compiling aiken-vn/hello-world 0.0.0
       Testing ...
 
     ┍━ hello_world ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -221,82 +221,6 @@ aiken blueprint address
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-## Ví dụ thực hành
-
-### Tạo và test validator đơn giản
-
-```bash
-# Bước 1: Tạo dự án
-aiken new my-org/first-contract
-cd first-contract
-```
-
-### Code: validators/always_true.ak
-
-```aiken title="validators/always_true.ak"
-/// Validator luôn cho phép chi tiêu
-validator always_true {
-  spend(_datum, _redeemer, _own_ref, _tx) {
-    True
-  }
-}
-
-/// Test đơn giản
-test test_always_passes() {
-  True
-}
-```
-
-### Chạy test và build
-
-```bash
-# Format code
-aiken fmt
-
-# Chạy tests
-aiken check
-
-# Build production
-aiken build
-```
-
-## Các flags hữu ích
-
-| Flag | Mô tả |
-|------|-------|
-| `--trace-level` | verbose/compact/silent |
-| `--seed` | Seed cho property tests |
-| `--max-success` | Số lần chạy property test |
-| `--skip` | Bỏ qua tests matching pattern |
-
-## Cấu hình aiken.toml
-
-```toml title="aiken.toml"
-name = "cardano-vn/hello-world"
-version = "0.0.0"
-license = "Apache-2.0"
-
-[repository]
-user = "cardano-vn"
-project = "hello-world"
-platform = "github"
-
-[[dependencies]]
-name = "aiken-lang/stdlib"
-version = "v2.2.0"
-source = "github"
-```
-
-## Tóm tắt lệnh
-
-| Mục đích | Lệnh |
-|----------|------|
-| Tạo dự án | `aiken new org/name` |
-| Kiểm tra | `aiken check` |
-| Build | `aiken build` |
-| Format | `aiken fmt` |
-| Docs | `aiken docs` |
 
 ## Bước tiếp theo
 

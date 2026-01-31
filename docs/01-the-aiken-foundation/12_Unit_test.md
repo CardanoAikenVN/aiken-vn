@@ -18,7 +18,7 @@ Bài học này hướng dẫn cách viết và chạy unit tests trong Aiken.
 
 ### Cú pháp test
 
-```aiken title="lib/math_test.ak"
+```rust title="lib/math_test.ak"
 /// Test đơn giản nhất
 test test_addition() {
   1 + 1 == 2
@@ -62,7 +62,7 @@ aiken check
 
 ### Test với custom types
 
-```aiken title="lib/user_test.ak"
+```rust title="lib/user_test.ak"
 type User {
   name: ByteArray,
   age: Int,
@@ -102,7 +102,7 @@ test test_is_adult_false() {
 
 Test phải fail để pass:
 
-```aiken title="lib/fail_test.ak"
+```rust title="lib/fail_test.ak"
 /// Test này pass nếu expression evaluates to False
 test test_division_by_zero() fail {
   let result = 10 / 0
@@ -121,7 +121,7 @@ test test_expect_none_fails() fail {
 
 Tự động sinh test cases:
 
-```aiken title="lib/property_test.ak"
+```rust title="lib/property_test.ak"
 use aiken/fuzz
 
 /// Property: Cộng số dương luôn lớn hơn operand
@@ -148,7 +148,7 @@ fn reverse_helper(xs: List<a>, acc: List<a>) -> List<a> {
 
 ### Custom Fuzzers
 
-```aiken
+```rust
 use aiken/fuzz
 
 /// Fuzzer cho số dương
@@ -176,7 +176,7 @@ test prop_user_age_valid(user: User via user_fuzzer()) {
 
 ### Sử dụng trace
 
-```aiken
+```rust
 fn calculate(a: Int, b: Int) -> Int {
   trace @"Starting calculation..."
   let result = a + b
@@ -193,7 +193,7 @@ test test_with_trace() {
 
 ### Trace operator (?)
 
-```aiken
+```rust
 test test_with_trace_operator() {
   let a = 10
   let b = 20
@@ -236,7 +236,7 @@ PASS [mem: 1234, cpu: 5678] test_name
 
 ### Tối ưu dựa trên metrics
 
-```aiken
+```rust
 // Version 1: Recursive (tốn resource)
 fn sum_v1(xs: List<Int>) -> Int {
   when xs is {
@@ -272,33 +272,33 @@ test test_sum_v2() {
 
 ### Workflow TDD
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
-│                    TDD WORKFLOW                             │
+│                     TDD WORKFLOW                            │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│   1. Write Test (RED)                                      │
+│   1. Write Test (RED)                                       │
 │          │                                                  │
 │          ▼                                                  │
-│   2. Run Test → FAIL                                       │
+│   2. Run Test → FAIL                                        │
 │          │                                                  │
 │          ▼                                                  │
-│   3. Write Code (GREEN)                                    │
+│   3. Write Code (GREEN)                                     │
 │          │                                                  │
 │          ▼                                                  │
-│   4. Run Test → PASS                                       │
+│   4. Run Test → PASS                                        │
 │          │                                                  │
 │          ▼                                                  │
-│   5. Refactor (REFACTOR)                                   │
+│   5. Refactor (REFACTOR)                                    │
 │          │                                                  │
-│          └───────────────▶ Repeat                          │
+│          └───────────────▶ Repeat                           │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Ví dụ TDD
 
-```aiken title="lib/calculator_test.ak"
+```rust title="lib/calculator_test.ak"
 // Step 1: Write tests first
 
 test test_add() {
@@ -322,7 +322,7 @@ test test_divide_by_zero() {
 }
 ```
 
-```aiken title="lib/calculator.ak"
+```rust title="lib/calculator.ak"
 // Step 2: Implement to make tests pass
 
 pub fn add(a: Int, b: Int) -> Int {
@@ -346,93 +346,28 @@ pub fn divide(a: Int, b: Int) -> Option<Int> {
 }
 ```
 
-## Ví dụ tổng hợp
+## Code mẫu
 
-### Code: lib/validator_test.ak
+Xem code mẫu đầy đủ trong thư mục `examples/`:
 
-```aiken title="lib/validator_test.ak"
-use aiken/fuzz
+| File | Mô tả | Tests |
+|------|-------|-------|
+| `lib/syntax_test.ak` | Test syntax & data types | 53 tests |
+| `lib/gift_test.ak` | Test Gift validator | 7 tests |
+| `lib/simple_ft_test.ak` | Test Fungible Token | 2 tests |
+| `lib/escrow_test.ak` | Test Escrow contract | 14 tests |
+| `lib/nft_test.ak` | Test NFT policy | 4 tests |
 
-/// Datum cho validator
-type Datum {
-  owner: ByteArray,
-  min_amount: Int,
-}
+```bash
+# Chạy tất cả tests (80 tests)
+cd examples
+aiken check
 
-/// Redeemer actions
-type Redeemer {
-  Claim
-  Cancel
-}
+# Chạy tests với trace
+aiken check --trace-level verbose
 
-/// Validate logic
-fn validate(datum: Datum, redeemer: Redeemer, signer: ByteArray, amount: Int) -> Bool {
-  when redeemer is {
-    Claim -> and {
-      signer == datum.owner,
-      amount >= datum.min_amount,
-    }
-    Cancel -> signer == datum.owner
-  }
-}
-
-// Unit tests
-
-test test_claim_valid() {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Claim, #"alice", 1500) == True
-}
-
-test test_claim_wrong_signer() {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Claim, #"bob", 1500) == False
-}
-
-test test_claim_insufficient_amount() {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Claim, #"alice", 500) == False
-}
-
-test test_cancel_by_owner() {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Cancel, #"alice", 0) == True
-}
-
-test test_cancel_by_non_owner() {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Cancel, #"bob", 0) == False
-}
-
-// Property tests
-
-fn amount_fuzzer() -> Fuzzer<Int> {
-  fuzz.int_between(0, 1_000_000_000)
-}
-
-test prop_owner_can_always_cancel(amount: Int via amount_fuzzer()) {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Cancel, #"alice", amount) == True
-}
-
-test prop_non_owner_cannot_cancel(amount: Int via amount_fuzzer()) {
-  let datum = Datum { owner: #"alice", min_amount: 1000 }
-  validate(datum, Cancel, #"bob", amount) == False
-}
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. test name() { bool_expr } = Unit test cơ bản           │
-│  2. test name() fail { ... } = Expected failure test       │
-│  3. test name(x via fuzzer) = Property-based test          │
-│  4. trace @"msg" = Debug output                            │
-│  5. aiken check = Chạy tất cả tests                        │
-│  6. [mem, cpu] = Resource metrics                          │
-└─────────────────────────────────────────────────────────────┘
+# Chạy tests của module cụ thể
+aiken check -m "syntax_test"
 ```
 
 ## Bước tiếp theo

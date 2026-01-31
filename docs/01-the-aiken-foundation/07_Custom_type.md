@@ -14,11 +14,11 @@ Bài học này hướng dẫn cách định nghĩa các kiểu dữ liệu ph�
 - Sử dụng generic types
 - Hiểu pattern matching với custom types
 
-## Record Types - Kiểu bản ghi
+## Record Types
 
 ### Cú pháp cơ bản
 
-```aiken title="lib/types.ak"
+```rust title="lib/types.ak"
 /// Thông tin người dùng
 pub type User {
   name: ByteArray,
@@ -40,7 +40,7 @@ fn create_user() {
 
 ### Truy cập fields
 
-```aiken
+```rust
 fn access_fields() {
   let user = User { name: "Bob", age: 30, is_active: True }
 
@@ -55,7 +55,7 @@ fn access_fields() {
 
 ### Cập nhật record (spread syntax)
 
-```aiken
+```rust
 fn update_record() {
   let user = User { name: "Bob", age: 30, is_active: True }
 
@@ -69,11 +69,11 @@ fn update_record() {
 }
 ```
 
-## Enum Types - Kiểu liệt kê
+## Enum Types
 
 ### Enum đơn giản (không có dữ liệu)
 
-```aiken title="lib/status.ak"
+```rust title="lib/status.ak"
 /// Trạng thái đơn hàng
 pub type OrderStatus {
   Pending
@@ -96,7 +96,7 @@ fn check_status(status: OrderStatus) -> ByteArray {
 
 ### Enum với dữ liệu (Tagged Unions)
 
-```aiken title="lib/payment.ak"
+```rust title="lib/payment.ak"
 /// Phương thức thanh toán
 pub type PaymentMethod {
   /// Thanh toán bằng ADA
@@ -116,38 +116,11 @@ fn process_payment(method: PaymentMethod) -> Int {
 }
 ```
 
-### Ví dụ: Kết quả xử lý
-
-```aiken title="lib/result.ak"
-/// Kết quả có thể thành công hoặc thất bại
-pub type Result<a, e> {
-  Ok(a)
-  Err(e)
-}
-
-fn divide(a: Int, b: Int) -> Result<Int, ByteArray> {
-  if b == 0 {
-    Err("Division by zero")
-  } else {
-    Ok(a / b)
-  }
-}
-
-fn handle_result() {
-  let result = divide(10, 2)
-
-  when result is {
-    Ok(value) -> value
-    Err(_msg) -> 0
-  }
-}
-```
-
-## Generic Types - Kiểu tổng quát
+## Generic Types
 
 ### Định nghĩa generic type
 
-```aiken title="lib/container.ak"
+```rust title="lib/container.ak"
 /// Hộp chứa giá trị bất kỳ
 pub type Box<a> {
   value: a,
@@ -175,7 +148,7 @@ fn generic_examples() {
 
 ### Option type (built-in)
 
-```aiken
+```rust
 fn option_examples() {
   let some_value: Option<Int> = Some(42)
   let no_value: Option<Int> = None
@@ -193,11 +166,11 @@ fn option_examples() {
 }
 ```
 
-## Pattern Matching - Khớp mẫu
+## Pattern Matching
 
 ### Cú pháp when/is
 
-```aiken
+```rust
 type Shape {
   Circle { radius: Int }
   Rectangle { width: Int, height: Int }
@@ -215,7 +188,7 @@ fn calculate_area(shape: Shape) -> Int {
 
 ### Wildcard patterns
 
-```aiken
+```rust
 fn describe_shape(shape: Shape) -> ByteArray {
   when shape is {
     Circle { .. } -> "A circle"
@@ -228,7 +201,7 @@ fn describe_shape(shape: Shape) -> ByteArray {
 
 ### Alternative patterns
 
-```aiken
+```rust
 type Animal {
   Dog { name: ByteArray }
   Cat { name: ByteArray }
@@ -244,7 +217,7 @@ fn get_name(animal: Animal) -> ByteArray {
 
 ### Nested patterns
 
-```aiken
+```rust
 type Container {
   Empty
   Single(Int)
@@ -261,9 +234,9 @@ fn first_value(container: Container) -> Option<Int> {
 }
 ```
 
-## Type Aliases - Bí danh kiểu
+## Type Aliases
 
-```aiken title="lib/aliases.ak"
+```rust title="lib/aliases.ak"
 /// Bí danh cho public key hash
 pub type PubKeyHash = ByteArray
 
@@ -282,11 +255,11 @@ fn use_aliases() {
 }
 ```
 
-## Opaque Types - Kiểu đóng gói
+## Opaque Types
 
 Ẩn implementation details, chỉ cho phép truy cập qua API:
 
-```aiken title="lib/counter.ak"
+```rust title="lib/counter.ak"
 /// Counter không thể truy cập value trực tiếp từ bên ngoài
 pub opaque type Counter {
   Counter { value: Int }
@@ -350,128 +323,6 @@ fn use_counter() {
 │                   │    (when/is)    │                      │
 │                   └─────────────────┘                      │
 │                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Ví dụ thực hành
-
-### Code: lib/nft.ak
-
-```aiken title="lib/nft.ak"
-/// Metadata NFT
-pub type NftMetadata {
-  name: ByteArray,
-  description: ByteArray,
-  image_url: ByteArray,
-  attributes: List<Attribute>,
-}
-
-/// Thuộc tính NFT
-pub type Attribute {
-  trait_type: ByteArray,
-  value: ByteArray,
-}
-
-/// Trạng thái listing
-pub type ListingStatus {
-  NotListed
-  Listed { price: Int, seller: ByteArray }
-  Sold { price: Int, buyer: ByteArray }
-}
-
-/// Thông tin NFT đầy đủ
-pub type Nft {
-  policy_id: ByteArray,
-  asset_name: ByteArray,
-  metadata: NftMetadata,
-  status: ListingStatus,
-}
-
-/// Tạo NFT mới
-pub fn create_nft(
-  policy_id: ByteArray,
-  asset_name: ByteArray,
-  name: ByteArray,
-) -> Nft {
-  Nft {
-    policy_id,
-    asset_name,
-    metadata: NftMetadata {
-      name,
-      description: "",
-      image_url: "",
-      attributes: [],
-    },
-    status: NotListed,
-  }
-}
-
-/// List NFT để bán
-pub fn list_for_sale(nft: Nft, price: Int, seller: ByteArray) -> Nft {
-  Nft { ..nft, status: Listed { price, seller } }
-}
-
-/// Kiểm tra NFT có đang bán không
-pub fn is_listed(nft: Nft) -> Bool {
-  when nft.status is {
-    Listed { .. } -> True
-    _ -> False
-  }
-}
-
-/// Lấy giá bán (nếu đang list)
-pub fn get_price(nft: Nft) -> Option<Int> {
-  when nft.status is {
-    Listed { price, .. } -> Some(price)
-    _ -> None
-  }
-}
-```
-
-### Test: lib/nft_test.ak
-
-```aiken title="lib/nft_test.ak"
-use nft.{Nft, NftMetadata, ListingStatus, create_nft, list_for_sale, is_listed, get_price}
-
-test test_create_nft() {
-  let new_nft = create_nft(#"policy123", #"asset456", "My NFT")
-
-  and {
-    new_nft.policy_id == #"policy123",
-    new_nft.asset_name == #"asset456",
-    new_nft.metadata.name == "My NFT",
-    !is_listed(new_nft),
-  }
-}
-
-test test_list_for_sale() {
-  let new_nft = create_nft(#"policy123", #"asset456", "My NFT")
-  let listed = list_for_sale(new_nft, 100_000_000, #"seller")
-
-  and {
-    is_listed(listed),
-    get_price(listed) == Some(100_000_000),
-  }
-}
-
-test test_not_listed_has_no_price() {
-  let new_nft = create_nft(#"policy123", #"asset456", "My NFT")
-  get_price(new_nft) == None
-}
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. Record = type với named fields                         │
-│  2. Enum = type với nhiều variants                         │
-│  3. Generic = type với type parameters                     │
-│  4. when/is = Pattern matching toàn diện                   │
-│  5. opaque = Ẩn implementation, expose API                 │
-│  6. Spread syntax = Cập nhật record dễ dàng               │
 └─────────────────────────────────────────────────────────────┘
 ```
 

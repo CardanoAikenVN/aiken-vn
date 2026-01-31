@@ -14,11 +14,11 @@ Bài học này hướng dẫn các cấu trúc điều khiển trong Aiken: if/
 - Hiểu pipe operator và function composition
 - Viết hàm đệ quy thay cho loops
 
-## Blocks - Khối lệnh
+## Blocks
 
 Mọi block đều là expression và trả về giá trị cuối cùng:
 
-```aiken title="lib/blocks.ak"
+```rust title="lib/blocks.ak"
 fn block_examples() {
   // Block trả về giá trị cuối
   let result = {
@@ -38,7 +38,7 @@ fn block_examples() {
 
 ### Cú pháp cơ bản
 
-```aiken title="lib/conditional.ak"
+```rust title="lib/conditional.ak"
 fn check_age(age: Int) -> ByteArray {
   if age >= 18 {
     "Adult"
@@ -62,7 +62,7 @@ fn classify_score(score: Int) -> ByteArray {
 
 ### If/Else là expression
 
-```aiken
+```rust
 fn abs(n: Int) -> Int {
   if n >= 0 { n } else { -n }
 }
@@ -76,7 +76,7 @@ fn max(a: Int, b: Int) -> Int {
 
 ### Cú pháp cơ bản
 
-```aiken title="lib/patterns.ak"
+```rust title="lib/patterns.ak"
 fn describe_number(n: Int) -> ByteArray {
   when n is {
     0 -> "Zero"
@@ -89,7 +89,7 @@ fn describe_number(n: Int) -> ByteArray {
 
 ### Pattern matching với custom types
 
-```aiken
+```rust
 type Color {
   Red
   Green
@@ -109,7 +109,7 @@ fn color_to_hex(color: Color) -> ByteArray {
 
 ### Guards trong patterns
 
-```aiken
+```rust
 fn classify_number(n: Int) -> ByteArray {
   when n is {
     0 -> "Zero"
@@ -132,7 +132,7 @@ fn validate_age(age: Int) -> ByteArray {
 
 ### Alternative patterns (|)
 
-```aiken
+```rust
 fn is_weekend(day: ByteArray) -> Bool {
   when day is {
     "Saturday" | "Sunday" -> True
@@ -151,7 +151,7 @@ fn is_vowel(char: ByteArray) -> Bool {
 
 ### Spread pattern (..)
 
-```aiken
+```rust
 type User {
   name: ByteArray,
   age: Int,
@@ -169,7 +169,7 @@ fn is_active_adult(user: User) -> Bool {
 
 ### Pattern matching với List
 
-```aiken
+```rust
 fn sum_list(numbers: List<Int>) -> Int {
   when numbers is {
     [] -> 0
@@ -191,7 +191,7 @@ fn first_two(items: List<a>) -> Option<(a, a)> {
 
 Thử cast mà không fail nếu không match:
 
-```aiken
+```rust
 fn safe_extract(data: Data) -> Int {
   if data is n: Int {
     n
@@ -216,7 +216,7 @@ fn get_value(result: Result) -> Int {
 
 ## Expect - Unsafe extraction
 
-```aiken
+```rust
 fn must_get_value(result: Result) {
   // Sẽ fail nếu không phải Ok
   expect Ok(value) = result
@@ -234,7 +234,7 @@ fn must_have_head(items: List<Int>) {
 
 ### Fail - Dừng thực thi có chủ đích
 
-```aiken
+```rust
 fn must_be_positive(n: Int) -> Int {
   if n > 0 {
     n
@@ -254,7 +254,7 @@ fn unreachable_case(status: OrderStatus) -> Int {
 
 ### Todo - Đánh dấu chưa implement
 
-```aiken
+```rust
 fn complex_calculation() -> Int {
   todo @"Implement this later"
 }
@@ -272,7 +272,7 @@ fn partial_implementation(n: Int) -> Int {
 
 Chain function calls dễ đọc:
 
-```aiken title="lib/piping.ak"
+```rust title="lib/piping.ak"
 use aiken/collection/list
 
 fn process_numbers(numbers: List<Int>) -> Int {
@@ -289,7 +289,7 @@ fn process_numbers(numbers: List<Int>) -> Int {
 
 ### Ví dụ thực tế
 
-```aiken
+```rust
 use aiken/collection/list
 use aiken/bytearray
 
@@ -315,7 +315,7 @@ fn count_valid_outputs(
 
 Aiken không có loops, thay vào đó dùng đệ quy:
 
-```aiken title="lib/recursion.ak"
+```rust title="lib/recursion.ak"
 /// Tính giai thừa
 fn factorial(n: Int) -> Int {
   if n <= 1 {
@@ -350,7 +350,7 @@ fn find(items: List<a>, predicate: fn(a) -> Bool) -> Option<a> {
 
 ### Tail recursion (tối ưu)
 
-```aiken
+```rust
 /// Factorial với tail recursion
 fn factorial_tail(n: Int) -> Int {
   factorial_helper(n, 1)
@@ -403,138 +403,6 @@ fn sum_helper(items: List<Int>, acc: Int) -> Int {
 │   │   expect    │  → Hard extraction (fail nếu ko match)   │
 │   └─────────────┘                                          │
 │                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Ví dụ tổng hợp
-
-### Code: lib/validation.ak
-
-```aiken title="lib/validation.ak"
-use aiken/collection/list
-
-pub type ValidationResult {
-  Valid
-  Invalid { reason: ByteArray }
-}
-
-pub type Transaction {
-  inputs: List<Input>,
-  outputs: List<Output>,
-  signers: List<ByteArray>,
-}
-
-pub type Input {
-  tx_id: ByteArray,
-  index: Int,
-}
-
-pub type Output {
-  address: ByteArray,
-  value: Int,
-}
-
-/// Validate transaction
-pub fn validate_tx(tx: Transaction) -> ValidationResult {
-  // Chain validations
-  when validate_inputs(tx.inputs) is {
-    Invalid { reason } -> Invalid { reason }
-    Valid ->
-      when validate_outputs(tx.outputs) is {
-        Invalid { reason } -> Invalid { reason }
-        Valid ->
-          when validate_signers(tx.signers) is {
-            Invalid { reason } -> Invalid { reason }
-            Valid -> Valid
-          }
-      }
-  }
-}
-
-fn validate_inputs(inputs: List<Input>) -> ValidationResult {
-  if list.is_empty(inputs) {
-    Invalid { reason: "No inputs" }
-  } else {
-    Valid
-  }
-}
-
-fn validate_outputs(outputs: List<Output>) -> ValidationResult {
-  let invalid_outputs =
-    outputs
-      |> list.filter(fn(o) { o.value <= 0 })
-      |> list.length()
-
-  if invalid_outputs > 0 {
-    Invalid { reason: "Invalid output value" }
-  } else {
-    Valid
-  }
-}
-
-fn validate_signers(signers: List<ByteArray>) -> ValidationResult {
-  if list.is_empty(signers) {
-    Invalid { reason: "No signers" }
-  } else {
-    Valid
-  }
-}
-```
-
-### Test: lib/validation_test.ak
-
-```aiken title="lib/validation_test.ak"
-use validation.{Transaction, Input, Output, ValidationResult, validate_tx}
-
-test test_valid_transaction() {
-  let tx = Transaction {
-    inputs: [Input { tx_id: #"abc", index: 0 }],
-    outputs: [Output { address: #"def", value: 1_000_000 }],
-    signers: [#"signer1"],
-  }
-
-  validate_tx(tx) == Valid
-}
-
-test test_no_inputs() {
-  let tx = Transaction {
-    inputs: [],
-    outputs: [Output { address: #"def", value: 1_000_000 }],
-    signers: [#"signer1"],
-  }
-
-  when validate_tx(tx) is {
-    Invalid { reason } -> reason == "No inputs"
-    Valid -> False
-  }
-}
-
-test test_invalid_output_value() {
-  let tx = Transaction {
-    inputs: [Input { tx_id: #"abc", index: 0 }],
-    outputs: [Output { address: #"def", value: 0 }],
-    signers: [#"signer1"],
-  }
-
-  when validate_tx(tx) is {
-    Invalid { reason } -> reason == "Invalid output value"
-    Valid -> False
-  }
-}
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. if/else = Điều kiện boolean đơn giản                   │
-│  2. when/is = Pattern matching exhaustive                  │
-│  3. if/is = Soft casting với fallback                      │
-│  4. expect = Hard extraction, fail nếu không match         │
-│  5. |> = Pipe operator cho function composition            │
-│  6. Recursion = Thay thế for/while loops                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 

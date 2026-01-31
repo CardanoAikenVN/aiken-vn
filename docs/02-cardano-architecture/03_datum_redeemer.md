@@ -95,7 +95,7 @@ Datum là dữ liệu được đính kèm vào UTxO tại script address. Nó �
 
 ### Thiết kế Datum hiệu quả
 
-```aiken title="lib/datum_design.ak"
+```rust title="lib/datum_design.ak"
 //// Các pattern thiết kế Datum
 
 /// ❌ Datum quá lớn - tốn phí
@@ -122,7 +122,7 @@ type OptimalDatum {
 
 ### Ví dụ Datum patterns
 
-```aiken title="lib/datum_patterns.ak"
+```rust title="lib/datum_patterns.ak"
 //// Common Datum Patterns
 
 /// Pattern 1: Simple Lock
@@ -200,7 +200,7 @@ Redeemer là dữ liệu được cung cấp khi muốn tiêu UTxO từ script a
 
 ### Thiết kế Redeemer
 
-```aiken title="lib/redeemer_design.ak"
+```rust title="lib/redeemer_design.ak"
 //// Redeemer Design Patterns
 
 /// Pattern 1: Unit Redeemer
@@ -242,7 +242,7 @@ pub type ProofRedeemer {
 
 Validator nhận Datum, Redeemer và Transaction context để quyết định có cho phép tiêu UTxO không.
 
-```aiken title="lib/validator_example.ak"
+```rust title="lib/validator_example.ak"
 use cardano/transaction.{Transaction, OutputReference}
 use aiken/collection/list
 
@@ -354,232 +354,6 @@ Validator còn nhận thêm thông tin về transaction context:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Sử dụng Transaction Context
-
-```aiken title="lib/tx_context_usage.ak"
-use cardano/transaction.{Transaction, Input, Output, OutputReference}
-use cardano/address.{Address}
-use cardano/assets.{Value, lovelace_of, quantity_of}
-use aiken/collection/list
-
-/// Tìm input của validator này
-pub fn find_own_input(tx: Transaction, own_ref: OutputReference) -> Option<Input> {
-  tx.inputs
-    |> list.find(fn(input) { input.output_reference == own_ref })
-}
-
-/// Tìm outputs gửi đến địa chỉ cụ thể
-pub fn outputs_to_address(tx: Transaction, addr: Address) -> List<Output> {
-  tx.outputs
-    |> list.filter(fn(output) { output.address == addr })
-}
-
-/// Kiểm tra có output với số tiền tối thiểu
-pub fn has_output_with_min_lovelace(tx: Transaction, addr: Address, min: Int) -> Bool {
-  tx.outputs
-    |> list.any(fn(output) {
-      output.address == addr && lovelace_of(output.value) >= min
-    })
-}
-
-/// Tính tổng lovelace trong inputs
-pub fn total_input_lovelace(tx: Transaction) -> Int {
-  tx.inputs
-    |> list.map(fn(input) { lovelace_of(input.output.value) })
-    |> list.foldr(0, fn(a, b) { a + b })
-}
-
-/// Kiểm tra có mint token với policy
-pub fn mints_token(tx: Transaction, policy_id: ByteArray, asset_name: ByteArray) -> Bool {
-  quantity_of(tx.mint, policy_id, asset_name) > 0
-}
-
-/// Kiểm tra validity range
-pub fn valid_after(tx: Transaction, time: Int) -> Bool {
-  when tx.validity_range.lower_bound.bound_type is {
-    Finite(lower) -> lower >= time
-    _ -> False
-  }
-}
-```
-
-## Datum/Redeemer Patterns phổ biến
-
-### Pattern 1: Simple Lock/Unlock
-
-```aiken
-type Datum {
-  owner: ByteArray,
-}
-
-type Redeemer {
-  Unlock
-}
-
-validator simple_lock {
-  spend(datum: Option<Datum>, _redeemer: Redeemer, _own_ref, tx) {
-    expect Some(d) = datum
-    list.has(tx.extra_signatories, d.owner)
-  }
-}
-```
-
-### Pattern 2: Time-locked Vesting
-
-```aiken
-type VestingDatum {
-  beneficiary: ByteArray,
-  deadline: Int,
-}
-
-type VestingRedeemer {
-  Claim
-}
-
-validator vesting {
-  spend(datum: Option<VestingDatum>, _redeemer: VestingRedeemer, _own_ref, tx) {
-    expect Some(d) = datum
-
-    and {
-      list.has(tx.extra_signatories, d.beneficiary),
-      valid_after(tx, d.deadline),
-    }
-  }
-}
-```
-
-### Pattern 3: State Machine (Auction)
-
-```aiken
-type AuctionDatum {
-  seller: ByteArray,
-  highest_bid: Int,
-  highest_bidder: Option<ByteArray>,
-  deadline: Int,
-}
-
-type AuctionRedeemer {
-  Bid { amount: Int, bidder: ByteArray }
-  Close
-}
-
-validator auction {
-  spend(datum: Option<AuctionDatum>, redeemer: AuctionRedeemer, own_ref, tx) {
-    expect Some(d) = datum
-
-    when redeemer is {
-      Bid { amount, bidder } -> {
-        // Kiểm tra bid cao hơn
-        // Trả lại tiền cho bidder trước
-        // Tạo UTxO mới với state mới
-        amount > d.highest_bid && valid_before(tx, d.deadline)
-      }
-
-      Close -> {
-        // Sau deadline, seller có thể close
-        valid_after(tx, d.deadline) && list.has(tx.extra_signatories, d.seller)
-      }
-    }
-  }
-}
-```
-
-### Pattern 4: Multi-sig Treasury
-
-```aiken
-type TreasuryDatum {
-  signers: List<ByteArray>,
-  threshold: Int,
-}
-
-type TreasuryRedeemer {
-  Spend
-}
-
-fn count_signatures(tx: Transaction, signers: List<ByteArray>) -> Int {
-  signers
-    |> list.filter(fn(s) { list.has(tx.extra_signatories, s) })
-    |> list.length()
-}
-
-validator treasury {
-  spend(datum: Option<TreasuryDatum>, _redeemer: TreasuryRedeemer, _own_ref, tx) {
-    expect Some(d) = datum
-    count_signatures(tx, d.signers) >= d.threshold
-  }
-}
-```
-
-## Test Datum và Redeemer
-
-```aiken title="lib/datum_redeemer_test.ak"
-use aiken/collection/list
-
-// Mock types
-type TestDatum {
-  owner: ByteArray,
-  amount: Int,
-}
-
-type TestRedeemer {
-  Claim
-  Cancel
-}
-
-// Mock validation logic
-fn validate_claim(datum: TestDatum, signer: ByteArray) -> Bool {
-  datum.owner == signer
-}
-
-fn validate_cancel(datum: TestDatum, signer: ByteArray, current_time: Int, deadline: Int) -> Bool {
-  datum.owner == signer && current_time < deadline
-}
-
-// Tests
-test test_claim_by_owner() {
-  let datum = TestDatum { owner: #"alice", amount: 1000 }
-  validate_claim(datum, #"alice") == True
-}
-
-test test_claim_by_non_owner() {
-  let datum = TestDatum { owner: #"alice", amount: 1000 }
-  validate_claim(datum, #"bob") == False
-}
-
-test test_cancel_before_deadline() {
-  let datum = TestDatum { owner: #"alice", amount: 1000 }
-  validate_cancel(datum, #"alice", 100, 200) == True
-}
-
-test test_cancel_after_deadline() {
-  let datum = TestDatum { owner: #"alice", amount: 1000 }
-  validate_cancel(datum, #"alice", 300, 200) == False
-}
-
-test test_redeemer_matching() {
-  let redeemer = Claim
-
-  let result = when redeemer is {
-    Claim -> 1
-    Cancel -> 2
-  }
-
-  result == 1
-}
-
-// Test datum serialization roundtrip
-test test_datum_equality() {
-  let datum1 = TestDatum { owner: #"abc", amount: 100 }
-  let datum2 = TestDatum { owner: #"abc", amount: 100 }
-  let datum3 = TestDatum { owner: #"def", amount: 100 }
-
-  and {
-    datum1 == datum2,
-    datum1 != datum3,
-  }
-}
-```
-
 ## Best Practices
 
 ```
@@ -606,22 +380,6 @@ test test_datum_equality() {
 │   ✅ Validate outputs nếu cần đảm bảo state đúng           │
 │   ✅ Sử dụng reference inputs cho shared state             │
 │                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. Datum = State của UTxO (lưu trong UTxO)                │
-│  2. Redeemer = Action để unlock (cung cấp khi spend)       │
-│  3. Validator = Logic kiểm tra Datum + Redeemer + Context  │
-│  4. Inline Datum được khuyến khích (CIP-32)                │
-│  5. Giữ Datum/Redeemer nhỏ gọn để tiết kiệm phí            │
-│  6. Always validate redeemer data                          │
-│  7. Sử dụng tx context để kiểm tra signatures, outputs     │
 └─────────────────────────────────────────────────────────────┘
 ```
 

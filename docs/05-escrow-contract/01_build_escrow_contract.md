@@ -17,37 +17,37 @@ Bài học này hướng dẫn thiết kế và triển khai một hợp đồng
 
 ## Escrow là gì?
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
-│                     ESCROW CONCEPT                          │
+│                      ESCROW CONCEPT                         │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│   Escrow = Bên thứ 3 giữ tiền cho đến khi điều kiện        │
+│   Escrow = Bên thứ 3 giữ tiền cho đến khi điều kiện         │
 │            được đáp ứng                                     │
 │                                                             │
-│   ┌─────────────────────────────────────────────────────┐  │
-│   │                                                      │  │
-│   │     BUYER ──────▶ ESCROW ──────▶ SELLER            │  │
-│   │       │            │  │            │                │  │
-│   │       │            │  │            │                │  │
-│   │    Gửi tiền      Giữ │          Giao hàng          │  │
-│   │                   tiền│                             │  │
-│   │                      │                              │  │
-│   │               ┌──────┴──────┐                      │  │
-│   │               ▼             ▼                      │  │
-│   │           Confirm       Dispute                    │  │
-│   │               │             │                      │  │
-│   │               ▼             ▼                      │  │
-│   │          → Seller      Arbitration                │  │
-│   │            gets $                                  │  │
-│   │                                                      │  │
-│   └─────────────────────────────────────────────────────┘  │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │                                                     │   │
+│   │     BUYER ──────▶ ESCROW ──────▶ SELLER             │   │
+│   │       │            │  │            │                │   │
+│   │       │            │  │            │                │   │
+│   │    Gửi tiền      Giữ │          Giao hàng           │   │
+│   │                   tiền│                             │   │
+│   │                      │                              │   │
+│   │               ┌──────┴──────┐                       │   │
+│   │               ▼             ▼                       │   │
+│   │           Confirm       Dispute                     │   │
+│   │               │             │                       │   │
+│   │               ▼             ▼                       │   │
+│   │          → Seller      Arbitration                  │   │
+│   │            gets $                                   │   │
+│   │                                                     │   │
+│   └─────────────────────────────────────────────────────┘   │
 │                                                             │
 │   Use cases:                                                │
-│   • P2P Trading                                            │
-│   • Freelance payments                                     │
-│   • Real estate deposits                                   │
-│   • Online marketplace                                     │
+│   • P2P Trading                                             │
+│   • Freelance payments                                      │
+│   • Real estate deposits                                    │
+│   • Online marketplace                                      │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -56,45 +56,45 @@ Bài học này hướng dẫn thiết kế và triển khai một hợp đồng
 
 ### Flow diagram
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
-│                   ESCROW FLOW                               │
+│                      ESCROW FLOW                            │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│   ┌──────────────────────────────────────────────────────┐ │
-│   │                     CREATE                            │ │
-│   │  Seller ──▶ Lock ADA with Datum                      │ │
-│   │              • Buyer PKH                              │ │
-│   │              • Price                                  │ │
-│   │              • Deadline                               │ │
-│   └────────────────────────┬─────────────────────────────┘ │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │                      CREATE                         │   │
+│   │  Seller ──▶ Lock ADA with Datum                     │   │
+│   │              • Buyer PKH                            │   │
+│   │              • Price                                │   │
+│   │              • Deadline                             │   │
+│   └────────────────────────┬────────────────────────────┘   │
 │                            │                                │
 │                            ▼                                │
-│   ┌──────────────────────────────────────────────────────┐ │
-│   │                   ACTIVE STATE                        │ │
-│   │                                                       │ │
-│   │  3 possible outcomes:                                 │ │
-│   │                                                       │ │
-│   │  1. COMPLETE (Buyer confirms)                        │ │
-│   │     → Seller gets payment                            │ │
-│   │                                                       │ │
-│   │  2. CANCEL (Seller cancels before deadline)          │ │
-│   │     → Seller gets refund                             │ │
-│   │                                                       │ │
-│   │  3. REFUND (Buyer claims after deadline)             │ │
-│   │     → Buyer gets refund                              │ │
-│   │                                                       │ │
-│   │  4. DISPUTE (Optional - needs arbitrator)            │ │
-│   │     → Arbitrator decides                             │ │
-│   │                                                       │ │
-│   └──────────────────────────────────────────────────────┘ │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │                   ACTIVE STATE                      │   │
+│   │                                                     │   │
+│   │  4 possible outcomes:                               │   │
+│   │                                                     │   │
+│   │  1. COMPLETE (Buyer confirms)                       │   │
+│   │     → Seller gets payment                           │   │
+│   │                                                     │   │
+│   │  2. CANCEL (Seller cancels before deadline)         │   │
+│   │     → Seller gets refund                            │   │
+│   │                                                     │   │
+│   │  3. REFUND (Buyer claims after deadline)            │   │
+│   │     → Buyer gets refund                             │   │
+│   │                                                     │   │
+│   │  4. DISPUTE (Optional - needs arbitrator)           │   │
+│   │     → Arbitrator decides                            │   │
+│   │                                                     │   │
+│   └─────────────────────────────────────────────────────┘   │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Types Definition
 
-```aiken title="lib/escrow/types.ak"
+```rust title="lib/escrow/types.ak"
 //// Types cho Escrow Contract
 
 /// Trạng thái của Escrow
@@ -150,7 +150,7 @@ pub type DisputeWinner {
 
 ## Validator Implementation
 
-```aiken title="validators/escrow.ak"
+```rust title="validators/escrow.ak"
 //// Escrow Validator
 //// Hợp đồng ký quỹ đơn giản
 
@@ -243,7 +243,7 @@ Phiên bản chính của escrow contract ở trên đã là phiên bản đơn 
 
 ## Comprehensive Tests
 
-```aiken title="lib/escrow/escrow_test.ak"
+```rust title="lib/escrow/escrow_test.ak"
 //// Tests cho Escrow Contract
 
 // ============================================
@@ -531,99 +531,6 @@ async function refundEscrow(
 }
 ```
 
-## Security Considerations
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│              SECURITY CONSIDERATIONS                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   1. TIME MANIPULATION                                      │
-│   ─────────────────────                                     │
-│   • Slot time có độ trễ ~20 giây                           │
-│   • Set deadline với buffer                                 │
-│   • Sử dụng validity_range đúng cách                       │
-│                                                             │
-│   2. OUTPUT VALIDATION                                      │
-│   ─────────────────────                                     │
-│   • Luôn verify output address                             │
-│   • Kiểm tra đủ amount                                     │
-│   • Cẩn thận với address format                            │
-│                                                             │
-│   3. DATUM INTEGRITY                                        │
-│   ──────────────────                                        │
-│   • Validate datum khi create                              │
-│   • Không trust datum từ input mà không verify             │
-│   • Check state transitions                                 │
-│                                                             │
-│   4. ACCESS CONTROL                                         │
-│   ─────────────────                                         │
-│   • Verify signatures cho mọi action                       │
-│   • Không hardcode PKHs trong production                   │
-│   • Consider multi-sig cho high-value                      │
-│                                                             │
-│   5. ECONOMIC ATTACKS                                       │
-│   ────────────────────                                      │
-│   • Min UTxO requirements                                  │
-│   • Transaction fees                                       │
-│   • Dust attacks                                           │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Production Checklist
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│              PRODUCTION CHECKLIST                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   □ Code Review                                             │
-│     • Peer review bởi experienced developer                │
-│     • Security audit nếu high-value                        │
-│                                                             │
-│   □ Testing                                                 │
-│     • Unit tests cho mọi branch                            │
-│     • Property-based testing                               │
-│     • Integration tests on testnet                         │
-│     • Stress testing                                       │
-│                                                             │
-│   □ Documentation                                           │
-│     • Clear datum/redeemer specs                           │
-│     • User guide cho off-chain                             │
-│     • Error handling guide                                 │
-│                                                             │
-│   □ Deployment                                              │
-│     • Deploy to testnet first                              │
-│     • Test with real transactions                          │
-│     • Monitor for issues                                   │
-│     • Gradual mainnet rollout                              │
-│                                                             │
-│   □ Operations                                              │
-│     • Monitoring setup                                     │
-│     • Alert system                                         │
-│     • Incident response plan                               │
-│     • Upgrade path (if needed)                             │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Tóm tắt
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    KEY TAKEAWAYS                            │
-├─────────────────────────────────────────────────────────────┤
-│  1. Escrow = Bên thứ 3 (contract) giữ tiền                 │
-│  2. States: AwaitingDelivery → Complete/Cancel/Refund      │
-│  3. Time-based conditions quan trọng cho disputes          │
-│  4. Validate outputs để ensure correct payment             │
-│  5. Test all branches và edge cases                        │
-│  6. Consider security implications trước mainnet           │
-│  7. Off-chain integration cần match on-chain logic         │
-└─────────────────────────────────────────────────────────────┘
-```
-
 ## Hoàn thành Khóa học
 
 Chúc mừng! Bạn đã hoàn thành toàn bộ khóa học **Aiken Smart Contract Development**!
@@ -651,15 +558,17 @@ Chúc mừng! Bạn đã hoàn thành toàn bộ khóa học **Aiken Smart Contr
 - One-shot pattern
 
 **Part 5: Escrow Contract**
-- Real-world dApp design
-- Dispute resolution
-- Production considerations
+- Real-world smart contract design
 
-### Bước tiếp theo
+## Code mẫu
 
-- Thực hành xây dựng projects riêng
-- Tham gia cộng đồng Aiken
-- Đọc documentation chính thức
-- Contribute to open source projects
+Xem code mẫu đầy đủ trong thư mục `examples/`:
 
-**Happy building on Cardano!**
+- **validators/escrow.ak** - Escrow Contract hoàn chỉnh với Complete/Cancel/Refund
+- **lib/escrow_test.ak** - 14 test cases bao gồm edge cases và scenarios
+
+```bash
+# Chạy tests
+cd examples
+aiken check -m "escrow_test"
+```
