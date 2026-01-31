@@ -1,0 +1,333 @@
+{
+  "preamble": {
+    "title": "aiken-vn/course-verification",
+    "description": "Aiken contracts for project 'aiken-vn/course-verification'",
+    "version": "0.0.0",
+    "plutusVersion": "v3",
+    "compiler": {
+      "name": "Aiken",
+      "version": "v1.1.21+42babe5"
+    },
+    "license": "Apache-2.0"
+  },
+  "validators": [
+    {
+      "title": "escrow.escrow.spend",
+      "datum": {
+        "title": "datum",
+        "schema": {
+          "$ref": "#/definitions/escrow~1EscrowDatum"
+        }
+      },
+      "redeemer": {
+        "title": "redeemer",
+        "schema": {
+          "$ref": "#/definitions/escrow~1EscrowRedeemer"
+        }
+      },
+      "compiledCode": "59038101010029800aba2aba1aba0aab9faab9eaab9dab9a488888896600264653001300800198041804800cdc3a400530080024888966002600460106ea800e26466453001159800980098059baa0028cc004c03cc030dd500148c040c044c044006460206022003230103011301130110019119198008009bac301230133013301330133013301330133013300f375400644b30010018a508acc004cdc79bae30130010038a51899801001180a000a01c404523010301130113011301130113011301100198059baa00748888888c9660026012005159800998020061bae30063014375401113300100c375a600e60286ea802229410124566002601a005159800998020061bae3017301437540111323322598009808180b1baa0028992cc004c044c05cdd51805180c1baa300a3018375400913371000200513371200200480b0dd6980d180b9baa0028a5040546030602a6ea8c01cc054dd50009bad300630153754012600660286ea803229410124566002660080186eb8c018c050dd50044566002646644b3001301030163754005132598009808980b9baa300a30183754603660306ea8012266e20008006266e240080050161bad301a3017375400514a080a8c060c054dd5180c180a9baa001375a600c602a6ea8024c00cc050dd500644cc004030dd69803980a1baa0088a50404914a08091012202422323300100137586012602c6ea800c896600200314a115980099b8900332598009808980b9baa0018a40011375a603660306ea8005016192cc004c044c05cdd5000c530103d87a8000899198008009bab301c3019375400444b30010018a6103d87a8000899192cc004cdc8a45000018acc004cdc7a44100001899ba548000cc078c0700092f5c114c0103d87a80004069133004004302000340686eb8c068004c07400501b202c32330010013756601460306ea8c06c008896600200314c103d87a8000899192cc004cdc8a45000018acc004cdc7a44100001899ba548000cc074c06c0092f5c114c0103d87a80004065133004004301f00340646eb8c064004c07000501a4528c4cc008008c06c005015203045900a4c02cdd5003cc03c00d2225980098020014566002601e6ea802a00716404115980098040014566002601e6ea802a00716404115980099b874801000a2b3001300f37540150038b20208b201a40348068601a601c0026e1d20003009375400716401c300800130033754011149a26cac8009",
+      "hash": "43049ce146f470148187f04832805873e65748c650feabe3b65cdd5f"
+    },
+    {
+      "title": "escrow.escrow.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "compiledCode": "59038101010029800aba2aba1aba0aab9faab9eaab9dab9a488888896600264653001300800198041804800cdc3a400530080024888966002600460106ea800e26466453001159800980098059baa0028cc004c03cc030dd500148c040c044c044006460206022003230103011301130110019119198008009bac301230133013301330133013301330133013300f375400644b30010018a508acc004cdc79bae30130010038a51899801001180a000a01c404523010301130113011301130113011301100198059baa00748888888c9660026012005159800998020061bae30063014375401113300100c375a600e60286ea802229410124566002601a005159800998020061bae3017301437540111323322598009808180b1baa0028992cc004c044c05cdd51805180c1baa300a3018375400913371000200513371200200480b0dd6980d180b9baa0028a5040546030602a6ea8c01cc054dd50009bad300630153754012600660286ea803229410124566002660080186eb8c018c050dd50044566002646644b3001301030163754005132598009808980b9baa300a30183754603660306ea8012266e20008006266e240080050161bad301a3017375400514a080a8c060c054dd5180c180a9baa001375a600c602a6ea8024c00cc050dd500644cc004030dd69803980a1baa0088a50404914a08091012202422323300100137586012602c6ea800c896600200314a115980099b8900332598009808980b9baa0018a40011375a603660306ea8005016192cc004c044c05cdd5000c530103d87a8000899198008009bab301c3019375400444b30010018a6103d87a8000899192cc004cdc8a45000018acc004cdc7a44100001899ba548000cc078c0700092f5c114c0103d87a80004069133004004302000340686eb8c068004c07400501b202c32330010013756601460306ea8c06c008896600200314c103d87a8000899192cc004cdc8a45000018acc004cdc7a44100001899ba548000cc074c06c0092f5c114c0103d87a80004065133004004301f00340646eb8c064004c07000501a4528c4cc008008c06c005015203045900a4c02cdd5003cc03c00d2225980098020014566002601e6ea802a00716404115980098040014566002601e6ea802a00716404115980099b874801000a2b3001300f37540150038b20208b201a40348068601a601c0026e1d20003009375400716401c300800130033754011149a26cac8009",
+      "hash": "43049ce146f470148187f04832805873e65748c650feabe3b65cdd5f"
+    },
+    {
+      "title": "gift.gift.spend",
+      "datum": {
+        "title": "datum",
+        "schema": {
+          "$ref": "#/definitions/gift~1GiftDatum"
+        }
+      },
+      "redeemer": {
+        "title": "redeemer",
+        "schema": {
+          "$ref": "#/definitions/gift~1GiftRedeemer"
+        }
+      },
+      "compiledCode": "58b101010029800aba2aba1aab9faab9eaab9dab9a48888896600264653001300700198039804000cc01c0092225980099b8748008c01cdd500144c8cc896600266e1d2000300a375400d13232598009808001456600266e1d2000300c375400713371e6e50dd7180798069baa008375c601e601a6ea8c03cc034dd5001c5900b45900e1bae300e001300b375400d16402460160026016601800260106ea800a2c8030600e00260066ea801e29344d95900101",
+      "hash": "5903e2275fe968f4882f19627be8653a80d77d4eff9a8b009d4e4bd4"
+    },
+    {
+      "title": "gift.gift.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "compiledCode": "58b101010029800aba2aba1aab9faab9eaab9dab9a48888896600264653001300700198039804000cc01c0092225980099b8748008c01cdd500144c8cc896600266e1d2000300a375400d13232598009808001456600266e1d2000300c375400713371e6e50dd7180798069baa008375c601e601a6ea8c03cc034dd5001c5900b45900e1bae300e001300b375400d16402460160026016601800260106ea800a2c8030600e00260066ea801e29344d95900101",
+      "hash": "5903e2275fe968f4882f19627be8653a80d77d4eff9a8b009d4e4bd4"
+    },
+    {
+      "title": "nft_policy.nft_policy.mint",
+      "redeemer": {
+        "title": "redeemer",
+        "schema": {
+          "$ref": "#/definitions/nft_policy~1NFTRedeemer"
+        }
+      },
+      "parameters": [
+        {
+          "title": "config",
+          "schema": {
+            "$ref": "#/definitions/nft_policy~1NFTConfig"
+          }
+        }
+      ],
+      "compiledCode": "590272010100229800aba2aba1aba0aab9faab9eaab9dab9a488888896600264653001300800198041804800cdc3a400130080024888966002600460106ea800e266446644b30013006001899192cc004c04c00a0091640406eb8c044004c034dd5004456600260060031323259800980980140122c8080dd7180880098069baa0088b2016402c2646644b30013007300d37540131598009919198008009bac30133010375401044b30010018a508acc004cdd7980a18089baa30140010038a51899801001180a800a01e40486022601c6ea80522b3001300432330010013259800980318079baa0018a5eb7bdb18226eacc04cc040dd5000a01c3300437566004601e6ea801c0188966002003148002266e01200233002002301400140451300498009bab3001300e375400d0059bae3011300e37540128012294100c45282018899b8798009bab3001300e375400d0059bae3011300e375401280112001403044464b30013006300f375400314800226eb4c04cc040dd5000a01c3259800980318079baa0018a60103d87a8000899198008009bab30143011375400444b30010018a6103d87a8000899192cc004cdc8803000c56600266e3c018006266e9520003301630140024bd7045300103d87a80004049133004004301800340486eb8c048004c054005013201c330040030022301030113011301130110012232330010010032259800800c530103d87a8000899192cc004cdc8802800c56600266e3c014006266e9520003301330110024bd7045300103d87a8000403d1330040043015003403c6eb8c03c004c04800501018051baa006375c601860126ea800cdc3a400516401c300800130033754011149a26cac8009",
+      "hash": "13ac632ccc9a077c8bb53c02cb1a37232905e1112822293b5e93a6e6"
+    },
+    {
+      "title": "nft_policy.nft_policy.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "config",
+          "schema": {
+            "$ref": "#/definitions/nft_policy~1NFTConfig"
+          }
+        }
+      ],
+      "compiledCode": "590272010100229800aba2aba1aba0aab9faab9eaab9dab9a488888896600264653001300800198041804800cdc3a400130080024888966002600460106ea800e266446644b30013006001899192cc004c04c00a0091640406eb8c044004c034dd5004456600260060031323259800980980140122c8080dd7180880098069baa0088b2016402c2646644b30013007300d37540131598009919198008009bac30133010375401044b30010018a508acc004cdd7980a18089baa30140010038a51899801001180a800a01e40486022601c6ea80522b3001300432330010013259800980318079baa0018a5eb7bdb18226eacc04cc040dd5000a01c3300437566004601e6ea801c0188966002003148002266e01200233002002301400140451300498009bab3001300e375400d0059bae3011300e37540128012294100c45282018899b8798009bab3001300e375400d0059bae3011300e375401280112001403044464b30013006300f375400314800226eb4c04cc040dd5000a01c3259800980318079baa0018a60103d87a8000899198008009bab30143011375400444b30010018a6103d87a8000899192cc004cdc8803000c56600266e3c018006266e9520003301630140024bd7045300103d87a80004049133004004301800340486eb8c048004c054005013201c330040030022301030113011301130110012232330010010032259800800c530103d87a8000899192cc004cdc8802800c56600266e3c014006266e9520003301330110024bd7045300103d87a8000403d1330040043015003403c6eb8c03c004c04800501018051baa006375c601860126ea800cdc3a400516401c300800130033754011149a26cac8009",
+      "hash": "13ac632ccc9a077c8bb53c02cb1a37232905e1112822293b5e93a6e6"
+    },
+    {
+      "title": "simple_ft.simple_ft.mint",
+      "redeemer": {
+        "title": "redeemer",
+        "schema": {
+          "$ref": "#/definitions/simple_ft~1FTRedeemer"
+        }
+      },
+      "parameters": [
+        {
+          "title": "config",
+          "schema": {
+            "$ref": "#/definitions/simple_ft~1FTConfig"
+          }
+        }
+      ],
+      "compiledCode": "58fa010100229800aba2aba1aab9faab9eaab9dab9a48888896600264653001300700198039804000cdc3a400130070024888966002600460106ea800e33001375c601660126ea800e264b300130033009375400b133001002375c601860146ea803e2660020046eb8c030c028dd5007a0102232330010013758601c601e601e601e601e601e601e601e601e60186ea800c896600200314a115980099b8f375c601e00200714a31330020023010001402c807260106ea8011222598009802800c56600260186ea801e00516403515980099b87480080062b3001300c375400f0028b201a8b201440288b200e180380098019baa0078a4d1365640041",
+      "hash": "6dcfc31ce4a0ca90e01349d228477f7278d50232d366e816db2733b6"
+    },
+    {
+      "title": "simple_ft.simple_ft.else",
+      "redeemer": {
+        "schema": {}
+      },
+      "parameters": [
+        {
+          "title": "config",
+          "schema": {
+            "$ref": "#/definitions/simple_ft~1FTConfig"
+          }
+        }
+      ],
+      "compiledCode": "58fa010100229800aba2aba1aab9faab9eaab9dab9a48888896600264653001300700198039804000cdc3a400130070024888966002600460106ea800e33001375c601660126ea800e264b300130033009375400b133001002375c601860146ea803e2660020046eb8c030c028dd5007a0102232330010013758601c601e601e601e601e601e601e601e601e60186ea800c896600200314a115980099b8f375c601e00200714a31330020023010001402c807260106ea8011222598009802800c56600260186ea801e00516403515980099b87480080062b3001300c375400f0028b201a8b201440288b200e180380098019baa0078a4d1365640041",
+      "hash": "6dcfc31ce4a0ca90e01349d228477f7278d50232d366e816db2733b6"
+    }
+  ],
+  "definitions": {
+    "ByteArray": {
+      "dataType": "bytes"
+    },
+    "Int": {
+      "dataType": "integer"
+    },
+    "cardano/assets/AssetName": {
+      "title": "AssetName",
+      "dataType": "bytes"
+    },
+    "cardano/transaction/OutputReference": {
+      "title": "OutputReference",
+      "description": "An `OutputReference` is a unique reference to an output on-chain. The `output_index`\n corresponds to the position in the output list of the transaction (identified by its id)\n that produced that output",
+      "anyOf": [
+        {
+          "title": "OutputReference",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "transaction_id",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "output_index",
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        }
+      ]
+    },
+    "escrow/EscrowDatum": {
+      "title": "EscrowDatum",
+      "anyOf": [
+        {
+          "title": "EscrowDatum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "seller",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "buyer",
+              "$ref": "#/definitions/ByteArray"
+            },
+            {
+              "title": "amount",
+              "$ref": "#/definitions/Int"
+            },
+            {
+              "title": "deadline",
+              "$ref": "#/definitions/Int"
+            }
+          ]
+        }
+      ]
+    },
+    "escrow/EscrowRedeemer": {
+      "title": "EscrowRedeemer",
+      "anyOf": [
+        {
+          "title": "Complete",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        },
+        {
+          "title": "Cancel",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": []
+        },
+        {
+          "title": "Refund",
+          "dataType": "constructor",
+          "index": 2,
+          "fields": []
+        }
+      ]
+    },
+    "gift/GiftDatum": {
+      "title": "GiftDatum",
+      "description": "Datum: Hash của password",
+      "anyOf": [
+        {
+          "title": "GiftDatum",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "password_hash",
+              "$ref": "#/definitions/ByteArray"
+            }
+          ]
+        }
+      ]
+    },
+    "gift/GiftRedeemer": {
+      "title": "GiftRedeemer",
+      "description": "Redeemer: Password plaintext",
+      "anyOf": [
+        {
+          "title": "GiftRedeemer",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "password",
+              "$ref": "#/definitions/ByteArray"
+            }
+          ]
+        }
+      ]
+    },
+    "nft_policy/NFTConfig": {
+      "title": "NFTConfig",
+      "description": "Config với UTxO reference (one-shot pattern)",
+      "anyOf": [
+        {
+          "title": "NFTConfig",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "utxo_ref",
+              "$ref": "#/definitions/cardano~1transaction~1OutputReference"
+            }
+          ]
+        }
+      ]
+    },
+    "nft_policy/NFTRedeemer": {
+      "title": "NFTRedeemer",
+      "description": "Redeemer cho NFT",
+      "anyOf": [
+        {
+          "title": "MintNFT",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "asset_name",
+              "$ref": "#/definitions/cardano~1assets~1AssetName"
+            }
+          ]
+        },
+        {
+          "title": "BurnNFT",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": [
+            {
+              "title": "asset_name",
+              "$ref": "#/definitions/cardano~1assets~1AssetName"
+            }
+          ]
+        }
+      ]
+    },
+    "simple_ft/FTConfig": {
+      "title": "FTConfig",
+      "description": "Admin public key hash (parameterized)",
+      "anyOf": [
+        {
+          "title": "FTConfig",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": [
+            {
+              "title": "admin_pkh",
+              "$ref": "#/definitions/ByteArray"
+            }
+          ]
+        }
+      ]
+    },
+    "simple_ft/FTRedeemer": {
+      "title": "FTRedeemer",
+      "description": "Redeemer",
+      "anyOf": [
+        {
+          "title": "Mint",
+          "dataType": "constructor",
+          "index": 0,
+          "fields": []
+        },
+        {
+          "title": "Burn",
+          "dataType": "constructor",
+          "index": 1,
+          "fields": []
+        }
+      ]
+    }
+  }
+}

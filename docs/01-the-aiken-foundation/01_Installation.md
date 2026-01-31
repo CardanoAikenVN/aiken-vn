@@ -1,262 +1,177 @@
 ---
-title: "01. Cài Đặt Môi Trường"
+title: Cài đặt
 sidebar_position: 1
-description: "Thiết lập môi trường phát triển hoàn chỉnh để viết smart contract trên Cardano với Aiken"
 ---
 
-# Bài 01: Cài Đặt Môi Trường Lập Trình Aiken
+# Cài đặt Aiken
 
-> **Mục tiêu**: Thiết lập môi trường phát triển hoàn chỉnh để viết smart contract trên Cardano với Aiken
+Bài học này hướng dẫn bạn thiết lập môi trường phát triển Aiken từ đầu.
 
----
+## Mục tiêu học tập
 
-## Giới thiệu
+- Cài đặt Aiken CLI trên các hệ điều hành khác nhau
+- Xác minh cài đặt thành công
+- Thiết lập editor hỗ trợ Aiken
 
-**AIKEN** là nền tảng Smart Contract hiện đại cho Cardano.
+## Aikup - Công cụ quản lý phiên bản
 
-| Bước | Input | Output |
-|------|-------|--------|
-| 1. Viết code | File `.ak` | Source code |
-| 2. Compile | `aiken build` | UPLC bytecode |
-| 3. Deploy | UPLC | On-chain contract |
+**Aikup** là công cụ được khuyến nghị để cài đặt và quản lý các phiên bản Aiken.
 
-Aiken là ngôn ngữ lập trình **functional** hiện đại được thiết kế riêng cho Cardano blockchain. Aiken compile xuống **UPLC (Untyped Plutus Core)** - ngôn ngữ thực thi smart contract trên Cardano.
+### Cài đặt trên macOS
 
----
+```bash
+# Sử dụng Homebrew
+brew install aiken-lang/tap/aikup
+
+# Hoặc sử dụng curl
+curl --proto '=https' --tlsv1.2 -LsSf https://install.aiken-lang.org | sh
+```
+
+### Cài đặt trên Linux
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://install.aiken-lang.org | sh
+```
+
+### Cài đặt trên Windows
+
+```powershell
+powershell -c "irm https://windows.aiken-lang.org | iex"
+```
+
+Hoặc tải MSI installer từ [GitHub releases](https://github.com/aiken-lang/aikup/releases/latest).
+
+### Cài đặt qua npm
+
+```bash
+npm install -g @aiken-lang/aikup
+```
 
 ## Cài đặt Aiken
 
-### Phương pháp 1: Sử dụng aikup (Khuyến nghị)
-
-**aikup** là công cụ quản lý phiên bản Aiken, tương tự như `nvm` cho Node.js hay `rustup` cho Rust.
-
-#### Trên macOS/Linux:
+Sau khi có aikup, chạy lệnh:
 
 ```bash
-# Cài đặt aikup
-curl --proto '=https' --tlsv1.2 -LsSf https://install.aiken-lang.org | sh
-
-# Sau khi cài, chạy:
 aikup
 ```
 
-#### Trên macOS (Homebrew):
+Lệnh này sẽ tự động tải và cài đặt phiên bản Aiken mới nhất.
+
+## Xác minh cài đặt
 
 ```bash
-# Cài đặt qua Homebrew
-brew install aiken-lang/tap/aikup
-
-# Chạy aikup
-aikup
-```
-
-#### Trên Windows:
-
-```powershell
-# Chạy trong PowerShell
-powershell -c "irm https://windows.aiken-lang.org | iex"
-
-# Sau đó:
-aikup
-```
-
-### Phương pháp 2: Sử dụng npm (Node.js)
-
-```bash
-# Cài đặt global
-npm install -g @aiken-lang/aikup
-
-# Chạy aikup
-aikup
-```
-
----
-
-## Kiểm tra cài đặt
-
-Sau khi cài đặt, verify bằng các lệnh sau:
-
-```bash
-# Kiểm tra version
 aiken --version
-
-# Output mong đợi: aiken v1.x.x
 ```
 
+Output mẫu:
+```
+aiken v1.1.0
+```
+
+## Các lệnh CLI cơ bản
+
+Kiểm tra danh sách lệnh có sẵn:
+
 ```bash
-# Xem help
 aiken --help
 ```
 
-**Các lệnh Aiken CLI chính:**
+```
+Usage: aiken <COMMAND>
 
-| Lệnh | Mô tả |
-|------|-------|
-| `aiken new` | Tạo project mới |
-| `aiken build` | Build project |
-| `aiken check` | Type-check project |
-| `aiken fmt` | Format code |
-| `aiken docs` | Tạo documentation |
-| `aiken add` | Thêm dependencies |
-| `aiken lsp` | Chạy language server |
+Commands:
+  new        Tạo dự án Aiken mới
+  build      Biên dịch dự án
+  check      Chạy kiểm thử
+  docs       Tạo tài liệu
+  fmt        Format mã nguồn
+  lsp        Khởi động Language Server
+  completion Tạo shell completions
+```
 
----
+## Thiết lập Editor
 
-## Cài đặt Editor Support
+### Visual Studio Code
 
-Aiken có hỗ trợ **Language Server Protocol (LSP)** cho các editor phổ biến.
+1. Cài đặt extension **Aiken** từ marketplace
+2. Extension tự động sử dụng Aiken LSP
 
-### Visual Studio Code (Khuyến nghị cho người mới)
+### Vim/Neovim
 
-1. Mở **VS Code**
-2. Nhấn `Ctrl+Shift+X` (Windows/Linux) hoặc `Cmd+Shift+X` (macOS)
-3. Tìm kiếm "**Aiken**"
-4. Cài đặt extension **Aiken** (by Aiken)
-
-**Tính năng VS Code Extension:**
-
-- ✅ Syntax highlighting
-- ✅ Auto-completion
-- ✅ Error diagnostics
-- ✅ Go to definition
-- ✅ Hover documentation
-
-### NeoVim
+Thêm vào config:
 
 ```lua
--- Trong init.lua hoặc config của bạn
--- Yêu cầu: nvim-lspconfig
+-- Neovim với nvim-lspconfig
 require('lspconfig').aiken.setup{}
 ```
 
-### Emacs
-
-```elisp
-;; Cài đặt aiken-mode từ MELPA
-(use-package aiken-mode)
-```
-
----
-
-## Tạo Project Đầu Tiên
-
-Hãy tạo project đầu tiên để test môi trường:
+### Shell Completions
 
 ```bash
-# Tạo project mới
-aiken new myname/hello_aiken
+# Bash
+aiken completion bash --install
 
-# Di chuyển vào project
-cd hello_aiken
+# Zsh
+aiken completion zsh --install
 
-# Kiểm tra cấu trúc
-ls -la
+# Fish
+aiken completion fish --install
 ```
 
-**Cấu trúc project:**
+## Kiểm tra môi trường
 
-| Thư mục/File | Mô tả |
-|--------------|-------|
-| `README.md` | Tài liệu dự án |
-| `aiken.toml` | File cấu hình project |
-| `lib/` | Thư mục cho library code |
-| `validators/` | Thư mục cho validator code |
-
----
-
-## Build và Test
+Tạo dự án thử nghiệm để xác nhận mọi thứ hoạt động:
 
 ```bash
-# Type-check và build project
-aiken build
-
-# Chỉ type-check (không build)
+aiken new my-org/hello-aiken
+cd hello-aiken
 aiken check
 ```
 
-**Output thành công:**
-
+Output thành công:
 ```
-    Compiling myname/hello_aiken 0.0.0
-    Generating blueprint (plutus.json)
-
+    Compiling my-org/hello-aiken 0.0.0
+    Finished compilation in 0.12s
 Summary
-    0 error, 0 warning(s)
+    0 errors, 0 warnings
 ```
 
----
+## Cấu trúc thư mục sau cài đặt
 
-## Workflow Phát Triển
+```
+~/.aiken/
+├── bin/
+│   └── aiken          # Aiken binary
+└── versions/
+    └── 1.1.0/         # Phiên bản đã cài
+```
 
-| Bước | Công cụ | Input | Output |
-|------|---------|-------|--------|
-| 1. Viết Code | Editor + LSP | - | File `.ak` |
-| 2. Check/Build | `aiken build` | File `.ak` | `plutus.json` |
-| 3. Test | `aiken check` | File `.ak` | Test results |
-| 4. Deploy | Off-chain tools | `plutus.json` | On-chain contract |
+## Xử lý lỗi thường gặp
 
-**Off-chain tools phổ biến:**
-- **Mesh.js** (JavaScript/TypeScript)
-- **Lucid Evolution** (TypeScript)
-- **PyCardano** (Python)
-- **cardano-cli** (Command line)
+### Lỗi "command not found"
 
----
+Thêm đường dẫn vào PATH:
 
-## Tài nguyên hữu ích
-
-| Tài nguyên | Link |
-|------------|------|
-| Tài liệu chính thức | https://aiken-lang.org |
-| Standard Library | https://aiken-lang.github.io/stdlib/ |
-| Playground (thử code online) | https://play.aiken-lang.org |
-| Discord Community | https://discord.gg/ub6atE94v4 |
-| GitHub | https://github.com/aiken-lang/aiken |
-
----
-
-## Bài tập thực hành
-
-### Bài tập 1: Xác nhận cài đặt
 ```bash
-# Chạy các lệnh sau và ghi lại output
-aiken --version
-aiken --help
+# Thêm vào ~/.bashrc hoặc ~/.zshrc
+export PATH="$HOME/.aiken/bin:$PATH"
 ```
 
-### Bài tập 2: Tạo project đầu tiên
+### Lỗi quyền truy cập trên Linux/macOS
+
 ```bash
-# Thay "yourname" bằng tên của bạn
-aiken new yourname/my_first_project
-cd my_first_project
-aiken build
+chmod +x ~/.aiken/bin/aiken
 ```
 
-### Bài tập 3: Khám phá playground
-1. Truy cập https://play.aiken-lang.org
-2. Thử chạy một ví dụ có sẵn
-3. Quan sát output và compilation result
+## Tóm tắt
 
----
+| Bước | Lệnh |
+|------|------|
+| Cài aikup | `brew install aiken-lang/tap/aikup` |
+| Cài Aiken | `aikup` |
+| Xác minh | `aiken --version` |
+| Kiểm tra | `aiken new test && cd test && aiken check` |
 
-## Checklist hoàn thành
+## Bước tiếp theo
 
-- [ ] Cài đặt aikup thành công
-- [ ] Chạy `aiken --version` hiển thị phiên bản
-- [ ] Cài đặt extension Aiken trên editor
-- [ ] Tạo và build thành công project đầu tiên
-- [ ] Tham gia Discord community (tuỳ chọn)
-
----
-
-## Ghi chú quan trọng
-
-:::warning Lưu ý
-Aiken được thiết kế **chỉ cho on-chain code** (validator scripts). Để build full DApp, bạn cần kết hợp với off-chain tools như Mesh.js, Lucid Evolution, PyCardano, hoặc cardano-cli.
-:::
-
----
-
-**Chúc mừng! Bạn đã sẵn sàng bắt đầu hành trình học Aiken!**
-
-➡️ **Tiếp theo**: [Bài 02 - Giới thiệu về Aiken](./02_Introduction.md)
+Trong bài tiếp theo, chúng ta sẽ tìm hiểu tổng quan về ngôn ngữ Aiken và lý do nó phù hợp cho phát triển smart contract trên Cardano.

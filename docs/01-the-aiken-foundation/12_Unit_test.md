@@ -1,685 +1,375 @@
 ---
-title: "12. Kiểm thử đơn vị (Unit Testing)"
+title: Kiểm thử đơn vị
 sidebar_position: 12
-description: "Viết và chạy tests hiệu quả trong Aiken - Unit tests, Expected failure tests, Property-based testing với Fuzzers"
 ---
 
-# Bài 12: Kiểm thử đơn vị (Unit Testing)
+# Kiểm thử đơn vị trong Aiken
 
-:::info Mục tiêu
-Viết và chạy tests hiệu quả trong Aiken
-:::
+Bài học này hướng dẫn cách viết và chạy unit tests trong Aiken.
 
-## Bạn sẽ học
+## Mục tiêu học tập
 
-- Viết unit tests với test keyword
-- Expected failure tests với fail keyword
-- Property-based testing với Fuzzers
-- Test organization và best practices
-- Đọc hiểu test output và debug
+- Viết unit tests cơ bản
+- Sử dụng property-based testing
+- Đọc kết quả test và metrics
+- Áp dụng test-driven development
 
----
+## Unit Test cơ bản
 
-## Testing trong Aiken
+### Cú pháp test
 
-Aiken có **built-in testing framework** chạy trên cùng VM với on-chain code.
-
-| Loại Test | Cú pháp | Mục đích |
-|-----------|---------|----------|
-| Unit Tests | `test name() { ... }` | Kiểm tra logic cụ thể |
-| Fail Tests | `test name() fail { ... }` | Kiểm tra code nên fail |
-| Property Tests | `test name(x via fuzzer) { ... }` | Kiểm tra với random inputs |
-
-:::tip
-Tất cả tests chạy trên Plutus VM → giống production
-:::
-
----
-
-## 1. Unit Tests cơ bản
-
-### Syntax
-
-```aiken
-// Test đơn giản - return Bool
-test my_first_test() {
+```rust title="lib/math_test.ak"
+/// Test đơn giản nhất
+test test_addition() {
   1 + 1 == 2
 }
 
-// Test với nhiều assertions
-test multiple_assertions() {
-  let x = 10
-  let y = 20
+/// Test với logic
+test test_is_positive() {
+  let n = 42
+  n > 0
+}
 
-  x < y && x + y == 30 && y - x == 10
+/// Test với and block
+test test_multiple_conditions() {
+  let a = 10
+  let b = 20
+
+  and {
+    a < b,
+    a + b == 30,
+    a * 2 == b,
+  }
 }
 ```
 
-### Test cho Functions
-
-```aiken
-fn add(a: Int, b: Int) -> Int {
-  a + b
-}
-
-fn multiply(a: Int, b: Int) -> Int {
-  a * b
-}
-
-test add_positive_numbers() {
-  add(2, 3) == 5
-}
-
-test add_negative_numbers() {
-  add(-5, 3) == -2
-}
-
-test add_zero() {
-  add(0, 0) == 0
-}
-
-test multiply_works() {
-  multiply(4, 5) == 20
-}
-
-test multiply_by_zero() {
-  multiply(100, 0) == 0
-}
-```
-
----
-
-## 2. Expected Failure Tests
-
-Dùng `fail` để test code **nên fail**.
-
-```aiken
-fn divide(a: Int, b: Int) -> Int {
-  expect b != 0
-  a / b
-}
-
-fn unwrap(opt: Option<Int>) -> Int {
-  expect Some(value) = opt
-  value
-}
-
-// Test expect sẽ fail
-test divide_by_zero_fails() fail {
-  divide(10, 0) == 0
-}
-
-test unwrap_none_fails() fail {
-  unwrap(None) == 0
-}
-
-// Test pattern match fails
-test list_head_empty_fails() fail {
-  expect [first, ..] = []
-  first == 0
-}
-```
-
-:::info fail Test Logic
-`test name() fail { ... }`
-
-- Test **PASS** nếu code bên trong **FAIL**
-- Test **FAIL** nếu code bên trong **PASS**
-
-Dùng để verify:
-- expect failures
-- Invalid input handling
-- Edge cases
-:::
-
----
-
-## 3. Property-Based Testing
-
-Aiken hỗ trợ **property-based testing** với random inputs.
-
-### Sử dụng Fuzzers
-
-```aiken
-use aiken/fuzz
-
-// Test với random Int
-test add_commutative(a via fuzz.int(), b via fuzz.int()) {
-  add(a, b) == add(b, a)
-}
-
-// Test với random Int trong range
-test add_positive_stays_positive(
-  a via fuzz.int_between(1, 1000),
-  b via fuzz.int_between(1, 1000),
-) {
-  add(a, b) > 0
-}
-
-// Test với random ByteArray
-test concat_length(
-  a via fuzz.bytearray(),
-  b via fuzz.bytearray(),
-) {
-  bytearray.length(bytearray.concat(a, b)) ==
-    bytearray.length(a) + bytearray.length(b)
-}
-```
-
-### Available Fuzzers
-
-```aiken
-use aiken/fuzz
-
-// Primitive fuzzers
-fuzz.int()                      // Random Int
-fuzz.int_between(min, max)      // Int trong range
-fuzz.bytearray()                // Random ByteArray
-fuzz.bytearray_between(min, max) // ByteArray với độ dài trong range
-fuzz.bool()                     // True hoặc False
-
-// Compound fuzzers
-fuzz.list(fuzz.int())           // List of random Ints
-fuzz.option(fuzz.int())         // Some(Int) hoặc None
-fuzz.either(fuzz.int(), fuzz.bytearray()) // Left hoặc Right
-```
-
-### Custom Fuzzers
-
-```aiken
-use aiken/fuzz.{Fuzzer}
-
-type Point {
-  x: Int,
-  y: Int,
-}
-
-// Custom fuzzer cho Point
-fn point_fuzzer() -> Fuzzer<Point> {
-  let x <- fuzz.and_then(fuzz.int_between(-100, 100))
-  let y <- fuzz.and_then(fuzz.int_between(-100, 100))
-  fuzz.constant(Point { x, y })
-}
-
-test point_distance_positive(p via point_fuzzer()) {
-  let d = p.x * p.x + p.y * p.y
-  d >= 0
-}
-```
-
----
-
-## 4. Chạy Tests
-
-### Commands
+### Chạy tests
 
 ```bash
 # Chạy tất cả tests
 aiken check
 
-# Chạy tests trong module cụ thể
-aiken check -m my_module
+# Output mẫu
+    Compiling my-project 0.0.0
+      Testing ...
 
-# Chạy tests matching pattern
-aiken check -m add
-
-# Exact match
-aiken check -m my_module -e test_add_positive
-
-# Tăng số lần chạy property tests
-aiken check --max-success=1000
+    ┍━ math_test ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │ PASS [mem: 1234, cpu: 5678] test_addition
+    │ PASS [mem: 2345, cpu: 6789] test_is_positive
+    │ PASS [mem: 3456, cpu: 7890] test_multiple_conditions
+    ┕━━━━━━━━━━━━━━━━━━━━━━━━━━ 3 tests | 3 passed | 0 failed
 ```
 
-### Test Output
+### Test với custom types
 
-```
-┍━ my_module ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-│ PASS [mem:   5099, cpu:   1884852] add_positive_numbers
-│ PASS [mem:   5963, cpu:   3091855] add_negative_numbers
-│ PASS [mem:   6100, cpu:   3200000] add_zero
-│ FAIL [mem:  11985, cpu:   5076974] multiply_edge_case
-│ · with traces
-│ | expected: 100
-│ | actual: 99
-┕━━━━━━━━━━━━━━ 4 tests | 3 passed | 1 failed
-
-Summary 1 error, 0 warning(s)
-```
-
----
-
-## 5. Testing Validators
-
-```aiken
-use aiken/collection/list
-
-type Datum {
-  owner: ByteArray,
-  amount: Int,
+```rust title="lib/user_test.ak"
+type User {
+  name: ByteArray,
+  age: Int,
+  active: Bool,
 }
 
-type Redeemer {
-  Withdraw
-  Deposit { value: Int }
+fn create_user(name: ByteArray, age: Int) -> User {
+  User { name, age, active: True }
 }
 
-validator my_validator {
-  spend(
-    datum: Option<Datum>,
-    redeemer: Redeemer,
-    _output_ref: Data,
-    _self: Data,
-  ) {
-    expect Some(d) = datum
+fn is_adult(user: User) -> Bool {
+  user.age >= 18
+}
 
-    when redeemer is {
-      Withdraw -> d.amount > 0
-      Deposit { value } -> value > 0
-    }
+test test_create_user() {
+  let user = create_user("Alice", 25)
+
+  and {
+    user.name == "Alice",
+    user.age == 25,
+    user.active == True,
   }
 }
 
-// Testing validator directly
-test validator_withdraw_success() {
-  let datum = Some(Datum { owner: #"abc", amount: 100 })
-  let redeemer = Withdraw
-
-  my_validator.spend(datum, redeemer, "", "")
+test test_is_adult_true() {
+  let adult = create_user("Bob", 30)
+  is_adult(adult) == True
 }
 
-test validator_withdraw_zero_fails() fail {
-  let datum = Some(Datum { owner: #"abc", amount: 0 })
-  let redeemer = Withdraw
-
-  my_validator.spend(datum, redeemer, "", "")
-}
-
-test validator_deposit_positive() {
-  let datum = Some(Datum { owner: #"abc", amount: 0 })
-  let redeemer = Deposit { value: 50 }
-
-  my_validator.spend(datum, redeemer, "", "")
-}
-
-test validator_deposit_negative_fails() fail {
-  let datum = Some(Datum { owner: #"abc", amount: 100 })
-  let redeemer = Deposit { value: -10 }
-
-  my_validator.spend(datum, redeemer, "", "")
+test test_is_adult_false() {
+  let minor = create_user("Charlie", 15)
+  is_adult(minor) == False
 }
 ```
 
----
+## Expected Failure Tests
 
-## 6. Test Organization
+Test phải fail để pass:
 
-### Separate Test Modules
-
-```
-lib/
-├── my_project/
-│   ├── types.ak
-│   ├── validation.ak
-│   └── validation_test.ak    # Tests cho validation
-validators/
-├── main.ak
-└── main_test.ak              # Tests cho validator
-```
-
-### validation_test.ak
-
-```aiken
-use my_project/validation.{validate_amount, validate_owner}
-
-// Group related tests together
-
-// == Amount Validation Tests ==
-
-test validate_amount_positive() {
-  validate_amount(100)
+```rust title="lib/fail_test.ak"
+/// Test này pass nếu expression evaluates to False
+test test_division_by_zero() fail {
+  let result = 10 / 0
+  True  // Sẽ không đến đây - fail trước
 }
 
-test validate_amount_zero() {
-  !validate_amount(0)
-}
-
-test validate_amount_negative() {
-  !validate_amount(-50)
-}
-
-// == Owner Validation Tests ==
-
-test validate_owner_correct_length() {
-  validate_owner(#"0011223344556677889900112233445566778899001122334455667788")
-}
-
-test validate_owner_too_short() {
-  !validate_owner(#"001122")
+/// Test expect với pattern không match
+test test_expect_none_fails() fail {
+  let value: Option<Int> = None
+  expect Some(n) = value
+  n > 0
 }
 ```
 
----
+## Property-Based Testing
 
-## 7. Testing Best Practices
+Tự động sinh test cases:
 
-### NÊN làm
+```rust title="lib/property_test.ak"
+use aiken/fuzz
 
-```aiken
-// 1. Test tên mô tả rõ ràng
-test add_two_positive_integers_returns_sum() {
+/// Property: Cộng số dương luôn lớn hơn operand
+test prop_addition_increases(n: Int via fuzz.int()) {
+  n + 1 > n
+}
+
+/// Property: Danh sách đảo ngược hai lần = gốc
+test prop_reverse_twice(xs: List<Int> via fuzz.list(fuzz.int())) {
+  reverse(reverse(xs)) == xs
+}
+
+fn reverse(xs: List<a>) -> List<a> {
+  reverse_helper(xs, [])
+}
+
+fn reverse_helper(xs: List<a>, acc: List<a>) -> List<a> {
+  when xs is {
+    [] -> acc
+    [head, ..tail] -> reverse_helper(tail, [head, ..acc])
+  }
+}
+```
+
+### Custom Fuzzers
+
+```rust
+use aiken/fuzz
+
+/// Fuzzer cho số dương
+fn positive_int() -> Fuzzer<Int> {
+  fuzz.int()
+    |> fuzz.map(fn(n) { if n < 0 { -n } else { n } })
+    |> fuzz.such_that(fn(n) { n > 0 })
+}
+
+/// Fuzzer cho User
+fn user_fuzzer() -> Fuzzer<User> {
+  fuzz.map2(
+    fuzz.bytearray_between(1, 20),
+    fuzz.int_between(0, 120),
+    fn(name, age) { User { name, age, active: True } },
+  )
+}
+
+test prop_user_age_valid(user: User via user_fuzzer()) {
+  user.age >= 0 && user.age <= 120
+}
+```
+
+## Trace và Debug
+
+### Sử dụng trace
+
+```rust
+fn calculate(a: Int, b: Int) -> Int {
+  trace @"Starting calculation..."
+  let result = a + b
+  trace @"Result calculated"
+  result
+}
+
+test test_with_trace() {
+  let result = calculate(10, 20)
+  trace @"Testing result..."
+  result == 30
+}
+```
+
+### Trace operator (?)
+
+```rust
+test test_with_trace_operator() {
+  let a = 10
+  let b = 20
+
+  // ? traces khi condition là False
+  (a > 0)? && (b > 0)? && (a + b == 30)?
+}
+```
+
+Chạy với trace:
+
+```bash
+aiken check --trace-level verbose
+```
+
+## Test Filtering
+
+```bash
+# Chạy tests trong module cụ thể
+aiken check -m "user_test"
+
+# Chạy test cụ thể
+aiken check -m "user_test.{test_is_adult_true}"
+
+# Match chính xác
+aiken check -m "user_test" -e
+
+# Bỏ qua tests
+aiken check --skip "slow_test"
+```
+
+## Test Metrics
+
+```
+PASS [mem: 1234, cpu: 5678] test_name
+      │           │
+      │           └── CPU units consumed
+      └────────────── Memory units consumed
+```
+
+### Tối ưu dựa trên metrics
+
+```rust
+// Version 1: Recursive (tốn resource)
+fn sum_v1(xs: List<Int>) -> Int {
+  when xs is {
+    [] -> 0
+    [head, ..tail] -> head + sum_v1(tail)
+  }
+}
+
+// Version 2: Tail recursive (tối ưu hơn)
+fn sum_v2(xs: List<Int>) -> Int {
+  sum_helper(xs, 0)
+}
+
+fn sum_helper(xs: List<Int>, acc: Int) -> Int {
+  when xs is {
+    [] -> acc
+    [head, ..tail] -> sum_helper(tail, acc + head)
+  }
+}
+
+test test_sum_v1() {
+  sum_v1([1, 2, 3, 4, 5]) == 15
+}
+
+test test_sum_v2() {
+  sum_v2([1, 2, 3, 4, 5]) == 15
+}
+
+// So sánh metrics để chọn version tốt hơn
+```
+
+## Test-Driven Development
+
+### Workflow TDD
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                     TDD WORKFLOW                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   1. Write Test (RED)                                       │
+│          │                                                  │
+│          ▼                                                  │
+│   2. Run Test → FAIL                                        │
+│          │                                                  │
+│          ▼                                                  │
+│   3. Write Code (GREEN)                                     │
+│          │                                                  │
+│          ▼                                                  │
+│   4. Run Test → PASS                                        │
+│          │                                                  │
+│          ▼                                                  │
+│   5. Refactor (REFACTOR)                                    │
+│          │                                                  │
+│          └───────────────▶ Repeat                           │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Ví dụ TDD
+
+```rust title="lib/calculator_test.ak"
+// Step 1: Write tests first
+
+test test_add() {
   add(2, 3) == 5
 }
 
-// 2. Test edge cases
-test add_handles_max_int() {
-  add(9_223_372_036_854_775_807, 0) == 9_223_372_036_854_775_807
+test test_subtract() {
+  subtract(10, 4) == 6
 }
 
-// 3. Test failure cases
-test divide_by_zero_fails() fail {
-  divide(10, 0) == 0
+test test_multiply() {
+  multiply(3, 4) == 12
 }
 
-// 4. Dùng property tests cho properties
-test addition_is_commutative(a via fuzz.int(), b via fuzz.int()) {
-  add(a, b) == add(b, a)
+test test_divide() {
+  divide(10, 2) == Some(5)
 }
 
-// 5. Group related tests
-// == Positive Cases ==
-test scenario_a_works() { ... }
-test scenario_b_works() { ... }
-
-// == Negative Cases ==
-test invalid_input_fails() fail { ... }
-```
-
-### KHÔNG NÊN làm
-
-```aiken
-// 1. Tên không rõ ràng
-test test1() { ... }
-
-// 2. Nhiều assertions không liên quan
-test everything() {
-  add(1, 1) == 2 &&
-  multiply(2, 2) == 4 &&
-  divide(10, 2) == 5
-}
-
-// 3. Quên test edge cases
-// Missing: empty list, None, zero, negative, etc.
-
-// 4. Hardcode magic numbers
-test some_calculation() {
-  calculate(42, 17) == 714  // What is 714?
+test test_divide_by_zero() {
+  divide(10, 0) == None
 }
 ```
 
----
+```rust title="lib/calculator.ak"
+// Step 2: Implement to make tests pass
 
-## Code mẫu hoàn chỉnh
-
-```aiken
-// ═══════════════════════════════════════════════════════════
-// Bài 12: Unit Testing - Code Examples
-// ═══════════════════════════════════════════════════════════
-
-use aiken/collection/list
-use aiken/fuzz
-
-// ─────────────────────────────────────────────────────────────
-// CODE TO TEST
-// ─────────────────────────────────────────────────────────────
-
-/// Stack data structure
-pub opaque type Stack<a> {
-  items: List<a>,
+pub fn add(a: Int, b: Int) -> Int {
+  a + b
 }
 
-/// Create empty stack
-pub fn empty() -> Stack<a> {
-  Stack { items: [] }
+pub fn subtract(a: Int, b: Int) -> Int {
+  a - b
 }
 
-/// Push item onto stack
-pub fn push<a>(stack: Stack<a>, item: a) -> Stack<a> {
-  Stack { items: [item, ..stack.items] }
+pub fn multiply(a: Int, b: Int) -> Int {
+  a * b
 }
 
-/// Pop item from stack
-pub fn pop<a>(stack: Stack<a>) -> (Option<a>, Stack<a>) {
-  when stack.items is {
-    [] -> (None, stack)
-    [top, ..rest] -> (Some(top), Stack { items: rest })
+pub fn divide(a: Int, b: Int) -> Option<Int> {
+  if b == 0 {
+    None
+  } else {
+    Some(a / b)
   }
-}
-
-/// Peek at top item
-pub fn peek<a>(stack: Stack<a>) -> Option<a> {
-  when stack.items is {
-    [] -> None
-    [top, ..] -> Some(top)
-  }
-}
-
-/// Check if stack is empty
-pub fn is_empty<a>(stack: Stack<a>) -> Bool {
-  stack.items == []
-}
-
-/// Get stack size
-pub fn size<a>(stack: Stack<a>) -> Int {
-  list.length(stack.items)
-}
-
-// ─────────────────────────────────────────────────────────────
-// BASIC UNIT TESTS
-// ─────────────────────────────────────────────────────────────
-
-test empty_stack_is_empty() {
-  is_empty(empty())
-}
-
-test empty_stack_size_is_zero() {
-  size(empty()) == 0
-}
-
-test push_increases_size() {
-  let stack = empty()
-  let stack = push(stack, 1)
-  size(stack) == 1
-}
-
-test push_multiple_items() {
-  let stack = empty()
-  let stack = push(stack, 1)
-  let stack = push(stack, 2)
-  let stack = push(stack, 3)
-  size(stack) == 3
-}
-
-test pop_returns_last_pushed() {
-  let stack = empty()
-  let stack = push(stack, 1)
-  let stack = push(stack, 2)
-  let (top, _) = pop(stack)
-  top == Some(2)
-}
-
-test pop_decreases_size() {
-  let stack = empty()
-  let stack = push(stack, 1)
-  let stack = push(stack, 2)
-  let (_, stack) = pop(stack)
-  size(stack) == 1
-}
-
-test peek_returns_top_without_removing() {
-  let stack = empty()
-  let stack = push(stack, 42)
-  let top = peek(stack)
-  top == Some(42) && size(stack) == 1
-}
-
-// ─────────────────────────────────────────────────────────────
-// EDGE CASE TESTS
-// ─────────────────────────────────────────────────────────────
-
-test pop_empty_returns_none() {
-  let (top, _) = pop(empty())
-  top == None
-}
-
-test peek_empty_returns_none() {
-  peek(empty()) == None
-}
-
-test push_then_pop_leaves_empty() {
-  let stack = empty()
-  let stack = push(stack, 1)
-  let (_, stack) = pop(stack)
-  is_empty(stack)
-}
-
-// ─────────────────────────────────────────────────────────────
-// PROPERTY-BASED TESTS
-// ─────────────────────────────────────────────────────────────
-
-test push_pop_identity(x via fuzz.int()) {
-  let stack = empty()
-  let stack = push(stack, x)
-  let (popped, _) = pop(stack)
-  popped == Some(x)
-}
-
-test push_increases_size_by_one(
-  initial_items via fuzz.list(fuzz.int()),
-  new_item via fuzz.int(),
-) {
-  let stack = list.foldl(initial_items, empty(), fn(s, i) { push(s, i) })
-  let old_size = size(stack)
-  let stack = push(stack, new_item)
-  size(stack) == old_size + 1
-}
-
-test lifo_order(items via fuzz.list(fuzz.int())) {
-  // Push all items
-  let stack = list.foldl(items, empty(), fn(s, i) { push(s, i) })
-
-  // Pop all items and collect
-  let reversed = collect_all(stack, [])
-
-  // Should be in reverse order
-  reversed == items
-}
-
-fn collect_all(stack: Stack<Int>, acc: List<Int>) -> List<Int> {
-  when pop(stack) is {
-    (None, _) -> acc
-    (Some(x), rest) -> collect_all(rest, [x, ..acc])
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// VALIDATION FUNCTION TESTS
-// ─────────────────────────────────────────────────────────────
-
-fn validate_positive(n: Int) -> Bool {
-  n > 0
-}
-
-fn validate_in_range(n: Int, min: Int, max: Int) -> Bool {
-  n >= min && n <= max
-}
-
-fn validate_non_empty(bytes: ByteArray) -> Bool {
-  bytearray.length(bytes) > 0
-}
-
-test validate_positive_true() {
-  validate_positive(1) &&
-  validate_positive(100) &&
-  validate_positive(999999)
-}
-
-test validate_positive_false() {
-  !validate_positive(0) &&
-  !validate_positive(-1) &&
-  !validate_positive(-100)
-}
-
-test validate_in_range_true() {
-  validate_in_range(5, 1, 10) &&
-  validate_in_range(1, 1, 10) &&
-  validate_in_range(10, 1, 10)
-}
-
-test validate_in_range_false() {
-  !validate_in_range(0, 1, 10) &&
-  !validate_in_range(11, 1, 10)
-}
-
-test validate_non_empty_true() {
-  validate_non_empty("hello") &&
-  validate_non_empty(#"00")
-}
-
-test validate_non_empty_false() {
-  !validate_non_empty("")
-}
-
-// ─────────────────────────────────────────────────────────────
-// EXPECTED FAILURE TESTS
-// ─────────────────────────────────────────────────────────────
-
-fn must_be_positive(n: Int) -> Int {
-  expect n > 0
-  n
-}
-
-fn must_have_value(opt: Option<Int>) -> Int {
-  expect Some(v) = opt
-  v
-}
-
-test must_be_positive_fails_on_zero() fail {
-  must_be_positive(0) == 0
-}
-
-test must_be_positive_fails_on_negative() fail {
-  must_be_positive(-5) == -5
-}
-
-test must_have_value_fails_on_none() fail {
-  must_have_value(None) == 0
 }
 ```
 
----
+## Code mẫu
 
-## Tổng kết
+Xem code mẫu đầy đủ trong thư mục `examples/`:
 
-| Cú pháp | Mục đích |
-|---------|----------|
-| `test name() { bool_expression }` | Unit test |
-| `test name() fail { ... }` | Expected failure |
-| `test name(x via fuzzer) { ... }` | Property test |
+| File | Mô tả | Tests |
+|------|-------|-------|
+| `lib/syntax_test.ak` | Test syntax & data types | 53 tests |
+| `lib/gift_test.ak` | Test Gift validator | 7 tests |
+| `lib/simple_ft_test.ak` | Test Fungible Token | 2 tests |
+| `lib/escrow_test.ak` | Test Escrow contract | 14 tests |
+| `lib/nft_test.ak` | Test NFT policy | 4 tests |
 
-| Command | Mô tả |
-|---------|-------|
-| `aiken check` | Run all tests |
-| `aiken check -m module` | Filter by module |
-| `aiken check --max-success=N` | Property iterations |
+```bash
+# Chạy tất cả tests (80 tests)
+cd examples
+aiken check
 
-**Best Practices:**
-- Descriptive test names
-- Test edge cases
-- Use property tests for invariants
-- Organize tests logically
+# Chạy tests với trace
+aiken check --trace-level verbose
 
----
+# Chạy tests của module cụ thể
+aiken check -m "syntax_test"
+```
 
-## Bài tiếp theo
+## Bước tiếp theo
 
-[Bài 13: Xử lý lỗi](./13_Troubleshooting.md)
+Trong bài tiếp theo, chúng ta sẽ học về Troubleshooting - cách debug và xử lý lỗi trong Aiken.

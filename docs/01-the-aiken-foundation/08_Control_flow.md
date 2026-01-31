@@ -1,737 +1,411 @@
 ---
-title: "08. Luồng Điều Khiển (Control Flow)"
+title: Luồng điều khiển
 sidebar_position: 8
-description: "Thành thạo các cấu trúc điều khiển trong Aiken: if/else, when/is pattern matching, và các kỹ thuật xử lý logic phức tạp."
 ---
 
-# Luồng Điều Khiển (Control Flow)
+# Luồng điều khiển trong Aiken
 
-:::info Mục tiêu
-Thành thạo các cấu trúc điều khiển trong Aiken: if/else, when/is pattern matching, và các kỹ thuật xử lý logic phức tạp.
-:::
+Bài học này hướng dẫn các cấu trúc điều khiển trong Aiken: if/else, when/is, piping và đệ quy.
 
----
+## Mục tiêu học tập
 
-## Mục Lục
+- Sử dụng if/else cho điều kiện đơn giản
+- Làm chủ pattern matching với when/is
+- Hiểu pipe operator và function composition
+- Viết hàm đệ quy thay cho loops
 
-1. [Tổng quan Control Flow](#1-tổng-quan-control-flow)
-2. [If/Else Expression](#2-ifelse-expression)
-3. [When/Is Pattern Matching](#3-whenis-pattern-matching)
-4. [Pattern Matching nâng cao](#4-pattern-matching-nâng-cao)
-5. [Guards và Conditions](#5-guards-và-conditions)
-6. [Kết hợp patterns](#6-kết-hợp-patterns)
-7. [Best Practices](#7-best-practices)
+## Blocks
 
----
+Mọi block đều là expression và trả về giá trị cuối cùng:
 
-## 1. Tổng Quan Control Flow
+```rust title="lib/blocks.ak"
+fn block_examples() {
+  // Block trả về giá trị cuối
+  let result = {
+    let a = 10
+    let b = 20
+    a + b  // Giá trị trả về: 30
+  }
 
-### Control Flow trong Functional Programming
+  // Block thay đổi độ ưu tiên phép toán
+  let celsius = { 100 - 32 } * 5 / 9  // (100 - 32) * 5 / 9
 
-| Khía cạnh | Imperative (Java, Python) | Functional (Aiken) |
-|-----------|---------------------------|-------------------|
-| Điều kiện | `if (x > 0) { return "positive"; } else { return "non-positive"; }` | `if x > 0 { "positive" } else { "non-positive" }` |
-| Switch/Case | `switch (action) { case "buy": ... case "sell": ... }` | `when action is { Buy -> ... Sell -> ... }` |
-
-:::warning Quan trọng
-- Mọi expression đều trả về giá trị
-- Không có "statements", chỉ có "expressions"
-- Pattern matching thay thế switch/case
-:::
-
-### So sánh các cấu trúc
-
-| Cấu trúc | Khi nào dùng | Ví dụ |
-|----------|--------------|-------|
-| `if/else` | Điều kiện Boolean đơn giản | `if x > 0 { ... } else { ... }` |
-| `when/is` | Pattern matching trên types | `when action is { Buy -> ... }` |
-| Guards | Điều kiện phức tạp trong patterns | `when x is { n if n > 0 -> ... }` |
-
----
-
-## 2. If/Else Expression
-
-### Cú pháp cơ bản
-
-```aiken
-// If/else là EXPRESSION - luôn trả về giá trị
-let result = if condition {
-  value_if_true
-} else {
-  value_if_false
+  result
 }
 ```
 
-### Ví dụ chi tiết
+## If/Else - Điều kiện
 
-```aiken
-/// Kiểm tra số dương
-fn check_positive(n: Int) -> String {
-  if n > 0 {
-    "Positive"
-  } else if n < 0 {
-    "Negative"
+### Cú pháp cơ bản
+
+```rust title="lib/conditional.ak"
+fn check_age(age: Int) -> ByteArray {
+  if age >= 18 {
+    "Adult"
   } else {
-    "Zero"
+    "Minor"
   }
 }
 
-/// Tính giá trị tuyệt đối
+fn classify_score(score: Int) -> ByteArray {
+  if score >= 90 {
+    "Excellent"
+  } else if score >= 70 {
+    "Good"
+  } else if score >= 50 {
+    "Pass"
+  } else {
+    "Fail"
+  }
+}
+```
+
+### If/Else là expression
+
+```rust
 fn abs(n: Int) -> Int {
-  if n >= 0 {
-    n
-  } else {
-    -n
-  }
+  if n >= 0 { n } else { -n }
 }
 
-/// Tìm số lớn nhất
 fn max(a: Int, b: Int) -> Int {
   if a > b { a } else { b }
 }
-
-/// Tìm số nhỏ nhất trong 3 số
-fn min3(a: Int, b: Int, c: Int) -> Int {
-  if a <= b && a <= c {
-    a
-  } else if b <= c {
-    b
-  } else {
-    c
-  }
-}
 ```
 
-### Quy tắc quan trọng
-
-| Quy tắc | Đúng | Sai |
-|---------|------|-----|
-| Phải có else branch | `if x > 0 { "yes" } else { "no" }` | `if x > 0 { "yes" }` (Lỗi: thiếu else) |
-| Cả hai branch phải cùng type | `if x > 0 { 1 } else { 0 }` (Cả hai là Int) | `if x > 0 { 1 } else { "zero" }` (Int vs String) |
-| Condition phải là Bool | `if x > 0 { ... }` (x > 0 là Bool) | `if x { ... }` (x phải là Bool) |
-| Nên dùng when/is cho enum types | `when option is { Some(x) -> x, None -> 0 }` | `if option == Some(1) { ... }` (Ít rõ ràng) |
-
-### Nested if/else
-
-```aiken
-/// Phân loại điểm số
-fn grade(score: Int) -> String {
-  if score >= 90 {
-    "A"
-  } else if score >= 80 {
-    "B"
-  } else if score >= 70 {
-    "C"
-  } else if score >= 60 {
-    "D"
-  } else {
-    "F"
-  }
-}
-
-/// Kiểm tra năm nhuận
-fn is_leap_year(year: Int) -> Bool {
-  if year % 400 == 0 {
-    True
-  } else if year % 100 == 0 {
-    False
-  } else if year % 4 == 0 {
-    True
-  } else {
-    False
-  }
-}
-```
-
----
-
-## 3. When/Is Pattern Matching
+## When/Is - Pattern Matching
 
 ### Cú pháp cơ bản
 
-```aiken
-when value is {
-  pattern1 -> expression1
-  pattern2 -> expression2
-  _ -> default_expression  // Wildcard pattern
-}
-```
-
-### Pattern Matching với Enum Types
-
-```aiken
-/// Action type cho trading
-type TradeAction {
-  Buy { amount: Int, price: Int }
-  Sell { amount: Int, price: Int }
-  Hold
-  Cancel { reason: String }
-}
-
-/// Xử lý trade action
-fn process_trade(action: TradeAction) -> String {
-  when action is {
-    Buy { amount, price } -> {
-      let total = amount * price
-      "Buying for total: " // Trong thực tế sẽ format số
-    }
-    Sell { amount, price } -> {
-      let total = amount * price
-      "Selling for total: "
-    }
-    Hold -> "Holding position"
-    Cancel { reason } -> reason
-  }
-}
-
-/// Tính phí giao dịch
-fn calculate_fee(action: TradeAction) -> Int {
-  when action is {
-    Buy { amount, .. } -> amount * 1 / 100  // 1% phí mua
-    Sell { amount, .. } -> amount * 2 / 100 // 2% phí bán
-    Hold -> 0
-    Cancel { .. } -> 50  // Phí hủy cố định
-  }
-}
-```
-
-### Pattern Matching với Primitive Types
-
-```aiken
-/// Chuyển số thành chữ
-fn number_to_word(n: Int) -> String {
+```rust title="lib/patterns.ak"
+fn describe_number(n: Int) -> ByteArray {
   when n is {
-    0 -> "zero"
-    1 -> "one"
-    2 -> "two"
-    3 -> "three"
-    _ -> "many"
-  }
-}
-
-/// Kiểm tra ngày trong tuần
-fn is_weekend(day: Int) -> Bool {
-  when day is {
-    6 -> True   // Saturday
-    7 -> True   // Sunday
-    _ -> False
+    0 -> "Zero"
+    1 -> "One"
+    2 -> "Two"
+    _ -> "Many"  // Wildcard - match tất cả
   }
 }
 ```
 
-### Pattern Matching với Option
+### Pattern matching với custom types
 
-```aiken
-use aiken/option
-
-/// Safe division với Option
-fn safe_divide(a: Int, b: Int) -> Option<Int> {
-  if b == 0 {
-    None
-  } else {
-    Some(a / b)
-  }
-}
-
-/// Xử lý kết quả Option
-fn process_division(a: Int, b: Int) -> Int {
-  when safe_divide(a, b) is {
-    Some(result) -> result
-    None -> 0  // Default value khi chia cho 0
-  }
-}
-
-/// Unwrap với default
-fn unwrap_or_default(opt: Option<Int>, default: Int) -> Int {
-  when opt is {
-    Some(value) -> value
-    None -> default
-  }
-}
-```
-
-### Pattern Matching với List
-
-```aiken
-/// Lấy phần tử đầu tiên
-fn head(list: List<a>) -> Option<a> {
-  when list is {
-    [] -> None
-    [first, ..] -> Some(first)
-  }
-}
-
-/// Lấy phần còn lại (tail)
-fn tail(list: List<a>) -> List<a> {
-  when list is {
-    [] -> []
-    [_, ..rest] -> rest
-  }
-}
-
-/// Kiểm tra độ dài
-fn length_category(list: List<a>) -> String {
-  when list is {
-    [] -> "empty"
-    [_] -> "single"
-    [_, _] -> "pair"
-    [_, _, _] -> "triple"
-    _ -> "many"
-  }
-}
-
-/// Tính tổng list
-fn sum(list: List<Int>) -> Int {
-  when list is {
-    [] -> 0
-    [first, ..rest] -> first + sum(rest)
-  }
-}
-```
-
-### Pattern Matching với Tuple
-
-```aiken
-/// So sánh hai số
-fn compare(pair: (Int, Int)) -> String {
-  when pair is {
-    (a, b) if a > b -> "first is greater"
-    (a, b) if a < b -> "second is greater"
-    (_, _) -> "equal"
-  }
-}
-
-/// Xử lý coordinates
-fn quadrant(point: (Int, Int)) -> String {
-  when point is {
-    (0, 0) -> "origin"
-    (x, 0) if x > 0 -> "positive x-axis"
-    (x, 0) if x < 0 -> "negative x-axis"
-    (0, y) if y > 0 -> "positive y-axis"
-    (0, y) if y < 0 -> "negative y-axis"
-    (x, y) if x > 0 && y > 0 -> "quadrant I"
-    (x, y) if x < 0 && y > 0 -> "quadrant II"
-    (x, y) if x < 0 && y < 0 -> "quadrant III"
-    (_, _) -> "quadrant IV"
-  }
-}
-```
-
----
-
-## 4. Pattern Matching Nâng Cao
-
-### Destructuring trong Patterns
-
-```aiken
-/// Nested type
-type Order {
-  order_id: Int,
-  customer: Customer,
-  items: List<Item>,
-}
-
-type Customer {
-  name: ByteArray,
-  address: Address,
-}
-
-type Address {
-  city: ByteArray,
-  country: ByteArray,
-}
-
-type Item {
-  product_id: Int,
-  quantity: Int,
-  price: Int,
-}
-
-/// Deep destructuring
-fn get_customer_city(order: Order) -> ByteArray {
-  let Order { customer: Customer { address: Address { city, .. }, .. }, .. } = order
-  city
-}
-
-/// Với when/is
-fn process_order(order: Order) -> Int {
-  when order is {
-    Order { items: [], .. } -> 0  // Empty order
-    Order { items: [single_item], .. } -> single_item.price * single_item.quantity
-    Order { items, .. } -> calculate_total(items)
-  }
-}
-
-fn calculate_total(items: List<Item>) -> Int {
-  when items is {
-    [] -> 0
-    [Item { quantity, price, .. }, ..rest] ->
-      quantity * price + calculate_total(rest)
-  }
-}
-```
-
-### As Patterns (Alias)
-
-```aiken
-/// Giữ reference đến toàn bộ value
-fn process_with_original(opt: Option<Int>) -> (Option<Int>, Int) {
-  when opt is {
-    Some(n) as original -> (original, n * 2)
-    None as original -> (original, 0)
-  }
-}
-
-/// Hữu ích khi cần cả destructured parts và whole value
-type Transaction {
-  sender: ByteArray,
-  receiver: ByteArray,
-  amount: Int,
-}
-
-fn validate_and_log(tx: Transaction) -> Bool {
-  when tx is {
-    Transaction { amount, .. } as full_tx if amount > 0 -> {
-      // Có thể dùng cả `amount` và `full_tx`
-      trace @"Processing valid transaction"
-      True
-    }
-    _ -> False
-  }
-}
-```
-
-### Or Patterns
-
-```aiken
-/// Nhóm nhiều patterns
-fn is_vowel(char: Int) -> Bool {
-  // Giả sử char là ASCII code
-  when char is {
-    97 | 101 | 105 | 111 | 117 -> True  // a, e, i, o, u
-    65 | 69 | 73 | 79 | 85 -> True      // A, E, I, O, U
-    _ -> False
-  }
-}
-
-/// Với enum types
-type Status {
-  Pending
-  Processing
-  Completed
-  Failed
-  Cancelled
-}
-
-fn is_final_status(status: Status) -> Bool {
-  when status is {
-    Completed | Failed | Cancelled -> True
-    Pending | Processing -> False
-  }
-}
-
-fn is_active(status: Status) -> Bool {
-  when status is {
-    Pending | Processing -> True
-    _ -> False
-  }
-}
-```
-
----
-
-## 5. Guards và Conditions
-
-### Guard Clauses
-
-```aiken
-/// Guards cho điều kiện phức tạp
-fn categorize_age(age: Int) -> String {
-  when age is {
-    n if n < 0 -> "invalid"
-    n if n < 13 -> "child"
-    n if n < 20 -> "teenager"
-    n if n < 60 -> "adult"
-    _ -> "senior"
-  }
-}
-
-/// Multiple conditions trong guard
-fn shipping_cost(weight: Int, distance: Int) -> Int {
-  when (weight, distance) is {
-    (w, d) if w <= 0 || d <= 0 -> 0
-    (w, d) if w <= 1000 && d <= 100 -> 50
-    (w, d) if w <= 1000 -> 100
-    (w, d) if d <= 100 -> 150
-    _ -> 200
-  }
-}
-```
-
-### Combining Patterns với Guards
-
-```aiken
-type PaymentMethod {
-  Cash { amount: Int }
-  Card { card_number: ByteArray, amount: Int }
-  Crypto { token: ByteArray, amount: Int }
-}
-
-fn process_payment(payment: PaymentMethod, required: Int) -> Bool {
-  when payment is {
-    // Đủ tiền mặt
-    Cash { amount } if amount >= required -> True
-
-    // Card với số hợp lệ và đủ tiền
-    Card { card_number, amount }
-      if builtin.length_of_bytearray(card_number) == 16 && amount >= required -> True
-
-    // Crypto (giả sử có premium 10%)
-    Crypto { amount, .. } if amount >= required * 110 / 100 -> True
-
-    // Tất cả trường hợp khác
-    _ -> False
-  }
-}
-```
-
-### Short-circuit Evaluation
-
-```aiken
-/// Guards được evaluate từ trên xuống
-fn validate_transaction(amount: Int, balance: Int, limit: Int) -> String {
-  when (amount, balance, limit) is {
-    // Check theo thứ tự ưu tiên
-    (a, _, _) if a <= 0 -> "Invalid amount"
-    (a, b, _) if a > b -> "Insufficient balance"
-    (a, _, l) if a > l -> "Exceeds daily limit"
-    _ -> "Valid"
-  }
-}
-```
-
----
-
-## 6. Kết Hợp Patterns
-
-### Real-world Examples
-
-```aiken
-/// Validator redeemer pattern
-type VestingRedeemer {
-  Claim
-  Cancel
-  Extend { new_deadline: Int }
-}
-
-type VestingDatum {
-  owner: ByteArray,
-  beneficiary: ByteArray,
-  deadline: Int,
-  amount: Int,
-}
-
-fn validate_vesting_action(
-  datum: VestingDatum,
-  redeemer: VestingRedeemer,
-  current_time: Int,
-  signatories: List<ByteArray>,
-) -> Bool {
-  when redeemer is {
-    // Claim: beneficiary signs, past deadline
-    Claim -> {
-      let VestingDatum { beneficiary, deadline, .. } = datum
-      let signed = list.has(signatories, beneficiary)
-      let past_deadline = current_time > deadline
-      signed && past_deadline
-    }
-
-    // Cancel: owner signs, before deadline
-    Cancel -> {
-      let VestingDatum { owner, deadline, .. } = datum
-      let signed = list.has(signatories, owner)
-      let before_deadline = current_time < deadline
-      signed && before_deadline
-    }
-
-    // Extend: owner signs, new deadline > current deadline
-    Extend { new_deadline } -> {
-      let VestingDatum { owner, deadline, .. } = datum
-      let signed = list.has(signatories, owner)
-      let valid_extension = new_deadline > deadline
-      signed && valid_extension
-    }
-  }
-}
-```
-
-### Chaining Pattern Matches
-
-```aiken
-/// Multi-step validation
-type InputValidation {
-  Valid { value: Int }
-  InvalidFormat
-  OutOfRange
-  Empty
-}
-
-fn validate_input(input: Option<ByteArray>) -> InputValidation {
-  when input is {
-    None -> Empty
-    Some(bytes) -> {
-      when parse_int(bytes) is {
-        None -> InvalidFormat
-        Some(n) if n < 0 || n > 1000 -> OutOfRange
-        Some(n) -> Valid { value: n }
-      }
-    }
-  }
-}
-
-// Helper function (simplified)
-fn parse_int(bytes: ByteArray) -> Option<Int> {
-  // Simplified: just check if it's a valid number representation
-  if builtin.length_of_bytearray(bytes) > 0 {
-    Some(1) // Placeholder
-  } else {
-    None
-  }
-}
-```
-
-### State Machine Pattern
-
-```aiken
-/// Order state machine
-type OrderState {
-  Created
-  Paid { amount: Int }
-  Shipped { tracking: ByteArray }
-  Delivered
-  Refunded
-}
-
-type OrderAction {
-  Pay { amount: Int }
-  Ship { tracking: ByteArray }
-  Deliver
-  Refund
-}
-
-/// State transitions
-fn transition(state: OrderState, action: OrderAction) -> Option<OrderState> {
-  when (state, action) is {
-    // Created -> Paid
-    (Created, Pay { amount }) if amount > 0 ->
-      Some(Paid { amount })
-
-    // Paid -> Shipped
-    (Paid { .. }, Ship { tracking }) ->
-      Some(Shipped { tracking })
-
-    // Shipped -> Delivered
-    (Shipped { .. }, Deliver) ->
-      Some(Delivered)
-
-    // Paid -> Refunded (before shipping)
-    (Paid { .. }, Refund) ->
-      Some(Refunded)
-
-    // Invalid transitions
-    _ -> None
-  }
-}
-
-/// Check if action is valid
-fn can_transition(state: OrderState, action: OrderAction) -> Bool {
-  when transition(state, action) is {
-    Some(_) -> True
-    None -> False
-  }
-}
-```
-
----
-
-## 7. Best Practices
-
-### Do's và Don'ts
-
-**Nên làm:**
-
-- Dùng when/is cho enum types thay vì if/else chains
-- Xử lý tất cả cases (exhaustive matching)
-- Đặt specific patterns trước, general patterns sau
-- Dùng guards cho điều kiện phức tạp
-- Sử dụng destructuring để extract data
-- Dùng `_` cho values không cần
-
-**Không nên làm:**
-
-- Không dùng if/else dài cho enums
-- Không quên case (non-exhaustive match)
-- Không đặt `_` wildcard đầu tiên (unreachable patterns)
-- Không nested when quá sâu (khó đọc)
-- Không duplicate logic giữa các branches
-
-### Pattern Order
-
-```aiken
-// GOOD: Specific to general
-fn process(value: Option<Int>) -> Int {
-  when value is {
-    Some(0) -> 0           // Most specific
-    Some(n) if n < 0 -> -1 // Specific with guard
-    Some(n) -> n           // General Some
-    None -> 0              // None case
-  }
-}
-
-// BAD: General before specific (unreachable code)
-fn process_bad(value: Option<Int>) -> Int {
-  when value is {
-    Some(n) -> n           // This catches everything!
-    Some(0) -> 0           // Unreachable!
-    None -> 0
-  }
-}
-```
-
-### Exhaustiveness
-
-```aiken
+```rust
 type Color {
   Red
   Green
   Blue
+  Rgb { r: Int, g: Int, b: Int }
 }
 
-// GOOD: All cases covered
-fn color_code(c: Color) -> Int {
-  when c is {
-    Red -> 1
-    Green -> 2
-    Blue -> 3
-  }
-}
-
-// WARNING: Using wildcard hides missing cases
-fn color_code_risky(c: Color) -> Int {
-  when c is {
-    Red -> 1
-    _ -> 0  // Nếu thêm Yellow sau, sẽ không có warning!
+fn color_to_hex(color: Color) -> ByteArray {
+  when color is {
+    Red -> "#FF0000"
+    Green -> "#00FF00"
+    Blue -> "#0000FF"
+    Rgb { r, g, b } -> "custom"
   }
 }
 ```
 
----
+### Guards trong patterns
 
-## Tài Liệu Tham Khảo
+```rust
+fn classify_number(n: Int) -> ByteArray {
+  when n is {
+    0 -> "Zero"
+    x if x > 0 -> "Positive"
+    x if x < 0 -> "Negative"
+    _ -> "Unknown"
+  }
+}
 
-- [Aiken Language Tour - Control Flow](https://aiken-lang.org/language-tour/control-flow)
-- [Pattern Matching in Aiken](https://aiken-lang.org/language-tour/custom-types#pattern-matching)
+fn validate_age(age: Int) -> ByteArray {
+  when age is {
+    a if a < 0 -> "Invalid"
+    a if a < 13 -> "Child"
+    a if a < 20 -> "Teen"
+    a if a < 60 -> "Adult"
+    _ -> "Senior"
+  }
+}
+```
 
----
+### Alternative patterns (|)
 
-**Tiếp theo**: [Bài 09 - Hàm (Functions)](./09_Function.md)
+```rust
+fn is_weekend(day: ByteArray) -> Bool {
+  when day is {
+    "Saturday" | "Sunday" -> True
+    _ -> False
+  }
+}
+
+fn is_vowel(char: ByteArray) -> Bool {
+  when char is {
+    "a" | "e" | "i" | "o" | "u" -> True
+    "A" | "E" | "I" | "O" | "U" -> True
+    _ -> False
+  }
+}
+```
+
+### Spread pattern (..)
+
+```rust
+type User {
+  name: ByteArray,
+  age: Int,
+  email: ByteArray,
+  active: Bool,
+}
+
+fn is_active_adult(user: User) -> Bool {
+  when user is {
+    User { age, active: True, .. } if age >= 18 -> True
+    _ -> False
+  }
+}
+```
+
+### Pattern matching với List
+
+```rust
+fn sum_list(numbers: List<Int>) -> Int {
+  when numbers is {
+    [] -> 0
+    [single] -> single
+    [first, second] -> first + second
+    [head, ..tail] -> head + sum_list(tail)
+  }
+}
+
+fn first_two(items: List<a>) -> Option<(a, a)> {
+  when items is {
+    [a, b, ..] -> Some((a, b))
+    _ -> None
+  }
+}
+```
+
+## If/Is - Soft casting
+
+Thử cast mà không fail nếu không match:
+
+```rust
+fn safe_extract(data: Data) -> Int {
+  if data is n: Int {
+    n
+  } else {
+    0  // Fallback nếu không phải Int
+  }
+}
+
+type Result {
+  Ok(Int)
+  Err(ByteArray)
+}
+
+fn get_value(result: Result) -> Int {
+  if result is Ok(value) {
+    value
+  } else {
+    0
+  }
+}
+```
+
+## Expect - Unsafe extraction
+
+```rust
+fn must_get_value(result: Result) {
+  // Sẽ fail nếu không phải Ok
+  expect Ok(value) = result
+  value
+}
+
+fn must_have_head(items: List<Int>) {
+  // Sẽ fail nếu list rỗng
+  expect [head, ..] = items
+  head
+}
+```
+
+## Fail & Todo
+
+### Fail - Dừng thực thi có chủ đích
+
+```rust
+fn must_be_positive(n: Int) -> Int {
+  if n > 0 {
+    n
+  } else {
+    fail @"Number must be positive"
+  }
+}
+
+fn unreachable_case(status: OrderStatus) -> Int {
+  when status is {
+    Pending -> 1
+    Processing -> 2
+    _ -> fail @"Unexpected status"
+  }
+}
+```
+
+### Todo - Đánh dấu chưa implement
+
+```rust
+fn complex_calculation() -> Int {
+  todo @"Implement this later"
+}
+
+fn partial_implementation(n: Int) -> Int {
+  if n > 0 {
+    n * 2
+  } else {
+    todo @"Handle negative numbers"
+  }
+}
+```
+
+## Pipe Operator (|>)
+
+Chain function calls dễ đọc:
+
+```rust title="lib/piping.ak"
+use aiken/collection/list
+
+fn process_numbers(numbers: List<Int>) -> Int {
+  // Không dùng pipe (khó đọc)
+  // list.foldr(list.filter(list.map(numbers, fn(n) { n * 2 }), fn(n) { n > 10 }), 0, fn(n, acc) { n + acc })
+
+  // Dùng pipe (dễ đọc)
+  numbers
+    |> list.map(fn(n) { n * 2 })
+    |> list.filter(fn(n) { n > 10 })
+    |> list.foldr(0, fn(n, acc) { n + acc })
+}
+```
+
+### Ví dụ thực tế
+
+```rust
+use aiken/collection/list
+use aiken/bytearray
+
+fn validate_signatures(
+  signers: List<ByteArray>,
+  required: List<ByteArray>,
+) -> Bool {
+  required
+    |> list.all(fn(req) { list.has(signers, req) })
+}
+
+fn count_valid_outputs(
+  outputs: List<Output>,
+  min_value: Int,
+) -> Int {
+  outputs
+    |> list.filter(fn(o) { o.value >= min_value })
+    |> list.length()
+}
+```
+
+## Recursion - Đệ quy
+
+Aiken không có loops, thay vào đó dùng đệ quy:
+
+```rust title="lib/recursion.ak"
+/// Tính giai thừa
+fn factorial(n: Int) -> Int {
+  if n <= 1 {
+    1
+  } else {
+    n * factorial(n - 1)
+  }
+}
+
+/// Fibonacci
+fn fibonacci(n: Int) -> Int {
+  when n is {
+    0 -> 0
+    1 -> 1
+    _ -> fibonacci(n - 1) + fibonacci(n - 2)
+  }
+}
+
+/// Tìm phần tử trong list
+fn find(items: List<a>, predicate: fn(a) -> Bool) -> Option<a> {
+  when items is {
+    [] -> None
+    [head, ..tail] ->
+      if predicate(head) {
+        Some(head)
+      } else {
+        find(tail, predicate)
+      }
+  }
+}
+```
+
+### Tail recursion (tối ưu)
+
+```rust
+/// Factorial với tail recursion
+fn factorial_tail(n: Int) -> Int {
+  factorial_helper(n, 1)
+}
+
+fn factorial_helper(n: Int, acc: Int) -> Int {
+  if n <= 1 {
+    acc
+  } else {
+    factorial_helper(n - 1, n * acc)
+  }
+}
+
+/// Sum với tail recursion
+fn sum_tail(items: List<Int>) -> Int {
+  sum_helper(items, 0)
+}
+
+fn sum_helper(items: List<Int>, acc: Int) -> Int {
+  when items is {
+    [] -> acc
+    [head, ..tail] -> sum_helper(tail, acc + head)
+  }
+}
+```
+
+## Sơ đồ luồng điều khiển
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    CONTROL FLOW IN AIKEN                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────┐                                          │
+│   │   if/else   │  → Điều kiện đơn giản                    │
+│   └─────────────┘                                          │
+│          │                                                  │
+│          ▼                                                  │
+│   ┌─────────────┐                                          │
+│   │   when/is   │  → Pattern matching đầy đủ               │
+│   └─────────────┘                                          │
+│          │                                                  │
+│          ▼                                                  │
+│   ┌─────────────┐                                          │
+│   │    if/is    │  → Soft casting (có fallback)            │
+│   └─────────────┘                                          │
+│          │                                                  │
+│          ▼                                                  │
+│   ┌─────────────┐                                          │
+│   │   expect    │  → Hard extraction (fail nếu ko match)   │
+│   └─────────────┘                                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Bước tiếp theo
+
+Trong bài tiếp theo, chúng ta sẽ học cách định nghĩa và sử dụng hàm trong Aiken.

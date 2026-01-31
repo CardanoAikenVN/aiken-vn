@@ -1,437 +1,236 @@
 ---
-title: "05. Biến & Hằng số"
+title: Biến & Hằng số
 sidebar_position: 5
-description: "Hiểu cách khai báo và sử dụng biến, hằng số trong Aiken"
 ---
 
-# Bài 05: Biến & Hằng số (Variables & Constants)
+# Biến & Hằng số trong Aiken
 
-> **Mục tiêu:** Hiểu cách khai báo và sử dụng biến, hằng số trong Aiken
+Bài học này hướng dẫn cách khai báo và sử dụng biến, hằng số trong Aiken.
 
----
+## Mục tiêu học tập
 
-## Giới thiệu
+- Hiểu cách khai báo biến với `let`
+- Nắm tính bất biến của dữ liệu
+- Sử dụng hằng số với `const`
 
-Trong Aiken, có hai cách để gán giá trị cho một identifier:
+## Let Binding - Khai báo biến
 
-| Từ khóa | Mô tả |
-|---------|-------|
-| `let` | Local binding, trong function/block. Có thể shadowing |
-| `const` | Module-level constant. Được inline khi compile, Evaluated at compile-time |
+Trong Aiken, biến được khai báo với từ khóa `let`:
 
----
-
-## Let Bindings (Biến cục bộ)
-
-### Cú pháp cơ bản
-
-```aiken
-// Khai báo với type inference (tự suy luận kiểu)
-let x = 42
-let name = "Alice"
-let is_valid = True
-
-// Khai báo với type annotation (chỉ định kiểu)
-let age: Int = 25
-let greeting: ByteArray = "Hello"
-let flag: Bool = False
-```
-
-### Immutability (Bất biến)
-
-**Quan trọng:** Trong Aiken, tất cả bindings đều là **immutable** (không thể thay đổi sau khi gán).
-
-```aiken
+```rust title="lib/main.ak"
 fn example() {
-  let x = 10
-  // x = 20  // ❌ LỖI! Không thể reassign
+  // Khai báo biến cơ bản
+  let name = "Cardano"
+  let age = 7
+  let is_active = True
 
-  // Thay vào đó, sử dụng shadowing
-  let x = 20  // ✅ OK - tạo binding mới với cùng tên
-  x
-}
-```
+  // Biến có annotation kiểu (optional)
+  let amount: Int = 1_000_000
+  let owner: ByteArray = #"abc123"
 
-### Shadowing
-
-```aiken
-fn shadowing_example() -> Int {
-  let x = 1
-  let x = x + 10   // Shadow biến x cũ, x = 11
-  let x = x * 2    // Shadow lần nữa, x = 22
-  x                // Return 22
-}
-```
-
-**Shadowing Visualization:**
-
-| Scope | Statement | Giá trị x |
-|-------|-----------|-----------|
-| 1 | `let x = 1` | 1 |
-| 2 | `let x = x + 10` (shadow) | 11 (cũ bị che) |
-| 3 | `let x = x * 2` (shadow) | 22 (final) |
-
----
-
-## Constants (Hằng số)
-
-### Khai báo Constants
-
-Constants được khai báo ở module level (ngoài function):
-
-```aiken
-// Module level constants
-const max_supply = 21_000_000
-const token_name = "ADA"
-const pi = 314159
-
-// Constants với type annotation
-const threshold: Int = 100
-const admin_key: ByteArray = #"abcd1234"
-```
-
-### Đặc điểm của Constants
-
-```aiken
-// ✅ Constants có thể reference other constants
-const summer = "Summer"
-const autumn = "Autumn"
-const winter = "Winter"
-const spring = "Spring"
-const seasons = [summer, autumn, winter, spring]
-
-// ✅ Constants được evaluate at compile-time
-const computed = 10 + 20 + 30  // = 60 khi compile
-
-// ❌ Constants KHÔNG thể reference constants defined sau nó
-// const a = b  // Error nếu b được define sau a
-// const b = 10
-```
-
-### Sử dụng Constants trong Pattern Matching
-
-```aiken
-const success_code = 200
-const error_code = 500
-
-fn check_status(code: Int) -> ByteArray {
-  when code is {
-    success_code -> "Success!"
-    error_code -> "Error!"
-    _ -> "Unknown"
-  }
-}
-```
-
----
-
-## Type Annotations
-
-Aiken có type inference mạnh, nhưng đôi khi bạn cần type annotation:
-
-```aiken
-// Không cần annotation - type được suy luận
-let number = 42           // Int
-let text = "hello"        // ByteArray
-let flag = True           // Bool
-let items = [1, 2, 3]     // List<Int>
-
-// Cần annotation cho clarity
-let balance: Int = get_balance()
-
-// Cần annotation khi type không rõ ràng
-let empty_list: List<Int> = []
-
-// Annotated function parameters (khuyến khích)
-fn greet(name: ByteArray, times: Int) -> ByteArray {
   name
 }
 ```
 
----
+### Tính bất biến (Immutability)
 
-## Destructuring với Let
+**Quan trọng**: Biến trong Aiken là **bất biến** - không thể thay đổi sau khi gán:
 
-Aiken hỗ trợ destructuring patterns trong let bindings:
+```rust
+fn immutability_demo() {
+  let x = 5
+  // x = 10  // ❌ Lỗi! Không thể gán lại
 
-### Tuple Destructuring
-
-```aiken
-fn tuple_example() {
-  let pair = (10, "ten")
-  let (number, word) = pair  // destructure
-
-  // number = 10
-  // word = "ten"
+  // ✅ Thay vào đó, tạo biến mới
+  let y = x + 5
+  y  // 10
 }
 ```
 
-### Record Destructuring
+### Shadowing - Che khuất biến
 
-```aiken
-type Person {
-  name: ByteArray,
-  age: Int,
-}
+Bạn có thể khai báo biến mới cùng tên (shadowing):
 
-fn record_example() {
-  let alice = Person { name: "Alice", age: 30 }
+```rust
+fn shadowing_demo() {
+  let value = 10
+  let value = value * 2  // Shadow biến cũ
+  let value = value + 5  // Shadow lần nữa
 
-  // Destructure
-  let Person { name, age } = alice
-
-  // Hoặc rename
-  let Person { name: person_name, age: person_age } = alice
+  value  // 25
 }
 ```
 
-### Partial Destructuring với Wildcard
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                     SHADOWING FLOW                          │
+│                                                             │
+│   let value = 10        →  value = 10                       │
+│         │                                                   │
+│         ▼                                                   │
+│   let value = value * 2 →  value = 20 (shadow)              │
+│         │                                                   │
+│         ▼                                                   │
+│   let value = value + 5 →  value = 25 (shadow)              │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-```aiken
-fn partial_destruct() {
-  let triple = (1, 2, 3)
-  let (first, _, third) = triple  // Bỏ qua phần tử giữa
+## Const - Hằng số
 
-  // first = 1
-  // third = 3
+Hằng số được khai báo ở cấp module với `const`:
+
+```rust title="lib/constants.ak"
+/// Số lovelace trong 1 ADA
+pub const lovelace_per_ada = 1_000_000
+
+/// Admin public key hash
+pub const admin_pkh = #"abc123def456..."
+
+/// Tên token
+pub const token_name = "MyToken"
+
+/// Danh sách whitelist
+pub const whitelist = [#"aaa...", #"bbb...", #"ccc..."]
+```
+
+### Sử dụng hằng số
+
+```aiken title="lib/main.ak"
+use constants.{lovelace_per_ada, admin_pkh}
+
+fn calculate_ada(lovelace: Int) -> Int {
+  lovelace / lovelace_per_ada
+}
+
+fn is_admin(pkh: ByteArray) -> Bool {
+  pkh == admin_pkh
 }
 ```
 
----
+## So sánh let vs const
 
-## Best Practices
+| Đặc điểm | `let` | `const` |
+|----------|-------|---------|
+| Phạm vi | Trong function/block | Module-level |
+| Thời điểm | Runtime | Compile-time |
+| Export | Không | Có (với `pub`) |
+| Giá trị | Bất kỳ | Literals only |
 
-### 1. Đặt tên biến
+## Expect - Khai báo với assertion
 
-```aiken
-// ✅ Good - snake_case, descriptive
-let total_amount = 1000
-let user_balance = 500
-let is_valid_signature = True
+`expect` giống `let` nhưng sẽ **fail** nếu pattern không match:
 
-// ❌ Bad
-let x = 1000
-let tA = 500
-let b = True
-```
+```rust
+fn expect_demo() {
+  let maybe_value = Some(42)
 
-### 2. Sử dụng Constants cho Magic Numbers
+  // Sẽ fail nếu maybe_value là None
+  expect Some(value) = maybe_value
 
-```aiken
-// ❌ Bad - magic number
-fn check_age(age: Int) -> Bool {
-  age >= 18
-}
-
-// ✅ Good - use constant
-const minimum_age = 18
-
-fn check_age(age: Int) -> Bool {
-  age >= minimum_age
+  value  // 42
 }
 ```
 
-### 3. Type Annotations cho Public Functions
+### So sánh let vs expect
 
-```aiken
-// ✅ Good - explicit types cho documentation
-pub fn calculate_fee(amount: Int, rate: Int) -> Int {
-  amount * rate / 100
+```rust
+fn comparison() {
+  let result = Some(100)
+
+  // Với let: Phải handle tất cả cases
+  let value = when result is {
+    Some(v) -> v
+    None -> 0
+  }
+
+  // Với expect: Chỉ handle case mong đợi
+  expect Some(v) = result
+  // Nếu result = None -> fail
+
+  value
 }
 ```
 
----
+## Ví dụ thực hành
 
-## Code Examples
+### Code: lib/wallet.ak
 
-### main.ak
+```aiken title="lib/wallet.ak"
+/// Số lovelace trong 1 ADA
+pub const ada_to_lovelace = 1_000_000
 
-```aiken
-// lib/variables_demo/main.ak
+/// Phí giao dịch tối thiểu (0.17 ADA)
+pub const min_fee = 170_000
 
-/// Constants ở module level
-const max_amount: Int = 1_000_000
-const min_amount: Int = 1_000
-const token_symbol: ByteArray = "tADA"
-
-/// Type cho ví dụ
+/// Kiểu dữ liệu ví
 pub type Wallet {
   owner: ByteArray,
   balance: Int,
 }
 
-/// Ví dụ về let bindings
-pub fn create_wallet(owner: ByteArray, initial_balance: Int) -> Wallet {
-  // Let binding với validation
-  let validated_balance =
-    if initial_balance >= min_amount {
-      initial_balance
-    } else {
-      min_amount
-    }
-
-  // Tạo và return wallet
-  Wallet { owner, balance: validated_balance }
+/// Tính số ADA từ lovelace
+pub fn to_ada(lovelace: Int) -> Int {
+  lovelace / ada_to_lovelace
 }
 
-/// Ví dụ về shadowing
-pub fn double_then_add_ten(x: Int) -> Int {
-  let x = x * 2      // Shadow: x = x * 2
-  let x = x + 10     // Shadow: x = x + 10
-  x
+/// Tính tổng balance sau khi trừ phí
+pub fn net_balance(wallet: Wallet) -> Int {
+  let Wallet { balance, .. } = wallet
+  let net = balance - min_fee
+
+  if net > 0 {
+    net
+  } else {
+    0
+  }
 }
 
-/// Ví dụ về destructuring
-pub fn get_wallet_info(wallet: Wallet) -> (ByteArray, Int) {
-  let Wallet { owner, balance } = wallet
-  (owner, balance)
-}
-
-/// Kiểm tra số dư hợp lệ
-pub fn is_valid_balance(balance: Int) -> Bool {
-  balance >= min_amount && balance <= max_amount
+/// Kiểm tra ví có đủ tiền
+pub fn has_sufficient_funds(wallet: Wallet, amount: Int) -> Bool {
+  let Wallet { balance, .. } = wallet
+  balance >= amount + min_fee
 }
 ```
 
-### test.ak
+### Test: lib/wallet_test.ak
 
-```aiken
-// lib/variables_demo/test.ak
+```aiken title="lib/wallet_test.ak"
+use wallet.{Wallet, ada_to_lovelace, to_ada, net_balance, has_sufficient_funds}
 
-use variables_demo/main.{
-  create_wallet,
-  double_then_add_ten,
-  get_wallet_info,
-  is_valid_balance,
-  Wallet,
+test test_to_ada() {
+  to_ada(5_000_000) == 5
 }
 
-// ===== Test Constants =====
-
-test test_min_balance() {
-  let wallet = create_wallet("Alice", 500)
-  // Balance should be min_amount (1000) since 500 < 1000
-  wallet.balance == 1000
+test test_net_balance() {
+  let w = Wallet { owner: #"abc", balance: 1_000_000 }
+  net_balance(w) == 830_000  // 1_000_000 - 170_000
 }
 
-test test_valid_balance() {
-  let wallet = create_wallet("Bob", 5000)
-  wallet.balance == 5000
+test test_has_sufficient_funds_true() {
+  let w = Wallet { owner: #"abc", balance: 1_000_000 }
+  has_sufficient_funds(w, 500_000) == True
 }
 
-// ===== Test Shadowing =====
-
-test test_double_then_add_ten() {
-  // x = 5
-  // x = 5 * 2 = 10
-  // x = 10 + 10 = 20
-  double_then_add_ten(5) == 20
-}
-
-test test_double_then_add_ten_zero() {
-  // x = 0
-  // x = 0 * 2 = 0
-  // x = 0 + 10 = 10
-  double_then_add_ten(0) == 10
-}
-
-// ===== Test Destructuring =====
-
-test test_get_wallet_info() {
-  let wallet = Wallet { owner: "Charlie", balance: 10000 }
-  let (owner, balance) = get_wallet_info(wallet)
-  owner == "Charlie" && balance == 10000
-}
-
-// ===== Test Validation =====
-
-test test_valid_balance_true() {
-  is_valid_balance(50000) == True
-}
-
-test test_valid_balance_too_low() {
-  is_valid_balance(500) == False
-}
-
-test test_valid_balance_too_high() {
-  is_valid_balance(2_000_000) == False
-}
-
-test test_valid_balance_at_min() {
-  is_valid_balance(1000) == True
-}
-
-test test_valid_balance_at_max() {
-  is_valid_balance(1_000_000) == True
+test test_has_sufficient_funds_false() {
+  let w = Wallet { owner: #"abc", balance: 100_000 }
+  has_sufficient_funds(w, 500_000) == False
 }
 ```
 
----
+## Code mẫu
 
-## Chạy Tests
+Xem code mẫu đầy đủ trong thư mục `examples/`:
+
+- **lib/syntax.ak** - Demo các kiểu dữ liệu và hàm cơ bản
+- **lib/syntax_test.ak** - Test cases cho syntax
 
 ```bash
-# Build và chạy tests
+# Chạy tests
+cd examples
 aiken check
-
-# Output mong đợi:
-#     Testing ...
-#
-#     ┍━ variables_demo/test ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#     │ PASS test_min_balance
-#     │ PASS test_valid_balance
-#     │ PASS test_double_then_add_ten
-#     │ PASS test_double_then_add_ten_zero
-#     │ PASS test_get_wallet_info
-#     │ PASS test_valid_balance_true
-#     │ PASS test_valid_balance_too_low
-#     │ PASS test_valid_balance_too_high
-#     │ PASS test_valid_balance_at_min
-#     │ PASS test_valid_balance_at_max
-#     ┕━━━━━━━━━━━━━━ 10 tests | 10 passed | 0 failed
 ```
 
----
+## Bước tiếp theo
 
-## Bài tập thực hành
-
-### Bài 1: Khai báo constants
-
-Tạo các constants cho một token:
-- `token_name`: "MyToken"
-- `max_supply`: 1 tỷ (1_000_000_000)
-- `decimals`: 6
-
-### Bài 2: Viết function với shadowing
-
-Viết function `transform(x: Int)` thực hiện:
-1. Cộng 5
-2. Nhân 3
-3. Trừ 10
-4. Return kết quả
-
-### Bài 3: Destructuring
-
-Cho type:
-```aiken
-type Token {
-  policy_id: ByteArray,
-  asset_name: ByteArray,
-  amount: Int,
-}
-```
-Viết function `get_token_amount(token: Token) -> Int` sử dụng destructuring.
-
----
-
-## Checklist hoàn thành
-
-- [ ] Hiểu sự khác biệt giữa `let` và `const`
-- [ ] Biết cách sử dụng type annotations
-- [ ] Hiểu về immutability và shadowing
-- [ ] Biết cách destructure tuples và records
-- [ ] Viết được tests cho functions
-
----
-
-➡️ **Tiếp theo**: [Bài 06 - Kiểu dữ liệu nguyên thuỷ](./06_Primitive_type.md)
+Trong bài tiếp theo, chúng ta sẽ học về các kiểu dữ liệu nguyên thủy trong Aiken - nền tảng để xây dựng logic phức tạp.

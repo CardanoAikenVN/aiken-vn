@@ -1,653 +1,305 @@
 ---
-title: "01. Xây Dựng Spending Validator"
+title: Xây dựng Spending Validator đầu tiên
 sidebar_position: 1
-description: "Viết validator (smart contract) đầu tiên để khóa tài sản và thiết lập điều kiện để mở khóa tài sản - Vesting Contract."
 ---
 
-# Bài 01: Xây Dựng Spending Validator
+# Xây dựng Spending Validator đầu tiên
 
-:::info Mục tiêu
-Viết validator (smart contract) đầu tiên để khóa tài sản và thiết lập điều kiện để mở khóa tài sản - Vesting Contract.
-:::
+Bài học này hướng dẫn tạo validator chi tiêu đầu tiên - từ thiết kế, viết code, biên dịch đến kiểm thử.
 
----
+## Mục tiêu học tập
 
-## Mục Lục
+- Hiểu cấu trúc của spending validator
+- Viết validator đơn giản "gift contract"
+- Biên dịch và deploy validator
+- Viết tests cho validator
+- Tương tác với validator on-chain
 
-1. [Tổng quan Spending Validator](#1-tổng-quan-spending-validator)
-2. [Thiết kế Vesting Contract](#2-thiết-kế-vesting-contract)
-3. [Implement Validator](#3-implement-validator)
-4. [Viết Tests](#4-viết-tests)
-5. [Build và Deploy](#5-build-và-deploy)
-6. [Tương tác với Contract](#6-tương-tác-với-contract)
-7. [Mở rộng và Cải tiến](#7-mở-rộng-và-cải-tiến)
+## Spending Validator là gì?
 
----
-
-## 1. Tổng Quan Spending Validator
-
-### Spending Validator là gì?
-
-Spending Validator là smart contract kiểm soát việc tiêu (spend) UTXOs trên Cardano.
-
-| Thành phần | Mô tả |
-|------------|-------|
-| Lock funds | Gửi tiền đến SCRIPT ADDRESS |
-| UTXO | Chứa Value, Address (script_hash), và Datum (conditions) |
-| Validator | Kiểm tra Datum, Redeemer, Context và trả về True/False |
-
-**Quy trình hoạt động:**
-
-1. **Lock funds tại SCRIPT ADDRESS**: UTXO chứa giá trị (VD: 100 ADA), địa chỉ script_hash, và datum chứa các điều kiện
-2. **Để SPEND, phải thỏa mãn VALIDATOR**: Validator kiểm tra Datum (stored state), Redeemer (action), Context (tx info) và trả về True hoặc False
-
-**Use cases:**
-- Vesting (time-locked funds)
-- Escrow (multi-party agreements)
-- DEX (token swaps)
-- Lending (collateralized loans)
-- NFT marketplaces
-
-### Validator Signature
-
-```aiken
-// Spending validator trong Aiken có signature:
-
-validator my_validator {
-  spend(
-    datum: Option<DatumType>,      // Data stored with UTXO
-    redeemer: RedeemerType,        // Action provided in tx
-    own_ref: OutputReference,      // Which UTXO being spent
-    tx: Transaction,               // Full transaction context
-  ) {
-    // Validation logic
-    // Return Bool (True = allow, False = reject)
-  }
-}
-```
-
----
-
-## 2. Thiết Kế Vesting Contract
-
-### Vesting Contract là gì?
-
-Vesting là việc khóa funds với điều kiện thời gian.
-
-**Scenario:**
-- Alice (Owner) locks 1000 ADA for Bob (Beneficiary)
-- Deadline: January 1, 2025
-
-**Rules:**
-- TRƯỚC deadline: Alice có thể CANCEL
-- SAU deadline: Bob có thể CLAIM
-
-```mermaid
-timeline
-    title Vesting Timeline
-    Lock : Owner khóa funds
-    section Before Deadline
-        CANCEL : Owner có thể hủy
-    section After Deadline
-        CLAIM : Beneficiary có thể nhận
-```
-
-### Data Structures
-
-```aiken
-// ========== DATUM ==========
-// Stored with UTXO, defines the vesting conditions
-
-/// Vesting datum - lưu trữ thông tin vesting
-type VestingDatum {
-  /// Owner - người tạo vesting, có thể cancel
-  owner: VerificationKeyHash,
-  /// Beneficiary - người nhận, có thể claim sau deadline
-  beneficiary: VerificationKeyHash,
-  /// Deadline - thời điểm unlock (POSIX milliseconds)
-  deadline: POSIXTime,
-}
-
-// ========== REDEEMER ==========
-// Provided in transaction, specifies action
-
-/// Vesting redeemer - action khi spend UTXO
-type VestingRedeemer {
-  /// Claim - beneficiary claims after deadline
-  Claim
-  /// Cancel - owner cancels before deadline
-  Cancel
-}
-
-// ========== TYPE ALIASES ==========
-
-/// Public key hash (28 bytes)
-type VerificationKeyHash = ByteArray
-
-/// POSIX timestamp in milliseconds
-type POSIXTime = Int
-```
-
-### State Diagram
-
-```mermaid
-stateDiagram-v2
-    [*] --> LOCKED: Lock funds
-    LOCKED --> CANCEL: Owner signed + Before deadline
-    LOCKED --> CLAIM: Beneficiary signed + After deadline
-    CANCEL --> [*]: Funds to Owner
-    CLAIM --> [*]: Funds to Beneficiary
-```
-
-| State | Điều kiện | Kết quả |
-|-------|-----------|---------|
-| LOCKED | UTXO tồn tại | Chờ xử lý |
-| CANCEL | Owner ký + Trước deadline | Funds về Owner |
-| CLAIM | Beneficiary ký + Sau deadline | Funds về Beneficiary |
-| SPENT | UTXO đã được tiêu | Kết thúc |
-
----
-
-## 3. Implement Validator
-
-### Project Structure
+Spending Validator là script quyết định ai có thể tiêu (spend) UTxO được lock tại script address.
 
 ```
-vesting/
-├── aiken.toml
-├── lib/
-│   └── vesting/
-│       ├── types.ak        # Data types
-│       └── utils.ak        # Helper functions
-├── validators/
-│   └── vesting.ak          # Main validator
+┌─────────────────────────────────────────────────────────────┐
+│                 SPENDING VALIDATOR                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │                                                      │  │
+│   │   User ───▶ Lock ADA ───▶ Script Address            │  │
+│   │                              │                       │  │
+│   │                              ├── Value: 100 ADA      │  │
+│   │                              └── Datum: { owner }    │  │
+│   │                                                      │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │                                                      │  │
+│   │   Someone ───▶ Spend UTxO ───▶ Validator checks:    │  │
+│   │                                                      │  │
+│   │   ┌─────────┐  ┌─────────┐  ┌─────────┐            │  │
+│   │   │ Datum   │ +│Redeemer │ +│Context  │            │  │
+│   │   └────┬────┘  └────┬────┘  └────┬────┘            │  │
+│   │        │            │            │                  │  │
+│   │        └────────────┼────────────┘                  │  │
+│   │                     │                               │  │
+│   │                     ▼                               │  │
+│   │              ┌──────────────┐                       │  │
+│   │              │  Validator   │                       │  │
+│   │              │    Logic     │                       │  │
+│   │              └──────┬───────┘                       │  │
+│   │                     │                               │  │
+│   │           ┌─────────┴─────────┐                    │  │
+│   │           ▼                   ▼                    │  │
+│   │         True               False                   │  │
+│   │     (Can Spend)        (TX Rejected)               │  │
+│   │                                                      │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Bài tập: Gift Contract
+
+Chúng ta sẽ xây dựng một "Gift Contract" đơn giản:
+- **Lock**: Ai cũng có thể lock ADA vào contract với một "secret password"
+- **Unlock**: Ai có password đúng có thể claim ADA
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    GIFT CONTRACT                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   LOCK (Tạo gift)                                          │
+│   ───────────────                                          │
+│   Alice ───▶ Lock 10 ADA                                   │
+│              Datum: hash("secret_password")                │
+│                                                             │
+│   UNLOCK (Claim gift)                                      │
+│   ─────────────────                                        │
+│   Bob ───▶ Redeemer: "secret_password"                     │
+│                │                                            │
+│                ▼                                            │
+│        hash("secret_password") == Datum?                   │
+│                │                                            │
+│        ┌───────┴───────┐                                   │
+│        ▼               ▼                                   │
+│       Yes              No                                   │
+│    (Bob gets 10 ADA)  (TX Fails)                           │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## Bước 1: Tạo dự án mới
+
+```bash
+# Tạo project mới
+aiken new gift_contract
+cd gift_contract
+
+# Cấu trúc project
+gift_contract/
+├── aiken.toml           # Project configuration
+├── lib/                 # Library modules
+│   └── gift_contract/
+│       └── validators.ak
+├── validators/          # Validator scripts
+│   └── gift.ak
 └── README.md
 ```
 
-### aiken.toml
+## Bước 2: Định nghĩa Types
 
-```toml
-name = "vesting"
-version = "0.1.0"
-license = "Apache-2.0"
-description = "A simple vesting contract"
+```rust title="lib/gift_contract/types.ak"
+//// Types cho Gift Contract
 
-[repository]
-user = "your-github"
-project = "vesting"
-platform = "github"
+use aiken/crypto.{Blake2b_224, Hash}
 
-[[dependencies]]
-name = "aiken-lang/stdlib"
-version = "v2.2.0"
-source = "github"
-```
-
-### lib/vesting/types.ak
-
-```aiken
-/// Public key hash type (28 bytes)
-pub type VerificationKeyHash =
-  ByteArray
-
-/// POSIX timestamp in milliseconds
-pub type POSIXTime =
-  Int
-
-/// Vesting datum - stores vesting information
-pub type VestingDatum {
-  /// Owner who can cancel the vesting
-  owner: VerificationKeyHash,
-  /// Beneficiary who can claim after deadline
-  beneficiary: VerificationKeyHash,
-  /// Unlock deadline (POSIX timestamp)
-  deadline: POSIXTime,
+/// Datum: Chứa hash của password
+/// Khi lock ADA, người tạo gift sẽ hash password và lưu vào datum
+pub type GiftDatum {
+  /// Hash của secret password (32 bytes)
+  password_hash: ByteArray,
 }
 
-/// Vesting redeemer - action to perform
-pub type VestingRedeemer {
-  /// Beneficiary claims the funds (after deadline)
-  Claim
-  /// Owner cancels the vesting (before deadline)
-  Cancel
+/// Redeemer: Password plaintext để unlock
+/// Người claim phải cung cấp password đúng
+pub type GiftRedeemer {
+  /// Password plaintext để verify
+  password: ByteArray,
 }
 ```
 
-### lib/vesting/utils.ak
+## Bước 3: Viết Validator
 
-```aiken
-use aiken/collection/list
-use cardano/transaction.{Transaction, ValidityRange}
-use aiken/interval.{Finite, Interval, IntervalBound}
+```rust title="validators/gift.ak"
+//// Gift Contract Validator
+//// Cho phép ai có password đúng có thể claim ADA
 
-/// Check if a public key hash is in the signatories list
-pub fn must_be_signed_by(
-  signatories: List<ByteArray>,
-  key_hash: ByteArray,
-) -> Bool {
-  list.has(signatories, key_hash)
-}
-
-/// Check if current time is after the given deadline
-pub fn is_after_deadline(validity_range: ValidityRange, deadline: Int) -> Bool {
-  // Get the lower bound of validity range
-  when validity_range.lower_bound.bound_type is {
-    Finite(tx_earliest_time) -> tx_earliest_time > deadline
-    _ -> False
-  }
-}
-
-/// Check if current time is before or at the deadline
-pub fn is_before_deadline(validity_range: ValidityRange, deadline: Int) -> Bool {
-  // Get the upper bound of validity range
-  when validity_range.upper_bound.bound_type is {
-    Finite(tx_latest_time) -> tx_latest_time <= deadline
-    _ -> False
-  }
-}
-
-// ========== TESTS ==========
-
-test must_be_signed_by_present() {
-  let signatories = [#"aabbcc", #"ddeeff", #"112233"]
-  must_be_signed_by(signatories, #"ddeeff")
-}
-
-test must_be_signed_by_absent() {
-  let signatories = [#"aabbcc", #"ddeeff"]
-  !must_be_signed_by(signatories, #"112233")
-}
-```
-
-### validators/vesting.ak
-
-```aiken
-use aiken/collection/list
+use aiken/crypto.{blake2b_256}
 use cardano/transaction.{OutputReference, Transaction}
-use vesting/types.{VestingDatum, VestingRedeemer, Claim, Cancel}
-use vesting/utils.{must_be_signed_by, is_after_deadline, is_before_deadline}
 
-/// Vesting validator
-///
-/// This validator locks funds that can be:
-/// - Claimed by the beneficiary after the deadline
-/// - Cancelled by the owner before the deadline
-validator vesting {
+/// Datum: Hash của password
+pub type GiftDatum {
+  password_hash: ByteArray,
+}
+
+/// Redeemer: Password plaintext
+pub type GiftRedeemer {
+  password: ByteArray,
+}
+
+/// Gift Validator
+/// Kiểm tra: hash(redeemer.password) == datum.password_hash
+validator gift {
   spend(
-    datum: Option<VestingDatum>,
-    redeemer: VestingRedeemer,
+    datum: Option<GiftDatum>,
+    redeemer: GiftRedeemer,
     _own_ref: OutputReference,
-    tx: Transaction,
+    _tx: Transaction,
   ) {
-    // Datum must exist
+    // Lấy datum, fail nếu không có
     expect Some(d) = datum
 
-    // Get transaction info
-    let signatories = tx.extra_signatories
-    let validity_range = tx.validity_range
+    // Hash password từ redeemer
+    let provided_hash = blake2b_256(redeemer.password)
 
-    // Validate based on action
-    when redeemer is {
-      Claim -> {
-        // Beneficiary claims after deadline
-        trace @"Processing Claim action"
-
-        // Check 1: Beneficiary must sign
-        let beneficiary_signed = must_be_signed_by(signatories, d.beneficiary)
-
-        // Check 2: Must be after deadline
-        let deadline_passed = is_after_deadline(validity_range, d.deadline)
-
-        // Both conditions must be true
-        if beneficiary_signed && deadline_passed {
-          trace @"Claim: SUCCESS"
-          True
-        } else {
-          if !beneficiary_signed {
-            trace @"Claim FAILED: Beneficiary signature missing"
-          }
-          if !deadline_passed {
-            trace @"Claim FAILED: Deadline not passed"
-          }
-          False
-        }
-      }
-
-      Cancel -> {
-        // Owner cancels before deadline
-        trace @"Processing Cancel action"
-
-        // Check 1: Owner must sign
-        let owner_signed = must_be_signed_by(signatories, d.owner)
-
-        // Check 2: Must be before or at deadline
-        let before_deadline = is_before_deadline(validity_range, d.deadline)
-
-        // Both conditions must be true
-        if owner_signed && before_deadline {
-          trace @"Cancel: SUCCESS"
-          True
-        } else {
-          if !owner_signed {
-            trace @"Cancel FAILED: Owner signature missing"
-          }
-          if !before_deadline {
-            trace @"Cancel FAILED: Deadline already passed"
-          }
-          False
-        }
-      }
-    }
+    // So sánh với hash trong datum
+    provided_hash == d.password_hash
   }
 }
 ```
 
----
+## Bước 4: Viết Tests
 
-## 4. Viết Tests
+```rust title="lib/gift_contract/gift_test.ak"
+//// Tests cho Gift Contract
 
-### Comprehensive Tests
+use aiken/crypto.{blake2b_256}
 
-```aiken
-// Thêm vào cuối file validators/vesting.ak
-
-use aiken/interval.{Finite, Interval, IntervalBound, PositiveInfinity, NegativeInfinity}
-use cardano/assets
-use cardano/address.{Address, Script, VerificationKey}
-
-// ========== TEST FIXTURES ==========
-
-const owner_pkh: ByteArray = #"00000000000000000000000000000000000000000000000000000001"
-const beneficiary_pkh: ByteArray = #"00000000000000000000000000000000000000000000000000000002"
-const random_pkh: ByteArray = #"00000000000000000000000000000000000000000000000000000003"
-const deadline: Int = 1704067200000  // January 1, 2024 00:00:00 UTC
-
-fn test_datum() -> VestingDatum {
-  VestingDatum {
-    owner: owner_pkh,
-    beneficiary: beneficiary_pkh,
-    deadline: deadline,
-  }
+/// Datum type
+type GiftDatum {
+  password_hash: ByteArray,
 }
 
-fn mock_output_reference() -> OutputReference {
-  OutputReference {
-    transaction_id: #"0000000000000000000000000000000000000000000000000000000000000000",
-    output_index: 0,
-  }
+/// Redeemer type
+type GiftRedeemer {
+  password: ByteArray,
 }
 
-fn mock_transaction(
-  signatories: List<ByteArray>,
-  lower_bound: Int,
-  upper_bound: Int,
-) -> Transaction {
-  Transaction {
-    inputs: [],
-    reference_inputs: [],
-    outputs: [],
-    fee: 0,
-    mint: assets.zero,
-    certificates: [],
-    withdrawals: [],
-    validity_range: Interval {
-      lower_bound: IntervalBound {
-        bound_type: Finite(lower_bound),
-        is_inclusive: True,
-      },
-      upper_bound: IntervalBound {
-        bound_type: Finite(upper_bound),
-        is_inclusive: True,
-      },
-    },
-    extra_signatories: signatories,
-    redeemers: [],
-    datums: [],
-    id: #"0000000000000000000000000000000000000000000000000000000000000000",
-    votes: [],
-    proposal_procedures: [],
-    current_treasury_amount: None,
-    treasury_donation: None,
-  }
+/// Core validation logic
+fn validate_gift(datum: GiftDatum, redeemer: GiftRedeemer) -> Bool {
+  let provided_hash = blake2b_256(redeemer.password)
+  provided_hash == datum.password_hash
 }
 
-// ========== CLAIM TESTS ==========
-
-test claim_succeeds_after_deadline_with_beneficiary_signature() {
-  let datum = Some(test_datum())
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
-
-  // Time after deadline, beneficiary signs
-  let tx = mock_transaction(
-    [beneficiary_pkh],
-    deadline + 1000,  // After deadline
-    deadline + 2000,
-  )
-
-  vesting.spend(datum, redeemer, own_ref, tx)
+/// Helper: Tạo datum từ password
+fn create_datum(password: ByteArray) -> GiftDatum {
+  GiftDatum { password_hash: blake2b_256(password) }
 }
 
-test claim_fails_before_deadline() {
-  let datum = Some(test_datum())
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
+// ============================================
+// TESTS
+// ============================================
 
-  // Time before deadline
-  let tx = mock_transaction(
-    [beneficiary_pkh],
-    deadline - 2000,  // Before deadline
-    deadline - 1000,
-  )
+test test_correct_password() {
+  let secret = "my_secret_password"
+  let datum = create_datum(secret)
+  let redeemer = GiftRedeemer { password: secret }
 
-  !vesting.spend(datum, redeemer, own_ref, tx)
+  validate_gift(datum, redeemer) == True
 }
 
-test claim_fails_without_beneficiary_signature() {
-  let datum = Some(test_datum())
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
+test test_wrong_password() {
+  let secret = "my_secret_password"
+  let datum = create_datum(secret)
+  let redeemer = GiftRedeemer { password: "wrong_password" }
 
-  // After deadline, but wrong signer
-  let tx = mock_transaction(
-    [owner_pkh],  // Owner signed, not beneficiary
-    deadline + 1000,
-    deadline + 2000,
-  )
-
-  !vesting.spend(datum, redeemer, own_ref, tx)
+  validate_gift(datum, redeemer) == False
 }
 
-test claim_fails_with_random_signature() {
-  let datum = Some(test_datum())
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
+test test_empty_password() {
+  let secret = ""
+  let datum = create_datum(secret)
+  let redeemer = GiftRedeemer { password: "" }
 
-  // After deadline, random signer
-  let tx = mock_transaction(
-    [random_pkh],
-    deadline + 1000,
-    deadline + 2000,
-  )
-
-  !vesting.spend(datum, redeemer, own_ref, tx)
+  validate_gift(datum, redeemer) == True
 }
 
-test claim_fails_at_exact_deadline() {
-  let datum = Some(test_datum())
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
+test test_case_sensitive() {
+  let secret = "Secret"
+  let datum = create_datum(secret)
+  let redeemer = GiftRedeemer { password: "secret" }
 
-  // Exactly at deadline (not after)
-  let tx = mock_transaction(
-    [beneficiary_pkh],
-    deadline,
-    deadline,
-  )
-
-  !vesting.spend(datum, redeemer, own_ref, tx)
+  // Password should be case-sensitive
+  validate_gift(datum, redeemer) == False
 }
 
-// ========== CANCEL TESTS ==========
+test test_special_characters() {
+  let secret = "p@ssw0rd!#$%"
+  let datum = create_datum(secret)
+  let redeemer = GiftRedeemer { password: "p@ssw0rd!#$%" }
 
-test cancel_succeeds_before_deadline_with_owner_signature() {
-  let datum = Some(test_datum())
-  let redeemer = Cancel
-  let own_ref = mock_output_reference()
-
-  // Time before deadline, owner signs
-  let tx = mock_transaction(
-    [owner_pkh],
-    deadline - 2000,  // Before deadline
-    deadline - 1000,
-  )
-
-  vesting.spend(datum, redeemer, own_ref, tx)
+  validate_gift(datum, redeemer) == True
 }
 
-test cancel_succeeds_at_exact_deadline() {
-  let datum = Some(test_datum())
-  let redeemer = Cancel
-  let own_ref = mock_output_reference()
+test test_long_password() {
+  let secret = "this_is_a_very_long_password_that_should_still_work_correctly_12345"
+  let datum = create_datum(secret)
+  let redeemer = GiftRedeemer { password: secret }
 
-  // Exactly at deadline (still allowed)
-  let tx = mock_transaction(
-    [owner_pkh],
-    deadline - 1000,
-    deadline,  // Upper bound at deadline
-  )
-
-  vesting.spend(datum, redeemer, own_ref, tx)
+  validate_gift(datum, redeemer) == True
 }
 
-test cancel_fails_after_deadline() {
-  let datum = Some(test_datum())
-  let redeemer = Cancel
-  let own_ref = mock_output_reference()
+test test_hash_uniqueness() {
+  let password1 = "password1"
+  let password2 = "password2"
 
-  // Time after deadline
-  let tx = mock_transaction(
-    [owner_pkh],
-    deadline + 1000,  // After deadline
-    deadline + 2000,
-  )
+  let hash1 = blake2b_256(password1)
+  let hash2 = blake2b_256(password2)
 
-  !vesting.spend(datum, redeemer, own_ref, tx)
-}
-
-test cancel_fails_without_owner_signature() {
-  let datum = Some(test_datum())
-  let redeemer = Cancel
-  let own_ref = mock_output_reference()
-
-  // Before deadline, but wrong signer
-  let tx = mock_transaction(
-    [beneficiary_pkh],  // Beneficiary signed, not owner
-    deadline - 2000,
-    deadline - 1000,
-  )
-
-  !vesting.spend(datum, redeemer, own_ref, tx)
-}
-
-// ========== EDGE CASE TESTS ==========
-
-test claim_with_multiple_signatories() {
-  let datum = Some(test_datum())
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
-
-  // Multiple signatures including beneficiary
-  let tx = mock_transaction(
-    [random_pkh, beneficiary_pkh, owner_pkh],
-    deadline + 1000,
-    deadline + 2000,
-  )
-
-  vesting.spend(datum, redeemer, own_ref, tx)
-}
-
-test cancel_with_multiple_signatories() {
-  let datum = Some(test_datum())
-  let redeemer = Cancel
-  let own_ref = mock_output_reference()
-
-  // Multiple signatures including owner
-  let tx = mock_transaction(
-    [random_pkh, owner_pkh, beneficiary_pkh],
-    deadline - 2000,
-    deadline - 1000,
-  )
-
-  vesting.spend(datum, redeemer, own_ref, tx)
-}
-
-test no_datum_fails() fail {
-  let datum: Option<VestingDatum> = None
-  let redeemer = Claim
-  let own_ref = mock_output_reference()
-
-  let tx = mock_transaction(
-    [beneficiary_pkh],
-    deadline + 1000,
-    deadline + 2000,
-  )
-
-  // Should crash because expect Some(d) = datum will fail
-  vesting.spend(datum, redeemer, own_ref, tx)
+  // Different passwords should produce different hashes
+  hash1 != hash2
 }
 ```
 
-### Chạy Tests
+## Bước 5: Build và Check
 
 ```bash
-# Chạy tất cả tests
+# Kiểm tra syntax và chạy tests
 aiken check
 
-# Output expected:
-#    Compiling vesting 0.1.0
-#     Checking vesting 0.1.0
-#       Testing ...
+# Output mong đợi:
+#     Compiling gift_contract 0.0.0
+#       Checking ...
 #
-#    ┍━ vesting/utils ━━━━━━━━━━━━━━━━━━━━━━━━━
-#    │ PASS [mem: ..., cpu: ...] must_be_signed_by_present
-#    │ PASS [mem: ..., cpu: ...] must_be_signed_by_absent
-#    ┕━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2 tests | 2 passed | 0 failed
-#
-#    ┍━ vesting ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-#    │ PASS [mem: ..., cpu: ...] claim_succeeds_after_deadline...
-#    │ PASS [mem: ..., cpu: ...] claim_fails_before_deadline
-#    │ ... (more tests)
-#    ┕━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12 tests | 12 passed | 0 failed
+#     ┍━ gift_test ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#     │ PASS [mem: xxx, cpu: xxx] test_correct_password
+#     │ PASS [mem: xxx, cpu: xxx] test_wrong_password
+#     │ PASS [mem: xxx, cpu: xxx] test_empty_password
+#     │ PASS [mem: xxx, cpu: xxx] test_case_sensitive
+#     │ PASS [mem: xxx, cpu: xxx] test_special_characters
+#     │ PASS [mem: xxx, cpu: xxx] test_long_password
+#     │ PASS [mem: xxx, cpu: xxx] test_hash_uniqueness
+#     ┕━━━━━━━━━━━━━━━━━━━━━━━━━━ 7 tests | 7 passed | 0 failed
 
-# Chạy với verbose traces
-aiken check --trace-level verbose
-
-# Chạy specific test
-aiken check -m "claim_succeeds"
-```
-
----
-
-## 5. Build và Deploy
-
-### Build Contract
-
-```bash
-# Build the validator
+# Build validator
 aiken build
 
-# Output files created in:
-# plutus.json - Contains compiled validators
+# Output file: plutus.json
+# Chứa compiled validator script
 ```
 
-### plutus.json Structure
+## Bước 6: Xem Blueprint
+
+Sau khi build, file `plutus.json` chứa blueprint của validator:
 
 ```json
 {
   "preamble": {
-    "title": "vesting",
-    "version": "0.1.0",
+    "title": "gift_contract",
+    "description": "Aiken contracts for project 'gift_contract'",
+    "version": "0.0.0",
     "plutusVersion": "v3",
     "compiler": {
       "name": "Aiken",
@@ -656,310 +308,345 @@ aiken build
   },
   "validators": [
     {
-      "title": "vesting.vesting.spend",
+      "title": "gift.gift.spend",
       "datum": {
-        "title": "datum",
+        "title": "GiftDatum",
         "schema": {
-          "$ref": "#/definitions/vesting~1types~1VestingDatum"
+          "$ref": "#/definitions/gift~1GiftDatum"
         }
       },
       "redeemer": {
-        "title": "redeemer",
+        "title": "GiftRedeemer",
         "schema": {
-          "$ref": "#/definitions/vesting~1types~1VestingRedeemer"
+          "$ref": "#/definitions/gift~1GiftRedeemer"
         }
       },
-      "compiledCode": "590a3f010000...",
+      "compiledCode": "5901a201000...",
       "hash": "abc123..."
     }
   ],
   "definitions": {
-    "vesting/types/VestingDatum": {
+    "gift/GiftDatum": {
+      "title": "GiftDatum",
       "dataType": "constructor",
       "fields": [
-        { "title": "owner", "dataType": "bytes" },
-        { "title": "beneficiary", "dataType": "bytes" },
-        { "title": "deadline", "dataType": "integer" }
+        {
+          "title": "password_hash",
+          "dataType": "bytes"
+        }
       ]
     },
-    "vesting/types/VestingRedeemer": {
-      "oneOf": [
-        { "dataType": "constructor", "index": 0, "title": "Claim" },
-        { "dataType": "constructor", "index": 1, "title": "Cancel" }
+    "gift/GiftRedeemer": {
+      "title": "GiftRedeemer",
+      "dataType": "constructor",
+      "fields": [
+        {
+          "title": "password",
+          "dataType": "bytes"
+        }
       ]
     }
   }
 }
 ```
 
-### Generate Script Address
+## Cải tiến: Thêm Owner
 
-```bash
-# Using cardano-cli (if installed)
-cardano-cli address build \
-  --payment-script-file vesting.plutus \
-  --testnet-magic 2 \
-  --out-file vesting.addr
+Phiên bản nâng cao với owner có thể cancel gift:
 
-# Or using Mesh.js / Lucid in JavaScript
-```
+```rust title="validators/gift_v2.ak"
+//// Gift Contract V2 - Với owner có thể cancel
 
-### Deploy to Testnet
+use aiken/crypto.{blake2b_256}
+use cardano/transaction.{OutputReference, Transaction}
+use aiken/collection/list
 
-```typescript
-// Using Mesh.js (TypeScript example)
-
-import { MeshWallet, Transaction, BlockfrostProvider } from "@meshsdk/core";
-import blueprint from "./plutus.json";
-
-// Setup provider
-const provider = new BlockfrostProvider("YOUR_BLOCKFROST_KEY");
-
-// Setup wallet
-const wallet = new MeshWallet({
-  networkId: 0, // Testnet
-  fetcher: provider,
-  submitter: provider,
-  key: {
-    type: "mnemonic",
-    words: ["your", "mnemonic", "..."],
-  },
-});
-
-// Get validator from blueprint
-const validator = {
-  code: blueprint.validators[0].compiledCode,
-  version: "V3",
-};
-
-// Calculate script address
-const scriptAddress = // ... derive from validator hash
-
-// Create datum
-const datum = {
-  owner: "OWNER_PKH_HEX",
-  beneficiary: "BENEFICIARY_PKH_HEX",
-  deadline: 1704067200000, // POSIX time
-};
-
-// Build lock transaction
-const tx = new Transaction({ initiator: wallet })
-  .sendLovelace(
-    {
-      address: scriptAddress,
-      datum: { value: datum, inline: true },
-    },
-    "10000000" // 10 ADA
-  );
-
-// Sign and submit
-const unsignedTx = await tx.build();
-const signedTx = await wallet.signTx(unsignedTx);
-const txHash = await wallet.submitTx(signedTx);
-
-console.log("Lock tx submitted:", txHash);
-```
-
----
-
-## 6. Tương Tác với Contract
-
-### Claim (Beneficiary)
-
-```typescript
-// Beneficiary claims after deadline
-
-import { MeshWallet, Transaction, BlockfrostProvider } from "@meshsdk/core";
-
-// ... setup code ...
-
-// Find the locked UTXO
-const utxos = await provider.fetchAddressUTxOs(scriptAddress);
-const lockedUtxo = utxos[0]; // The UTXO we want to claim
-
-// Build claim transaction
-const tx = new Transaction({ initiator: beneficiaryWallet })
-  .redeemValue({
-    value: lockedUtxo,
-    script: validator,
-    redeemer: {
-      data: { constructor: 0, fields: [] }, // Claim = constructor 0
-    },
-  })
-  .setRequiredSigners([beneficiaryPkh])
-  .setTimeToStart(deadline + 1) // Must be after deadline
-  .sendValue(beneficiaryAddress, lockedUtxo); // Send to self
-
-const unsignedTx = await tx.build();
-const signedTx = await beneficiaryWallet.signTx(unsignedTx);
-const txHash = await beneficiaryWallet.submitTx(signedTx);
-
-console.log("Claim tx:", txHash);
-```
-
-### Cancel (Owner)
-
-```typescript
-// Owner cancels before deadline
-
-// Build cancel transaction
-const tx = new Transaction({ initiator: ownerWallet })
-  .redeemValue({
-    value: lockedUtxo,
-    script: validator,
-    redeemer: {
-      data: { constructor: 1, fields: [] }, // Cancel = constructor 1
-    },
-  })
-  .setRequiredSigners([ownerPkh])
-  .setTimeToExpire(deadline) // Must be before deadline
-  .sendValue(ownerAddress, lockedUtxo); // Return to owner
-
-const unsignedTx = await tx.build();
-const signedTx = await ownerWallet.signTx(unsignedTx);
-const txHash = await ownerWallet.submitTx(signedTx);
-
-console.log("Cancel tx:", txHash);
-```
-
----
-
-## 7. Mở Rộng và Cải Tiến
-
-### Version 2: Partial Vesting
-
-```aiken
-/// Enhanced vesting with partial claims
-
-type VestingDatumV2 {
-  owner: ByteArray,
-  beneficiary: ByteArray,
-  total_amount: Int,
-  claimed_amount: Int,
-  start_time: Int,
-  end_time: Int,
+/// Datum với thêm owner
+pub type GiftDatum {
+  password_hash: ByteArray,
+  owner: ByteArray,  // Public key hash của owner
 }
 
-type VestingRedeemerV2 {
-  /// Claim available amount
-  Claim { amount: Int }
-  /// Cancel and return remaining
+/// Redeemer với 2 actions
+pub type GiftRedeemer {
+  /// Claim với password
+  Claim { password: ByteArray }
+  /// Owner cancel và lấy lại ADA
   Cancel
 }
 
-validator vesting_v2 {
+/// Helper: Kiểm tra signature
+fn signed_by(tx: Transaction, pkh: ByteArray) -> Bool {
+  list.has(tx.extra_signatories, pkh)
+}
+
+/// Gift Validator V2
+validator gift_v2 {
   spend(
-    datum: Option<VestingDatumV2>,
-    redeemer: VestingRedeemerV2,
-    own_ref: OutputReference,
-    tx: Transaction,
-  ) {
-    expect Some(d) = datum
-
-    when redeemer is {
-      Claim { amount } -> {
-        // Calculate vested amount based on time
-        let current_time = get_current_time(tx)
-        let vested = calculate_vested(d, current_time)
-        let claimable = vested - d.claimed_amount
-
-        // Checks
-        let beneficiary_signed = has_signature(tx, d.beneficiary)
-        let amount_valid = amount <= claimable && amount > 0
-
-        // If partial claim, check continuing output
-        let remaining = d.total_amount - d.claimed_amount - amount
-        let continuing_valid = if remaining > 0 {
-          check_continuing_output(tx, d, amount)
-        } else {
-          True
-        }
-
-        beneficiary_signed && amount_valid && continuing_valid
-      }
-
-      Cancel -> {
-        // Owner can cancel before start_time
-        let owner_signed = has_signature(tx, d.owner)
-        let current_time = get_current_time(tx)
-        let before_start = current_time < d.start_time
-
-        owner_signed && before_start
-      }
-    }
-  }
-}
-
-fn calculate_vested(d: VestingDatumV2, current_time: Int) -> Int {
-  if current_time >= d.end_time {
-    d.total_amount
-  } else if current_time <= d.start_time {
-    0
-  } else {
-    let elapsed = current_time - d.start_time
-    let duration = d.end_time - d.start_time
-    d.total_amount * elapsed / duration
-  }
-}
-```
-
-### Version 3: Multi-Beneficiary
-
-```aiken
-/// Vesting to multiple beneficiaries
-
-type MultiBeneficiary {
-  address: ByteArray,
-  share: Int,  // Percentage (e.g., 50 for 50%)
-}
-
-type MultiVestingDatum {
-  owner: ByteArray,
-  beneficiaries: List<MultiBeneficiary>,
-  deadline: Int,
-  total_shares: Int,  // Should equal 100
-}
-
-validator multi_vesting {
-  spend(
-    datum: Option<MultiVestingDatum>,
-    redeemer: VestingRedeemer,
+    datum: Option<GiftDatum>,
+    redeemer: GiftRedeemer,
     _own_ref: OutputReference,
     tx: Transaction,
   ) {
     expect Some(d) = datum
 
     when redeemer is {
-      Claim -> {
-        // Any beneficiary can trigger claim
-        // But outputs must distribute according to shares
-        let after_deadline = is_after_deadline(tx.validity_range, d.deadline)
-        let correct_distribution = check_distribution(tx.outputs, d)
-
-        after_deadline && correct_distribution
+      // Claim: Ai có password đúng có thể claim
+      Claim { password } -> {
+        let provided_hash = blake2b_256(password)
+        provided_hash == d.password_hash
       }
 
-      Cancel -> {
-        // Only owner can cancel
-        let owner_signed = has_signature(tx, d.owner)
-        let before_deadline = is_before_deadline(tx.validity_range, d.deadline)
+      // Cancel: Chỉ owner mới cancel được
+      Cancel -> signed_by(tx, d.owner)
+    }
+  }
+}
+```
 
-        owner_signed && before_deadline
+### Tests cho V2
+
+```rust title="lib/gift_contract/gift_v2_test.ak"
+use aiken/crypto.{blake2b_256}
+use aiken/collection/list
+
+type GiftDatum {
+  password_hash: ByteArray,
+  owner: ByteArray,
+}
+
+type GiftRedeemer {
+  Claim { password: ByteArray }
+  Cancel
+}
+
+fn validate_claim(datum: GiftDatum, password: ByteArray) -> Bool {
+  blake2b_256(password) == datum.password_hash
+}
+
+fn validate_cancel(datum: GiftDatum, signers: List<ByteArray>) -> Bool {
+  list.has(signers, datum.owner)
+}
+
+// Tests
+test test_claim_with_correct_password() {
+  let datum = GiftDatum {
+    password_hash: blake2b_256("secret"),
+    owner: #"alice",
+  }
+  validate_claim(datum, "secret") == True
+}
+
+test test_claim_with_wrong_password() {
+  let datum = GiftDatum {
+    password_hash: blake2b_256("secret"),
+    owner: #"alice",
+  }
+  validate_claim(datum, "wrong") == False
+}
+
+test test_cancel_by_owner() {
+  let datum = GiftDatum {
+    password_hash: blake2b_256("secret"),
+    owner: #"alice",
+  }
+  let signers = [#"alice", #"bob"]
+  validate_cancel(datum, signers) == True
+}
+
+test test_cancel_by_non_owner() {
+  let datum = GiftDatum {
+    password_hash: blake2b_256("secret"),
+    owner: #"alice",
+  }
+  let signers = [#"bob", #"charlie"]
+  validate_cancel(datum, signers) == False
+}
+```
+
+## Time-locked Gift
+
+Thêm điều kiện thời gian:
+
+```rust title="validators/gift_v3.ak"
+//// Gift Contract V3 - Time-locked
+
+use aiken/crypto.{blake2b_256}
+use cardano/transaction.{OutputReference, Transaction}
+use aiken/collection/list
+use aiken/interval
+
+/// Datum với deadline
+pub type GiftDatum {
+  password_hash: ByteArray,
+  owner: ByteArray,
+  deadline: Int,  // POSIX timestamp
+}
+
+/// Redeemer
+pub type GiftRedeemer {
+  Claim { password: ByteArray }
+  Cancel
+  Refund  // Owner lấy lại sau deadline nếu không ai claim
+}
+
+/// Helper: Kiểm tra signature
+fn signed_by(tx: Transaction, pkh: ByteArray) -> Bool {
+  list.has(tx.extra_signatories, pkh)
+}
+
+/// Helper: Kiểm tra thời gian
+fn is_before_deadline(tx: Transaction, deadline: Int) -> Bool {
+  when tx.validity_range.upper_bound.bound_type is {
+    Finite(upper) -> upper < deadline
+    _ -> False
+  }
+}
+
+fn is_after_deadline(tx: Transaction, deadline: Int) -> Bool {
+  when tx.validity_range.lower_bound.bound_type is {
+    Finite(lower) -> lower > deadline
+    _ -> False
+  }
+}
+
+/// Gift Validator V3
+validator gift_v3 {
+  spend(
+    datum: Option<GiftDatum>,
+    redeemer: GiftRedeemer,
+    _own_ref: OutputReference,
+    tx: Transaction,
+  ) {
+    expect Some(d) = datum
+
+    when redeemer is {
+      // Claim: Trước deadline với password đúng
+      Claim { password } -> {
+        let correct_password = blake2b_256(password) == d.password_hash
+        let before_deadline = is_before_deadline(tx, d.deadline)
+        correct_password && before_deadline
+      }
+
+      // Cancel: Owner có thể cancel bất kỳ lúc nào
+      Cancel -> signed_by(tx, d.owner)
+
+      // Refund: Owner lấy lại sau deadline
+      Refund -> {
+        let is_owner = signed_by(tx, d.owner)
+        let after_deadline = is_after_deadline(tx, d.deadline)
+        is_owner && after_deadline
       }
     }
   }
 }
 ```
 
----
+## Workflow tương tác On-chain
 
-## Tài Liệu Tham Khảo
+```
+┌─────────────────────────────────────────────────────────────┐
+│              ON-CHAIN INTERACTION                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   1. BUILD VALIDATOR                                        │
+│   ──────────────────                                        │
+│   $ aiken build                                             │
+│   → plutus.json (contains script hash)                      │
+│                                                             │
+│   2. COMPUTE SCRIPT ADDRESS                                 │
+│   ─────────────────────────                                 │
+│   script_hash → addr_test1...                               │
+│   (Using cardano-cli or SDK)                                │
+│                                                             │
+│   3. LOCK ADA (Create gift)                                 │
+│   ─────────────────────────                                 │
+│   $ cardano-cli transaction build \                         │
+│       --tx-out "script_addr+10000000" \                     │
+│       --tx-out-datum-inline-file datum.json \               │
+│       ...                                                   │
+│                                                             │
+│   4. UNLOCK ADA (Claim gift)                                │
+│   ──────────────────────────                                │
+│   $ cardano-cli transaction build \                         │
+│       --tx-in "utxo_at_script" \                            │
+│       --tx-in-script-file plutus.json \                     │
+│       --tx-in-datum-inline \                                │
+│       --tx-in-redeemer-file redeemer.json \                 │
+│       --tx-out "my_addr+9800000" \                          │
+│       ...                                                   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-- [Aiken Validators](https://aiken-lang.org/language-tour/validators)
-- [Cardano Spending Scripts](https://docs.cardano.org/plutus/spending-scripts)
-- [Mesh.js Documentation](https://meshjs.dev/)
-- [Lucid Documentation](https://lucid.spacebudz.io/)
+## Sử dụng với Off-chain SDK
 
----
+### Lucid (TypeScript)
 
-**Phần tiếp theo:** [Part 04: Phát Hành Token & NFT](../04-minting-tokens-nfts/01_ft_vs_nft.md)
+```typescript
+import { Lucid, fromText } from "lucid-cardano";
+
+// Initialize Lucid
+const lucid = await Lucid.new(provider, "Preview");
+lucid.selectWalletFromSeed(seed);
+
+// Load validator from blueprint
+const validator = {
+  type: "PlutusV3",
+  script: blueprint.validators[0].compiledCode,
+};
+const validatorAddress = lucid.utils.validatorToAddress(validator);
+
+// Create datum
+const password = "my_secret";
+const passwordHash = lucid.utils.sha256(fromText(password));
+const datum = Data.to({
+  password_hash: passwordHash,
+});
+
+// Lock ADA
+const lockTx = await lucid
+  .newTx()
+  .payToContract(validatorAddress, { inline: datum }, { lovelace: 10_000_000n })
+  .complete();
+
+const signedLockTx = await lockTx.sign().complete();
+const lockTxHash = await signedLockTx.submit();
+
+// Unlock ADA
+const utxos = await lucid.utxosAt(validatorAddress);
+const redeemer = Data.to({ password: fromText(password) });
+
+const unlockTx = await lucid
+  .newTx()
+  .collectFrom(utxos, redeemer)
+  .attachSpendingValidator(validator)
+  .complete();
+
+const signedUnlockTx = await unlockTx.sign().complete();
+const unlockTxHash = await signedUnlockTx.submit();
+```
+
+## Code mẫu
+
+Xem code mẫu đầy đủ trong thư mục `examples/`:
+
+- **validators/gift.ak** - Gift Contract validator hoàn chỉnh
+- **lib/gift_test.ak** - 7 test cases cho Gift Contract
+
+```bash
+# Chạy tests
+cd examples
+aiken check -m "gift_test"
+```
+
+## Hoàn thành Part 3
+
+Chúc mừng! Bạn đã hoàn thành **Part 3: Your First Validator**. Bạn đã học:
+
+- Cấu trúc của spending validator
+- Viết Gift Contract với nhiều tính năng
+- Build và test validator
+- Các vấn đề bảo mật cần lưu ý
+
+Tiếp theo, chúng ta sẽ chuyển sang **Part 4: Minting Tokens & NFTs** để học cách tạo minting policies.

@@ -1,787 +1,394 @@
 ---
-title: "03. Datum & Redeemer"
+title: Datum & Redeemer
 sidebar_position: 3
-description: "Hiểu sâu về Datum và Redeemer - hai thành phần cốt lõi của smart contracts trong Cardano, cách thiết kế và sử dụng hiệu quả."
 ---
 
-# Bài 03: Datum & Redeemer
+# Datum và Redeemer trong Cardano
 
-:::info Mục tiêu
-Hiểu sâu về Datum và Redeemer - hai thành phần cốt lõi của smart contracts trong Cardano, cách thiết kế và sử dụng hiệu quả.
-:::
+Bài học này giải thích cách dữ liệu di chuyển giữa giao dịch thông qua Datum và Redeemer để kích hoạt chuyển trạng thái hợp đồng.
 
----
+## Mục tiêu học tập
 
-## 1. Tổng Quan Datum & Redeemer
+- Hiểu vai trò của Datum trong smart contracts
+- Nắm cách sử dụng Redeemer để unlock UTxO
+- Biết các pattern thiết kế Datum/Redeemer phổ biến
+- Áp dụng vào validator thực tế
 
-### Vai trò trong Smart Contracts
+## Tổng quan: Luồng dữ liệu Smart Contract
 
-Trong Cardano smart contracts:
-
-| Component | Vai trò | Mô tả |
-|-----------|---------|-------|
-| **DATUM** | "What" (State/Data) | Stored WITH the UTXO, Represents contract state, Immutable once created, Read by validator |
-| **REDEEMER** | "How" (Action/Proof) | Provided IN the transaction, Specifies action to perform, Can contain parameters, Triggers specific logic |
-| **CONTEXT** | "Where" (Environment) | Full transaction information, Inputs, outputs, signers, Time validity |
-
-**Validator Function:**
 ```
-validate(datum, redeemer, context) -> Bool
-
-"Given this STATE (datum),
- can this ACTION (redeemer)
- be performed in this CONTEXT?"
+┌─────────────────────────────────────────────────────────────┐
+│              SMART CONTRACT DATA FLOW                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   LOCK (Tạo UTxO)                                          │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │                                                      │  │
+│   │   User ───▶ TX ───▶ Script Address                   │  │
+│   │                      │                               │  │
+│   │                      ├── Value: 100 ADA              │  │
+│   │                      └── Datum: { owner: "alice" }   │  │
+│   │                                                      │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+│   UNLOCK (Tiêu UTxO)                                       │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │                                                      │  │
+│   │   ┌─────────┐    ┌─────────┐    ┌─────────┐        │  │
+│   │   │  Datum  │ +  │Redeemer │ +  │ Script  │        │  │
+│   │   │ (state) │    │ (action)│    │ (logic) │        │  │
+│   │   └────┬────┘    └────┬────┘    └────┬────┘        │  │
+│   │        │              │              │              │  │
+│   │        └──────────────┼──────────────┘              │  │
+│   │                       │                              │  │
+│   │                       ▼                              │  │
+│   │              Script Execution                        │  │
+│   │                       │                              │  │
+│   │            ┌──────────┴──────────┐                  │  │
+│   │            ▼                     ▼                  │  │
+│   │          True                  False                │  │
+│   │       (Unlock OK)           (TX Fail)               │  │
+│   │                                                      │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Lifecycle
+## Datum - Trạng thái UTxO
 
-**PHASE 1: LOCK (Create UTXO)**
-- User creates transaction
-- Output to script address
-- Attach DATUM (inline or hash)
-- No redeemer needed yet
-- Result: UTXO created at script address with datum attached
-
-**PHASE 2: UTXO EXISTS (On-chain)**
-```
-+------------------------+
-|  Script UTXO           |
-|  - Value: 100 ADA      |
-|  - Address: script_addr|
-|  - Datum: {            |
-|      owner: "alice",   |
-|      deadline: 1700... |
-|    }                   |
-+------------------------+
-```
-
-**PHASE 3: UNLOCK (Spend UTXO)**
-- User creates spending transaction
-- Input: the script UTXO
-- Provide REDEEMER (action)
-- Validator executed with (datum, redeemer, ctx)
-- Result: If validator returns True, UTXO is spent
-
----
-
-## 2. Datum - Contract State
+Datum là dữ liệu được đính kèm vào UTxO tại script address. Nó đại diện cho "state" của smart contract.
 
 ### Datum Types
 
-**1. INLINE DATUM (Plutus V2+) - Recommended**
-
-UTXO contains full datum data.
-
-| Pros | Cons |
-|------|------|
-| No separate lookup needed | Larger UTXO size |
-| Datum always available | Higher min ADA requirement |
-| Simpler transaction building | |
-
-**2. DATUM HASH (Legacy)**
-
-UTXO contains only hash of datum. Actual datum provided in transaction.
-
-| Pros | Cons |
-|------|------|
-| Smaller UTXO size | Must track datum off-chain |
-| Lower min ADA | Datum can be "lost" |
-| | More complex transactions |
-
-**3. NO DATUM**
-
-UTXO has no datum. Used for simple scripts (no state needed).
-
-### Defining Datums in Aiken
-
-```aiken
-// ========== SIMPLE DATUMS ==========
-
-/// Basic vesting datum
-type VestingDatum {
-  /// Owner who can cancel
-  owner: ByteArray,
-  /// Beneficiary who can claim
-  beneficiary: ByteArray,
-  /// Deadline (POSIX timestamp in milliseconds)
-  deadline: Int,
-}
-
-/// Simple lock datum
-type LockDatum {
-  /// Required signer to unlock
-  key_hash: ByteArray,
-}
-
-// ========== COMPLEX DATUMS ==========
-
-/// DEX liquidity pool datum
-type PoolDatum {
-  /// Token A identifier
-  token_a: AssetClass,
-  /// Token B identifier
-  token_b: AssetClass,
-  /// Reserve of token A
-  reserve_a: Int,
-  /// Reserve of token B
-  reserve_b: Int,
-  /// LP token policy
-  lp_token: AssetClass,
-  /// Total LP tokens minted
-  total_lp: Int,
-  /// Fee numerator (e.g., 3 for 0.3%)
-  fee_num: Int,
-  /// Fee denominator (e.g., 1000)
-  fee_den: Int,
-}
-
-/// Auction datum
-type AuctionDatum {
-  /// Seller address
-  seller: ByteArray,
-  /// Item being auctioned
-  asset: AssetClass,
-  /// Minimum bid amount
-  min_bid: Int,
-  /// Current highest bid (if any)
-  highest_bid: Option<Bid>,
-  /// Auction deadline
-  deadline: Int,
-}
-
-type Bid {
-  bidder: ByteArray,
-  amount: Int,
-}
-
-/// Asset identifier
-type AssetClass {
-  policy_id: ByteArray,
-  asset_name: ByteArray,
-}
-
-// ========== NESTED DATUMS ==========
-
-/// Order book datum with nested types
-type OrderDatum {
-  /// Order details
-  order: OrderDetails,
-  /// Execution constraints
-  constraints: OrderConstraints,
-  /// Metadata
-  metadata: OrderMetadata,
-}
-
-type OrderDetails {
-  maker: ByteArray,
-  sell_asset: AssetClass,
-  sell_amount: Int,
-  buy_asset: AssetClass,
-  buy_amount: Int,
-}
-
-type OrderConstraints {
-  min_fill: Int,
-  allow_partial: Bool,
-  deadline: Option<Int>,
-}
-
-type OrderMetadata {
-  created_at: Int,
-  order_id: ByteArray,
-}
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    DATUM TYPES                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   1. Inline Datum                                           │
+│   ─────────────                                             │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │ UTxO                                                 │  │
+│   │ ├── Address: script_addr                            │  │
+│   │ ├── Value: 100 ADA                                  │  │
+│   │ └── Datum: { owner: #"abc", amount: 100 }          │  │
+│   │            ↑                                        │  │
+│   │            Stored directly in UTxO                  │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+│   2. Datum Hash Only                                        │
+│   ──────────────                                            │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │ UTxO                                                 │  │
+│   │ ├── Address: script_addr                            │  │
+│   │ ├── Value: 100 ADA                                  │  │
+│   │ └── DatumHash: #"hash_of_datum"                    │  │
+│   │                                                      │  │
+│   │ TX Witness                                           │  │
+│   │ └── Datum: { owner: #"abc", amount: 100 }          │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+│   Inline Datum được khuyến khích (CIP-32)                  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Accessing Datum in Validators
+### Thiết kế Datum hiệu quả
 
-```aiken
-use cardano/transaction.{Transaction, OutputReference, InlineDatum, DatumHash}
+```rust title="lib/datum_design.ak"
+//// Các pattern thiết kế Datum
 
-validator my_validator {
-  spend(
-    datum: Option<VestingDatum>,  // Aiken auto-casts from Data
-    redeemer: MyRedeemer,
-    own_ref: OutputReference,
-    tx: Transaction,
-  ) {
-    // Check datum exists
-    expect Some(d) = datum
-
-    // Access datum fields directly
-    let owner = d.owner
-    let deadline = d.deadline
-
-    // Use in validation logic
-    validate_claim(d, tx)
-  }
-}
-
-/// Alternative: Accept raw Data type
-validator raw_validator {
-  spend(
-    datum: Option<Data>,  // Raw Data
-    redeemer: Data,
-    own_ref: OutputReference,
-    tx: Transaction,
-  ) {
-    // Must manually cast
-    expect Some(raw) = datum
-    expect d: VestingDatum = raw
-
-    // Now use typed datum
-    d.deadline > 0
-  }
-}
-
-/// Accessing datum from outputs
-fn check_output_datum(output: Output) -> Bool {
-  when output.datum is {
-    InlineDatum(data) -> {
-      // Cast and check
-      expect d: VestingDatum = data
-      d.deadline > 0
-    }
-    DatumHash(_hash) -> {
-      // Need to lookup in tx.datums
-      False
-    }
-    NoDatum -> False
-  }
-}
-```
-
----
-
-## 3. Redeemer - Contract Actions
-
-### Redeemer Purpose
-
-Redeemer tells the validator WHAT ACTION to perform.
-
-Same UTXO, different redeemers = different logic:
-
-```mermaid
-graph TB
-    UTXO[UTXO<br/>Vesting Contract] --> Claim[Claim<br/>after deadline]
-    UTXO --> Cancel[Cancel<br/>before deadline]
-
-    Claim --> CheckBeneficiary[Check beneficiary signed]
-    Cancel --> CheckOwner[Check owner signed]
-```
-
-### Defining Redeemers
-
-```aiken
-// ========== SIMPLE REDEEMERS ==========
-
-/// Simple action enum
-type SimpleRedeemer {
-  Claim
-  Cancel
-}
-
-/// With parameters
-type MintRedeemer {
-  Mint { amount: Int }
-  Burn { amount: Int }
-}
-
-// ========== COMPLEX REDEEMERS ==========
-
-/// DEX swap actions
-type DexRedeemer {
-  /// Swap tokens
-  Swap {
-    direction: SwapDirection,
-    min_received: Int,
-  }
-  /// Add liquidity to pool
-  AddLiquidity {
-    amount_a: Int,
-    amount_b: Int,
-    min_lp: Int,
-  }
-  /// Remove liquidity from pool
-  RemoveLiquidity {
-    lp_amount: Int,
-    min_a: Int,
-    min_b: Int,
-  }
-  /// Collect accumulated fees
-  CollectFees
-}
-
-type SwapDirection {
-  AtoB
-  BtoA
-}
-
-/// Auction actions
-type AuctionRedeemer {
-  /// Place a new bid
-  Bid { amount: Int }
-  /// Close auction (after deadline)
-  Close
-  /// Cancel auction (seller, no bids)
-  Cancel
-  /// Extend auction deadline
-  Extend { new_deadline: Int }
-}
-
-/// Governance actions
-type GovernanceRedeemer {
-  /// Create new proposal
-  Propose {
-    proposal_id: ByteArray,
-    description_hash: ByteArray,
-  }
-  /// Vote on existing proposal
-  Vote {
-    proposal_id: ByteArray,
-    vote: VoteChoice,
-    voting_power: Int,
-  }
-  /// Execute passed proposal
-  Execute { proposal_id: ByteArray }
-  /// Cancel proposal (creator only)
-  CancelProposal { proposal_id: ByteArray }
-}
-
-type VoteChoice {
-  Yes
-  No
-  Abstain
-}
-```
-
-### Using Redeemers in Validators
-
-```aiken
-use aiken/collection/list
-use cardano/transaction.{Transaction, OutputReference, InlineDatum}
-
-type VestingDatum {
-  owner: ByteArray,
-  beneficiary: ByteArray,
-  deadline: Int,
-}
-
-type VestingRedeemer {
-  Claim
-  Cancel
-  Extend { new_deadline: Int }
-}
-
-validator vesting {
-  spend(
-    datum: Option<VestingDatum>,
-    redeemer: VestingRedeemer,
-    own_ref: OutputReference,
-    tx: Transaction,
-  ) {
-    expect Some(d) = datum
-
-    let signatories = tx.extra_signatories
-    let current_time = get_lower_bound(tx)
-
-    // Branch based on redeemer action
-    when redeemer is {
-      Claim -> {
-        trace @"Processing Claim action"
-        // Beneficiary must sign
-        let signed = list.has(signatories, d.beneficiary)
-        // Must be after deadline
-        let deadline_passed = current_time > d.deadline
-
-        signed && deadline_passed
-      }
-
-      Cancel -> {
-        trace @"Processing Cancel action"
-        // Owner must sign
-        let signed = list.has(signatories, d.owner)
-        // Must be before deadline
-        let before_deadline = current_time <= d.deadline
-
-        signed && before_deadline
-      }
-
-      Extend { new_deadline } -> {
-        trace @"Processing Extend action"
-        // Owner must sign
-        let signed = list.has(signatories, d.owner)
-        // New deadline must be later
-        let valid_extension = new_deadline > d.deadline
-        // Check continuing output has updated datum
-        let datum_updated = check_datum_continuation(tx, d, new_deadline)
-
-        signed && valid_extension && datum_updated
-      }
-    }
-  }
-}
-
-fn get_lower_bound(tx: Transaction) -> Int {
-  when tx.validity_range.lower_bound.bound_type is {
-    Finite(t) -> t
-    _ -> 0
-  }
-}
-
-fn check_datum_continuation(
-  tx: Transaction,
-  old_datum: VestingDatum,
-  new_deadline: Int,
-) -> Bool {
-  let expected = VestingDatum {
-    ..old_datum,
-    deadline: new_deadline
-  }
-
-  list.any(tx.outputs, fn(output) {
-    when output.datum is {
-      InlineDatum(data) -> {
-        expect new_datum: VestingDatum = data
-        new_datum == expected
-      }
-      _ -> False
-    }
-  })
-}
-```
-
----
-
-## 4. Script Context
-
-### Context Structure
-
-Context = Full transaction info available to validator.
-
-| Field | Type | Mô tả |
-|-------|------|-------|
-| **inputs** | List\<Input\> | Each has: output_reference, output |
-| **reference_inputs** | List\<Input\> | Read-only (Plutus V2+) |
-| **outputs** | List\<Output\> | New UTXOs being created |
-| **fee** | Int (Lovelace) | Transaction fee |
-| **mint** | Value | Tokens being minted/burned |
-| **validity_range** | Interval\<Int\> | Time window tx is valid |
-| **extra_signatories** | List\<ByteArray\> | Public key hashes that signed |
-| **datums** | Map\<ByteArray, Data\> | Datum hash -> datum lookup |
-| **id** | TransactionId | Transaction ID |
-
-Plus: **own_ref: OutputReference** - Which input triggered this validator
-
-### Using Context in Validators
-
-```aiken
-use aiken/collection/list
-use cardano/transaction.{Transaction, Input, Output, OutputReference, find_input, InlineDatum}
-use cardano/assets.{lovelace_of, quantity_of}
-use cardano/address.{Address, Script}
-
-/// Comprehensive validation using context
-fn comprehensive_validation(
-  datum: MyDatum,
-  own_ref: OutputReference,
-  tx: Transaction,
-) -> Bool {
-  // ========== FIND OWN INPUT ==========
-  expect Some(own_input) = find_input(tx.inputs, own_ref)
-  let own_value = own_input.output.value
-  let own_address = own_input.output.address
-
-  // ========== CHECK SIGNATURES ==========
-  let owner_signed = list.has(tx.extra_signatories, datum.owner)
-
-  // ========== CHECK TIME ==========
-  let current_time = get_lower_bound(tx)
-  let time_valid = current_time > datum.deadline
-
-  // ========== CHECK OUTPUTS ==========
-  let continuing_outputs = list.filter(
-    tx.outputs,
-    fn(o) { o.address == own_address }
-  )
-
-  // ========== CHECK MINTING ==========
-  let tokens_minted = quantity_of(tx.mint, my_policy, my_token)
-
-  // ========== COMBINE ALL CHECKS ==========
-  and {
-    owner_signed,
-    time_valid,
-    list.length(continuing_outputs) == 1,
-    tokens_minted == 0,
-  }
-}
-
-fn get_lower_bound(tx: Transaction) -> Int {
-  when tx.validity_range.lower_bound.bound_type is {
-    Finite(t) -> t
-    _ -> 0
-  }
-}
-
-fn is_script_address(addr: Address) -> Bool {
-  when addr.payment_credential is {
-    Script(_) -> True
-    _ -> False
-  }
-}
-```
-
----
-
-## 5. Thiết Kế Datum & Redeemer
-
-### Design Principles
-
-**DATUM DESIGN:**
-
-| Principle | Mô tả |
-|-----------|-------|
-| **MINIMAL** | Only store what's needed for validation. Larger datum = higher min ADA. Store hashes instead of full data when possible |
-| **COMPLETE** | Include all info needed to validate. Don't rely on external state |
-| **VERSIONED** | Consider future upgrades. Add version field for compatibility |
-
-**REDEEMER DESIGN:**
-
-| Principle | Mô tả |
-|-----------|-------|
-| **EXPLICIT ACTIONS** | Clear enum for each possible action. Easy to understand intent |
-| **PARAMETERIZED** | Include necessary parameters. Avoid hardcoding values |
-| **EXHAUSTIVE** | Cover all valid operations. Consider edge cases |
-
-### Good vs Bad Design
-
-```aiken
-// ========== GOOD DESIGN ==========
-
-/// Minimal, versioned datum
-type GoodDatum {
-  version: Int,           // For future upgrades
-  owner: ByteArray,       // 28 bytes (pub key hash)
-  deadline: Int,          // POSIX timestamp
-  config_hash: ByteArray, // Hash of config, not full config
-}
-
-/// Clear, parameterized redeemer
-type GoodRedeemer {
-  Claim                                    // Clear intent
-  Cancel                                   // Clear intent
-  UpdateConfig { new_config_hash: ByteArray }  // Parameterized
-  Extend { additional_time: Int }          // Parameterized
-}
-
-// ========== BAD DESIGN ==========
-
-/// Too much data - DON'T DO THIS
+/// ❌ Datum quá lớn - tốn phí
 type BadDatum {
-  owner_name: ByteArray,      // Unnecessary - just use hash
-  owner_email: ByteArray,     // Unnecessary personal data
-  full_config: LargeConfig,   // Store hash instead
-  history: List<Entry>,       // Unbounded - dangerous!
-  description: ByteArray,     // Store off-chain
+  user_name: ByteArray,      // 100 bytes
+  user_email: ByteArray,     // 100 bytes
+  user_address: ByteArray,   // 200 bytes
+  user_history: List<Int>,   // Có thể rất lớn!
 }
 
-/// Vague redeemer - DON'T DO THIS
-type BadRedeemer {
-  Action1  // What does this do?
-  Action2  // Unclear intent
-  Other    // Catch-all is dangerous
-}
-```
-
----
-
-## 6. Patterns Phổ Biến
-
-### Common Patterns
-
-**PATTERN 1: Multi-Sig**
-
-```aiken
-type MultiSigDatum {
-  signers: List<ByteArray>,
-  threshold: Int,
+/// ✅ Datum tối ưu - chỉ lưu essentials
+type GoodDatum {
+  owner_pkh: ByteArray,      // 28 bytes
+  deadline: Int,             // Số slot
+  amount: Int,               // Lovelace
 }
 
-fn validate_multisig(datum: MultiSigDatum, tx: Transaction) -> Bool {
-  let signed_count = list.foldl(
-    datum.signers,
-    0,
-    fn(count, signer) {
-      if list.has(tx.extra_signatories, signer) {
-        count + 1
-      } else {
-        count
-      }
-    }
-  )
-
-  signed_count >= datum.threshold
+/// ✅ Reference external data bằng hash
+type OptimalDatum {
+  owner_pkh: ByteArray,
+  metadata_hash: ByteArray,  // Hash của metadata off-chain
 }
 ```
 
-**PATTERN 2: Time-Locked**
+### Ví dụ Datum patterns
 
-```aiken
-type TimeLockDatum {
+```rust title="lib/datum_patterns.ak"
+//// Common Datum Patterns
+
+/// Pattern 1: Simple Lock
+/// Chỉ cần biết owner để unlock
+pub type SimpleLockDatum {
   owner: ByteArray,
-  unlock_time: Int,
 }
 
-type TimeLockRedeemer {
+/// Pattern 2: Time-locked
+/// Có thêm điều kiện thời gian
+pub type TimeLockDatum {
+  owner: ByteArray,
+  lock_until: Int,  // POSIX time in milliseconds
+}
+
+/// Pattern 3: Multi-sig
+/// Yêu cầu nhiều signatures
+pub type MultiSigDatum {
+  signers: List<ByteArray>,
+  required: Int,  // Số signatures tối thiểu
+}
+
+/// Pattern 4: State Machine
+/// Contract có nhiều trạng thái
+pub type AuctionDatum {
+  seller: ByteArray,
+  highest_bidder: Option<ByteArray>,
+  highest_bid: Int,
+  deadline: Int,
+  status: AuctionStatus,
+}
+
+pub type AuctionStatus {
+  Open
+  Closed
+  Settled
+}
+
+/// Pattern 5: Reference Script
+/// Datum chứa script hash để reference
+pub type ProxyDatum {
+  implementation_hash: ByteArray,
+  admin: ByteArray,
+}
+```
+
+## Redeemer - Action để Unlock
+
+Redeemer là dữ liệu được cung cấp khi muốn tiêu UTxO từ script address. Nó đại diện cho "action" mà user muốn thực hiện.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    REDEEMER ROLE                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   Redeemer = "Hành động" để unlock UTxO                    │
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │                                                      │  │
+│   │   enum Redeemer {                                    │  │
+│   │     Claim    ───────▶  User muốn claim tiền         │  │
+│   │     Cancel   ───────▶  Owner muốn cancel            │  │
+│   │     Update   ───────▶  Cập nhật state               │  │
+│   │     Bid(amt) ───────▶  Đặt giá trong auction        │  │
+│   │   }                                                  │  │
+│   │                                                      │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+│   Validator kiểm tra:                                       │
+│   • Redeemer có hợp lệ không?                              │
+│   • Điều kiện của action này có thỏa mãn không?            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Thiết kế Redeemer
+
+```rust title="lib/redeemer_design.ak"
+//// Redeemer Design Patterns
+
+/// Pattern 1: Unit Redeemer
+/// Khi không cần thông tin gì thêm
+pub type SimpleRedeemer {
   Unlock
 }
 
-fn validate_timelock(datum: TimeLockDatum, tx: Transaction) -> Bool {
-  let current_time = get_lower_bound(tx)
-  let signed = list.has(tx.extra_signatories, datum.owner)
+/// Pattern 2: Action Enum
+/// Nhiều hành động khác nhau
+pub type ActionRedeemer {
+  Claim
+  Cancel
+  Extend { extra_days: Int }
+}
 
-  signed && current_time >= datum.unlock_time
+/// Pattern 3: Data-carrying Redeemer
+/// Cần truyền dữ liệu cùng action
+pub type BidRedeemer {
+  Bid { amount: Int, bidder: ByteArray }
+  Accept
+  Reject
+}
+
+/// Pattern 4: Index-based Redeemer
+/// Chỉ định output cụ thể
+pub type IndexRedeemer {
+  SpendTo { output_index: Int }
+}
+
+/// Pattern 5: Proof Redeemer
+/// Cung cấp proof để verify
+pub type ProofRedeemer {
+  WithProof { merkle_proof: List<ByteArray>, leaf: ByteArray }
 }
 ```
 
-**PATTERN 3: Escrow**
+## Validator - Logic xử lý
 
-```aiken
-type EscrowDatum {
-  buyer: ByteArray,
+Validator nhận Datum, Redeemer và Transaction context để quyết định có cho phép tiêu UTxO không.
+
+```rust title="lib/validator_example.ak"
+use cardano/transaction.{Transaction, OutputReference}
+use aiken/collection/list
+
+/// Datum: State của contract
+pub type EscrowDatum {
   seller: ByteArray,
-  arbiter: ByteArray,
+  buyer: ByteArray,
   amount: Int,
   deadline: Int,
 }
 
-type EscrowRedeemer {
-  Release         // Buyer releases to seller
-  Refund          // Seller refunds to buyer
-  Arbitrate       // Arbiter decides
-  Timeout         // After deadline
-}
-
-fn validate_escrow(
-  datum: EscrowDatum,
-  redeemer: EscrowRedeemer,
-  tx: Transaction,
-) -> Bool {
-  let signatories = tx.extra_signatories
-  let current_time = get_lower_bound(tx)
-
-  when redeemer is {
-    Release -> list.has(signatories, datum.buyer)
-    Refund -> list.has(signatories, datum.seller)
-    Arbitrate -> list.has(signatories, datum.arbiter)
-    Timeout -> {
-      current_time > datum.deadline &&
-      list.has(signatories, datum.seller)
-    }
-  }
-}
-```
-
-**PATTERN 4: State Machine**
-
-```aiken
-type OrderState {
-  Created { seller: ByteArray, price: Int }
-  Paid { seller: ByteArray, buyer: ByteArray, price: Int }
-  Completed { completed_at: Int }
-}
-
-type OrderAction {
-  Pay
-  Confirm
+/// Redeemer: Actions có thể thực hiện
+pub type EscrowRedeemer {
+  /// Buyer xác nhận đã nhận hàng
+  Complete
+  /// Seller hủy giao dịch (trước deadline)
   Cancel
+  /// Refund cho buyer (sau deadline)
+  Refund
 }
 
-fn validate_state_machine(
-  state: OrderState,
-  action: OrderAction,
-  tx: Transaction,
-) -> Bool {
-  when (state, action) is {
-    (Created { seller, .. }, Pay) -> validate_payment(tx)
-    (Paid { buyer, .. }, Confirm) -> list.has(tx.extra_signatories, buyer)
-    (Created { seller, .. }, Cancel) -> list.has(tx.extra_signatories, seller)
-    _ -> {
-      trace @"Invalid state transition"
-      False
-    }
+/// Helper: Kiểm tra signature
+fn signed_by(tx: Transaction, pkh: ByteArray) -> Bool {
+  list.has(tx.extra_signatories, pkh)
+}
+
+/// Helper: Kiểm tra thời gian
+fn is_after_deadline(tx: Transaction, deadline: Int) -> Bool {
+  when tx.validity_range.lower_bound.bound_type is {
+    Finite(current_time) -> current_time > deadline
+    _ -> False
   }
 }
 
-fn validate_payment(tx: Transaction) -> Bool {
-  True  // Check payment in outputs
+fn is_before_deadline(tx: Transaction, deadline: Int) -> Bool {
+  when tx.validity_range.upper_bound.bound_type is {
+    Finite(current_time) -> current_time < deadline
+    _ -> False
+  }
+}
+
+/// Validator chính
+validator escrow {
+  spend(datum: Option<EscrowDatum>, redeemer: EscrowRedeemer, _own_ref: OutputReference, tx: Transaction) {
+    expect Some(d) = datum
+
+    when redeemer is {
+      Complete -> {
+        // Buyer xác nhận đã nhận hàng
+        // Seller có thể claim tiền
+        signed_by(tx, d.buyer)
+      }
+
+      Cancel -> {
+        // Seller hủy trước deadline
+        // Buyer nhận lại tiền
+        and {
+          signed_by(tx, d.seller),
+          is_before_deadline(tx, d.deadline),
+        }
+      }
+
+      Refund -> {
+        // Sau deadline, buyer có thể claim refund
+        and {
+          signed_by(tx, d.buyer),
+          is_after_deadline(tx, d.deadline),
+        }
+      }
+    }
+  }
 }
 ```
 
----
+## Script Context
 
-## 7. Best Practices
+Validator còn nhận thêm thông tin về transaction context:
 
-### Nên và Không Nên
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 SCRIPT CONTEXT                              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   Validator Parameters:                                     │
+│                                                             │
+│   spend(                                                    │
+│     datum: Option<Datum>,     ← Datum của UTxO này         │
+│     redeemer: Redeemer,       ← Action từ user             │
+│     own_ref: OutputReference, ← Reference đến UTxO này     │
+│     tx: Transaction,          ← Full transaction context   │
+│   )                                                         │
+│                                                             │
+│   Transaction Context (tx):                                 │
+│   ┌─────────────────────────────────────────────────────┐  │
+│   │ • inputs: List<Input>          Các UTxOs bị tiêu    │  │
+│   │ • reference_inputs: List<Input> UTxOs tham chiếu    │  │
+│   │ • outputs: List<Output>         UTxOs mới tạo       │  │
+│   │ • fee: Int                      Phí giao dịch       │  │
+│   │ • mint: Value                   Tokens được mint    │  │
+│   │ • certificates: List<Cert>      Stake certificates  │  │
+│   │ • withdrawals: Dict             Stake withdrawals   │  │
+│   │ • validity_range: Interval      Khoảng thời gian   │  │
+│   │ • extra_signatories: List       Required signers    │  │
+│   │ • redeemers: Dict               Tất cả redeemers   │  │
+│   │ • datums: Dict                  Tất cả datums      │  │
+│   │ • id: TransactionId             Hash của TX        │  │
+│   └─────────────────────────────────────────────────────┘  │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-:::tip Nên làm - DATUM
-- Keep datum minimal (affects min ADA)
-- Use inline datums for new contracts
-- Include version field for upgrades
-- Store hashes for large data
-- Validate output datum for state machines
-:::
+## Best Practices
 
-:::tip Nên làm - REDEEMER
-- Use descriptive action names
-- Include all necessary parameters
-- Handle all cases exhaustively
-- Keep redeemer data minimal
-:::
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    BEST PRACTICES                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   DATUM:                                                    │
+│   ✅ Giữ datum nhỏ gọn (giảm phí)                          │
+│   ✅ Sử dụng Inline Datum (CIP-32)                         │
+│   ✅ Hash dữ liệu lớn, lưu off-chain                       │
+│   ✅ Chỉ lưu dữ liệu cần thiết cho validation              │
+│   ❌ Không lưu dữ liệu có thể derive từ context            │
+│                                                             │
+│   REDEEMER:                                                 │
+│   ✅ Sử dụng enum cho các actions                          │
+│   ✅ Giữ redeemer đơn giản                                 │
+│   ✅ Validate tất cả data trong redeemer                   │
+│   ❌ Không trust redeemer data blindly                     │
+│                                                             │
+│   VALIDATOR:                                                │
+│   ✅ Handle tất cả redeemer cases                          │
+│   ✅ Kiểm tra signatures khi cần                           │
+│   ✅ Validate outputs nếu cần đảm bảo state đúng           │
+│   ✅ Sử dụng reference inputs cho shared state             │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-:::tip Nên làm - VALIDATION
-- Check datum exists before using
-- Use trace for debugging
-- Test all redeemer paths
-- Verify all context fields needed
-:::
+## Hoàn thành Part 2
 
-:::warning Không nên làm - DATUM
-- Store unnecessary data
-- Use unbounded lists
-- Store sensitive data in plain text
-- Rely on datum hash without backup
-:::
+Chúc mừng! Bạn đã hoàn thành **Part 2: Cardano Architecture**. Bạn đã học:
 
-:::warning Không nên làm - REDEEMER
-- Use catch-all patterns (Other, Default)
-- Hardcode values that should be parameters
-- Create ambiguous action names
-:::
+- Kiến trúc tổng quan của Cardano
+- Mô hình UTxO và Extended UTxO
+- Cách sử dụng Datum và Redeemer trong smart contracts
 
-:::warning Không nên làm - VALIDATION
-- Assume datum exists without checking
-- Ignore edge cases
-- Skip time validation when needed
-:::
-
----
-
-## Tài Liệu Tham Khảo
-
-- [Aiken Language Tour](https://aiken-lang.org/language-tour)
-- [Cardano Plutus Documentation](https://plutus.readthedocs.io/)
-- [CIP-32: Inline Datums](https://cips.cardano.org/cips/cip32/)
-
----
-
-## Hoàn Thành Part 02: Cardano Architecture!
-
-Chúc mừng bạn đã hoàn thành phần Kiến Trúc Cardano!
-
-Bạn đã học được:
-- Tổng quan về Cardano blockchain
-- Mô hình UTXO và eUTXO
-- Datum, Redeemer và Script Context
-
-**Tiếp theo:** [Part 03: Validator Đầu Tiên](../03-your-first-validator/01_build_first_validator.md)
+Tiếp theo, chúng ta sẽ chuyển sang **Part 3: Your First Validator** để xây dựng spending validator đầu tiên.

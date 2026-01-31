@@ -144,10 +144,12 @@ textarea:focus-visible {
 	--ifm-color-primary-light: #33925d;
 	--ifm-color-primary-lighter: #359962;
 	--ifm-color-primary-lightest: #3cad6e;
-	--ifm-code-font-size: 95%;
+	--ifm-code-font-size: 14px;
 	--docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 	--ifm-navbar-background-color: #ffffff;
 	--ifm-font-family-base: Arial, Helvetica, sans-serif;
+	--ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Source Code Pro',
+		'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
 	/* Landing page theme colors */
 	--bg-primary: #0F1B2A;
@@ -173,6 +175,27 @@ textarea:focus-visible {
 	--ifm-color-primary-lighter: #32d8b4;
 	--ifm-color-primary-lightest: #4fddbf;
 	--docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+	--ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Source Code Pro',
+		'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* ============================================
+   ASCII Diagram Rendering Fixes
+   ============================================ */
+pre code {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+	font-variant-ligatures: none;
+	font-feature-settings: "liga" 0, "calt" 0;
+}
+
+/* Ensure consistent character width in code blocks */
+.prism-code,
+pre[class*="language-"] {
+	font-variant-ligatures: none;
+	-webkit-font-feature-settings: "liga" 0, "calt" 0;
+	font-feature-settings: "liga" 0, "calt" 0;
 }
 
 /* ============================================

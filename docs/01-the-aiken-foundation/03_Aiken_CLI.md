@@ -1,385 +1,227 @@
 ---
-title: "03. Aiken CLI"
+title: Aiken CLI
 sidebar_position: 3
-description: "Thành thạo tất cả các lệnh CLI của Aiken để quản lý dự án smart contract hiệu quả"
 ---
 
-# Bài 03: Aiken CLI - Công Cụ Dòng Lệnh
+# Aiken CLI
 
-> **Mục tiêu:** Thành thạo tất cả các lệnh CLI của Aiken để quản lý dự án smart contract hiệu quả.
+Bài học này hướng dẫn sử dụng Aiken Command Line Interface (CLI) - công cụ chính để phát triển smart contract.
 
----
+## Mục tiêu học tập
 
-## Tổng Quan Aiken CLI
+- Làm chủ các lệnh Aiken CLI
+- Hiểu workflow phát triển chuẩn
+- Biết cách debug và tối ưu
 
-**Aiken CLI** là công cụ command-line để quản lý toàn bộ lifecycle của smart contract.
+## Tổng quan các lệnh
 
-| Lệnh | Mô tả |
-|------|-------|
-| `aiken new` | Tạo dự án mới |
-| `aiken build` | Compile smart contracts |
-| `aiken check` | Type-check và chạy tests |
-| `aiken fmt` | Format code |
-| `aiken docs` | Tạo documentation |
-| `aiken add` | Thêm dependencies |
-| `aiken address` | Tính địa chỉ validator |
-| `aiken blueprint` | Quản lý blueprint |
+```
+┌────────────────────────────────────────────────────────────┐
+│                    AIKEN CLI COMMANDS                      │
+├────────────────────────────────────────────────────────────┤
+│  new        │  Tạo dự án mới                               │
+│  build      │  Biên dịch validators sang Plutus            │
+│  check      │  Kiểm tra types + chạy tests                 │
+│  fmt        │  Format mã nguồn                             │
+│  docs       │  Tạo tài liệu HTML                           │
+│  blueprint  │  Xuất/chuyển đổi blueprint                   │
+│  lsp        │  Khởi động Language Server                   │
+│  completion │  Tạo shell completions                       │
+└────────────────────────────────────────────────────────────┘
+```
+
+## aiken new - Tạo dự án
+
+### Cú pháp
 
 ```bash
-# Xem tất cả lệnh
-aiken --help
+aiken new <owner>/<project-name>
 ```
 
----
-
-## Các Lệnh Cơ Bản
-
-### `aiken new` - Tạo Dự Án Mới
+### Ví dụ
 
 ```bash
-# Tạo dự án cơ bản
-aiken new hello_cardano
-
-# Tạo với tên tổ chức (kiểu GitHub)
-aiken new vbi-academy/escrow_contract
+aiken new aiken-vn/hello-world
 ```
 
-**Cấu trúc được tạo:**
+Output:
+```
+     Created aiken-vn/hello-world
+```
 
-| File/Folder | Mô tả |
-|-------------|-------|
-| `aiken.toml` | Cấu hình dự án |
-| `lib/` | Thư viện & helper functions |
-| `validators/` | Smart contracts |
-| `README.md` | Tài liệu dự án |
+### Cấu trúc được tạo
 
----
+```
+hello-world/
+├── aiken.toml           # Cấu hình dự án
+├── lib/                 # Thư viện chia sẻ
+│   └── .gitkeep
+└── validators/          # Smart contracts
+    └── .gitkeep
+```
 
-### `aiken check` - Kiểm Tra Type
+## aiken build - Biên dịch
+
+### Cú pháp cơ bản
 
 ```bash
-cd hello_cardano
-aiken check
-```
-
-**Quy trình check:**
-
-| Bước | Mô tả |
-|------|-------|
-| 1. Parser | Kiểm tra cú pháp |
-| 2. Type Checker | Kiểm tra types khớp nhau |
-| 3. Test Runner | Chạy tất cả tests |
-
-**Output thành công:**
-```
-    Compiling vbi-academy/hello_cardano 0.0.0
-      Checking ...
-    Completed in 0.05s
-```
-
----
-
-### `aiken fmt` - Format Code
-
-```bash
-# Format toàn bộ dự án
-aiken fmt
-
-# Chỉ kiểm tra (không thay đổi file)
-aiken fmt --check
-
-# Format một file cụ thể
-aiken fmt validators/hello_cardano.ak
-```
-
----
-
-### `aiken build` - Biên Dịch
-
-```bash
-# Build cơ bản
 aiken build
+```
 
-# Build với trace messages (debug)
+### Các options
+
+```bash
+# Hiển thị trace logs
 aiken build --trace-level verbose
 
-# Build chỉ kiểm tra, không tạo artifacts
-aiken build --check
+# Giữ tên biến trong output (debug)
+aiken build --keep-traces
+
+# Chỉ định thư mục output
+aiken build --out-dir ./dist
 ```
 
-**Trace levels:**
+### Output
 
-| Level | Mô tả |
-|-------|-------|
-| `silent` | Không có trace |
-| `compact` | Trace ngắn gọn (mặc định) |
-| `verbose` | Trace chi tiết (debug) |
-
-**Output:**
 ```
-    Compiling vbi-academy/hello_cardano 0.0.0
-    Generating blueprint (/path/to/hello_cardano/plutus.json)
+    Compiling aiken-vn/hello-world 0.0.0
+    Finished compilation in 0.15s
 
-    Validator   Size (bytes)   Mem (units)   CPU (units)
-    ───────────────────────────────────────────────────────
-    hello       1,234          45,678        12,345,678
+    Wrote plutus.json
+```
+
+## aiken check - Kiểm tra và Test
+
+### Chạy tất cả tests
+
+```bash
+aiken check
+```
+
+Output mẫu:
+```
+    Compiling aiken-vn/hello-world 0.0.0
+      Testing ...
+
+    ┍━ hello_world ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │ PASS [mem: 1234, cpu: 5678] test_always_succeeds
+    │ PASS [mem: 2345, cpu: 6789] test_with_datum
+    ┕━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2 tests | 2 passed | 0 failed
 
 Summary
-    1 validator
-    Completed in 0.25s
+    0 errors, 0 warnings
 ```
 
----
-
-## Quản Lý Dependencies
-
-### `aiken add` - Thêm Package
+### Lọc tests theo pattern
 
 ```bash
-# Thêm stdlib (đã có sẵn trong dự án mới)
-aiken add aiken-lang/stdlib
+# Chạy tests trong module cụ thể
+aiken check -m "hello_world"
 
-# Thêm với version cụ thể
-aiken add aiken-lang/stdlib@v2
+# Match chính xác tên
+aiken check -m "hello_world" -e
 
-# Thêm từ GitHub với tag
-aiken add aiken-lang/fuzz --version main
+# Chạy test cụ thể
+aiken check -m "hello_world.{test_always_succeeds}"
 ```
 
-**Kết quả trong aiken.toml:**
-```toml
-[dependencies]
-aiken-lang/stdlib = { version = "v2", source = "github" }
-aiken-lang/fuzz = { version = "main", source = "github" }
-```
-
-**Popular packages:**
-
-| Package | Mô tả |
-|---------|-------|
-| `aiken-lang/stdlib` | Standard library |
-| `aiken-lang/fuzz` | Fuzzing/property testing |
-| `sundaeswap/multisig` | Multi-signature |
-
-### `aiken packages` - Liệt Kê Packages
+### Hiển thị traces
 
 ```bash
-# Xem tất cả packages có sẵn
-aiken packages
-
-# Tìm kiếm package
-aiken packages --search multisig
-```
-
----
-
-## Testing với Aiken
-
-### Chạy Tests
-
-```bash
-# Chạy tất cả tests
-aiken check
-
-# Chạy test cụ thể (match tên)
-aiken check -m "add"
-
-# Chạy với exact match
-aiken check -e "test_add_positive"
-
-# Hiển thị chi tiết trace
 aiken check --trace-level verbose
 ```
 
-### Test Output
+## aiken fmt - Format code
 
-```
-Running tests...
-
-✅ add_positive         PASS   [mem: 1234]
-✅ add_negative         PASS   [mem: 1234]
-❌ add_overflow         FAIL
-
-2 passed, 1 failed
-```
-
----
-
-## Documentation Generation
-
-### `aiken docs` - Tạo Tài Liệu
+### Format toàn bộ dự án
 
 ```bash
-# Generate docs
+aiken fmt
+```
+
+### Chỉ kiểm tra (không sửa)
+
+```bash
+aiken fmt --check
+```
+
+Output khi có file cần format:
+```
+The following files need to be formatted:
+  - validators/hello.ak
+```
+
+## aiken docs - Tạo tài liệu
+
+### Tạo tài liệu HTML
+
+```bash
 aiken docs
-
-# Mở trong browser
-open docs/index.html
 ```
 
-### Cách viết Doc Comments
-
-```aiken
-/// Cộng hai số nguyên
-///
-/// ## Arguments
-///
-/// * `a` - Số thứ nhất
-/// * `b` - Số thứ hai
-///
-/// ## Returns
-///
-/// Tổng của a và b
-///
-/// ## Example
-///
-/// ```aiken
-/// add(2, 3) == 5
-/// ```
-pub fn add(a: Int, b: Int) -> Int {
-  a + b
-}
+Output được tạo trong `docs/`:
+```
+docs/
+├── index.html
+├── hello_world.html
+└── assets/
+    ├── style.css
+    └── search.js
 ```
 
----
-
-## Blueprint và Deployment
-
-### `aiken address` - Tính Address
+### Mở tài liệu
 
 ```bash
-# Mainnet address
-aiken address --mainnet
-
-# Testnet address (Preview)
-aiken address --testnet
-
-# Với validator cụ thể
-aiken address --validator hello_cardano --testnet
+aiken docs --open
 ```
 
-### `aiken blueprint` - Quản Lý Blueprint
+## aiken blueprint - Quản lý Blueprint
+
+### Xuất blueprint
 
 ```bash
-# Xem thông tin blueprint
-aiken blueprint policy
-
-# Convert plutus.json format
 aiken blueprint convert
-
-# Apply parameters to validator
-aiken blueprint apply -v my_validator '{"field": "value"}'
 ```
 
-### Tích hợp với Off-chain
-
-```javascript
-// Sử dụng blueprint với Mesh.js
-import blueprint from './plutus.json';
-
-const validator = {
-  type: "PlutusV3",
-  script: blueprint.validators[0].compiledCode,
-};
-
-const scriptAddress = resolvePlutusScriptAddress(validator, 0);
-```
-
----
-
-## Tips và Best Practices
-
-### Development Workflow
-
-| Bước | Lệnh | Mô tả |
-|------|------|-------|
-| 1 | Viết code | Editor |
-| 2 | `aiken fmt` | Format code |
-| 3 | `aiken check` | Type check + tests |
-| 4 | `aiken build` | Compile |
-| 5 | Test trên testnet | Off-chain |
-| 6 | Deploy mainnet | Production |
-
-### Shell Aliases (khuyến nghị)
+### Áp dụng parameters
 
 ```bash
-# Thêm vào ~/.bashrc hoặc ~/.zshrc
-alias ab="aiken build"
-alias ac="aiken check"
-alias af="aiken fmt"
-alias an="aiken new"
-alias at="aiken check -m"
+aiken blueprint apply <param-file>
 ```
 
-### So sánh các lệnh
-
-| Lệnh | Mục đích | Khi nào dùng |
-|------|----------|--------------|
-| `check` | Type check + tests | Sau mỗi thay đổi |
-| `build` | Compile đầy đủ | Trước deploy |
-| `fmt` | Format code | Trước commit |
-| `docs` | Generate docs | Trước release |
-
-### Common Errors và Solutions
-
-| Error | Solution |
-|-------|----------|
-| "Module not found" | Kiểm tra import path, chạy `aiken build` |
-| "Type mismatch" | Đọc error message, kiểm tra function signature |
-| "Validator too large" | Tối ưu code, sử dụng built-in functions |
-
----
-
-## Bài Tập Thực Hành
-
-### Bài 1: Khám phá CLI
+### Hiển thị địa chỉ validator
 
 ```bash
-# 1. Tạo dự án mới
-aiken new my_first_project
-
-# 2. Di chuyển vào thư mục
-cd my_first_project
-
-# 3. Build và xem output
-aiken build
-
-# 4. Chạy tests
-aiken check
+aiken blueprint address
 ```
 
-### Bài 2: Package Management
+## Workflow phát triển chuẩn
 
-```bash
-# 1. Xem packages có sẵn
-aiken packages
-
-# 2. Thêm một package
-aiken add aiken-lang/fuzz
-
-# 3. Kiểm tra aiken.toml
-cat aiken.toml
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 STANDARD DEV WORKFLOW                       │
+│                                                             │
+│   1. aiken new              ← Khởi tạo dự án               │
+│          │                                                  │
+│          ▼                                                  │
+│   2. Viết code .ak          ← Phát triển logic             │
+│          │                                                  │
+│          ▼                                                  │
+│   3. aiken check            ← Test liên tục                │
+│          │                                                  │
+│          ├── FAIL ──────────┐                              │
+│          │                  ▼                              │
+│          │            Fix lỗi → quay lại 3                 │
+│          │                                                  │
+│          ▼ PASS                                            │
+│   4. aiken build            ← Biên dịch production         │
+│          │                                                  │
+│          ▼                                                  │
+│   5. Deploy plutus.json     ← Triển khai on-chain          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
 ```
 
----
+## Bước tiếp theo
 
-## Checklist Hoàn Thành
-
-- [ ] Hiểu tất cả lệnh CLI cơ bản
-- [ ] Biết cách tạo và quản lý dự án
-- [ ] Có thể thêm và quản lý dependencies
-- [ ] Hiểu quy trình build và compile
-- [ ] Biết cách chạy và debug tests
-- [ ] Có thể generate documentation
-
----
-
-## Tài Liệu Tham Khảo
-
-- [Aiken CLI Documentation](https://aiken-lang.org/installation-instructions)
-- [Aiken Package Registry](https://packages.aiken-lang.org)
-- [Blueprint Specification (CIP-57)](https://cips.cardano.org/cips/cip57)
-
----
-
-➡️ **Tiếp theo**: [Bài 04 - Cấu trúc dự án](./04_Project_structure.md)
+Trong bài tiếp theo, chúng ta sẽ tìm hiểu chi tiết cấu trúc dự án Aiken và cách tổ chức code hiệu quả.
