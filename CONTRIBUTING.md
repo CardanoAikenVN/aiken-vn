@@ -1,95 +1,95 @@
-# Huong Dan Dong Gop / Contributing Guidelines
+# Hướng Dẫn Đóng Góp / Contributing Guidelines
 
-> [Tieng Viet](#tieng-viet) | [English](#english)
-
----
-
-## Tieng Viet
-
-Chao mung ban den voi du an Vietnamese Aiken! Chung toi dang xay dung giao trinh ma nguon mo dau tien de lam chu viec phat trien smart contract Aiken tren Cardano, danh rieng cho cong dong lap trinh vien Viet Nam.
-
-Cam on ban da quan tam den viec dong gop. Tai lieu nay se huong dan ban bat dau.
+> [Tiếng Việt](#tiếng-việt) | [English](#english)
 
 ---
 
-### Muc luc
+## Tiếng Việt
 
-- [Cac cach dong gop](#cac-cach-dong-gop)
-- [Huong dan bat dau](#huong-dan-bat-dau)
-- [Quy trinh phat trien](#quy-trinh-phat-trien)
-- [Quy uoc dat ten branch](#quy-uoc-dat-ten-branch)
-- [Quy uoc commit message](#quy-uoc-commit-message)
-- [Quy trinh Pull Request](#quy-trinh-pull-request)
-- [Mau bao cao van de](#mau-bao-cao-van-de)
-- [Quy tac ung xu](#quy-tac-ung-xu)
-- [Quy trinh review](#quy-trinh-review)
-- [Ghi nhan dong gop](#ghi-nhan-dong-gop)
+Chào mừng bạn đến với dự án Vietnamese Aiken! Chúng tôi đang xây dựng giáo trình mã nguồn mở đầu tiên để làm chủ việc phát triển smart contract Aiken trên Cardano, dành riêng cho cộng đồng lập trình viên Việt Nam.
+
+Cảm ơn bạn đã quan tâm đến việc đóng góp. Tài liệu này sẽ hướng dẫn bạn bắt đầu.
 
 ---
 
-### Cac cach dong gop
+### Mục lục
 
-#### Tai lieu
+- [Các cách đóng góp](#các-cách-đóng-góp)
+- [Hướng dẫn bắt đầu](#hướng-dẫn-bắt-đầu)
+- [Quy trình phát triển](#quy-trình-phát-triển)
+- [Quy ước đặt tên branch](#quy-ước-đặt-tên-branch)
+- [Quy ước commit message](#quy-ước-commit-message)
+- [Quy trình Pull Request](#quy-trình-pull-request)
+- [Mẫu báo cáo vấn đề](#mẫu-báo-cáo-vấn-đề)
+- [Quy tắc ứng xử](#quy-tắc-ứng-xử)
+- [Quy trình review](#quy-trình-review)
+- [Ghi nhận đóng góp](#ghi-nhận-đóng-góp)
 
-- **Bai hoc moi**: Viet noi dung giao duc moi cho cac phan giao trinh hien co hoac da len ke hoach
-- **Cai tien**: Sua loi chinh ta, lam ro giai thich, them vi du
-- **Dich thuat**: Ho tro dich thuat cac thuat ngu ky thuat hoac cai thien chat luong noi dung tieng Viet
-- **Vi du code**: Them hoac cai tien cac vi du code Aiken hoat dong duoc
+---
+
+### Các cách đóng góp
+
+#### Tài liệu
+
+- **Bài học mới**: Viết nội dung giáo dục mới cho các phần giáo trình hiện có hoặc đã lên kế hoạch
+- **Cải tiến**: Sửa lỗi chính tả, làm rõ giải thích, thêm ví dụ
+- **Dịch thuật**: Hỗ trợ dịch thuật các thuật ngữ kỹ thuật hoặc cải thiện chất lượng nội dung tiếng Việt
+- **Ví dụ code**: Thêm hoặc cải tiến các ví dụ code Aiken hoạt động được
 
 #### Code
 
-- **Sua loi**: Sua cac van de trong trang Docusaurus hoac vi du Aiken
-- **Tinh nang moi**: Cai thien chuc nang, kha nang tiep can, hoac trai nghiem nguoi dung
-- **Testing**: Them test case cho cac smart contract Aiken
-- **Hieu suat**: Toi uu hoa thoi gian build hoac hieu suat runtime
+- **Sửa lỗi**: Sửa các vấn đề trong trang Docusaurus hoặc ví dụ Aiken
+- **Tính năng mới**: Cải thiện chức năng, khả năng tiếp cận, hoặc trải nghiệm người dùng
+- **Testing**: Thêm test case cho các smart contract Aiken
+- **Hiệu suất**: Tối ưu hóa thời gian build hoặc hiệu suất runtime
 
-#### Cong dong
+#### Cộng đồng
 
-- **Bao cao loi**: Bao cao cac van de ban gap phai
-- **De xuat tinh nang**: De xuat cai tien cho giao trinh hoac trang web
-- **Thao luan**: Chia se y tuong trong GitHub Discussions hoac Discord
+- **Báo cáo lỗi**: Báo cáo các vấn đề bạn gặp phải
+- **Đề xuất tính năng**: Đề xuất cải tiến cho giáo trình hoặc trang web
+- **Thảo luận**: Chia sẻ ý tưởng trong GitHub Discussions hoặc Discord
 
 ---
 
-### Huong dan bat dau
+### Hướng dẫn bắt đầu
 
-#### Yeu cau he thong
+#### Yêu cầu hệ thống
 
-| Yeu cau | Phien ban | Muc dich |
+| Yêu cầu | Phiên bản | Mục đích |
 |---------|-----------|----------|
-| Node.js | v20+ | Phat trien Docusaurus |
-| npm | v10+ | Quan ly package |
-| Aiken | Moi nhat | Vi du smart contract |
-| Git | Moi nhat | Quan ly phien ban |
+| Node.js | v20+ | Phát triển Docusaurus |
+| npm | v10+ | Quản lý package |
+| Aiken | Mới nhất | Ví dụ smart contract |
+| Git | Mới nhất | Quản lý phiên bản |
 
-#### Cac buoc cai dat
+#### Các bước cài đặt
 
 1. **Fork repository**
 
-   Nhan nut "Fork" tai [github.com/CardanoAikenVN/aiken-vn](https://github.com/CardanoAikenVN/aiken-vn)
+   Nhấn nút "Fork" tại [github.com/CardanoAikenVN/aiken-vn](https://github.com/CardanoAikenVN/aiken-vn)
 
-2. **Clone fork cua ban**
+2. **Clone fork của bạn**
 
    ```bash
    git clone https://github.com/YOUR_USERNAME/aiken-vn.git
    cd aiken-vn
    ```
 
-3. **Cai dat dependencies**
+3. **Cài đặt dependencies**
 
    ```bash
    npm install
    ```
 
-4. **Khoi dong development server**
+4. **Khởi động development server**
 
    ```bash
    npm start
    ```
 
-   Trang web se mo tai `http://localhost:3000`
+   Trang web sẽ mở tại `http://localhost:3000`
 
-5. **Kiem tra vi du Aiken (tuy chon)**
+5. **Kiểm tra ví dụ Aiken (tùy chọn)**
 
    ```bash
    cd examples
@@ -98,87 +98,87 @@ Cam on ban da quan tam den viec dong gop. Tai lieu nay se huong dan ban bat dau.
 
 ---
 
-### Quy trinh phat trien
+### Quy trình phát triển
 
-#### Tham khao nhanh
+#### Tham khảo nhanh
 
-| Tac vu | Lenh |
+| Tác vụ | Lệnh |
 |--------|------|
-| Khoi dong dev server | `npm start` |
+| Khởi động dev server | `npm start` |
 | Build cho production | `npm run build` |
-| Chay production build | `npm run serve` |
-| Xoa cache | `npm run clear` |
-| Chay Aiken tests | `cd examples && aiken check` |
+| Chạy production build | `npm run serve` |
+| Xóa cache | `npm run clear` |
+| Chạy Aiken tests | `cd examples && aiken check` |
 | Format code Aiken | `cd examples && aiken fmt` |
 
-#### Thuc hien thay doi
+#### Thực hiện thay đổi
 
-1. Tao feature branch tu `main`
-2. Thuc hien cac thay doi cua ban
-3. Test o local voi `npm run build`
-4. Commit voi message mo ta ro rang
-5. Push len fork cua ban
-6. Mo pull request
+1. Tạo feature branch từ `main`
+2. Thực hiện các thay đổi của bạn
+3. Test ở local với `npm run build`
+4. Commit với message mô tả rõ ràng
+5. Push lên fork của bạn
+6. Mở pull request
 
 ---
 
-### Quy uoc dat ten branch
+### Quy ước đặt tên branch
 
-| Loai Branch | Mau | Vi du | Mo ta |
+| Loại Branch | Mẫu | Ví dụ | Mô tả |
 |-------------|-----|-------|-------|
-| Noi dung | `part-N` | `part-1`, `part-2` | Cap nhat phan giao trinh |
-| Tinh nang | `feature/mo-ta` | `feature/dark-mode` | Chuc nang moi |
-| Sua loi | `fix/mo-ta` | `fix/broken-links` | Sua loi |
-| Tai lieu | `docs/mo-ta` | `docs/readme-update` | Cap nhat tai lieu |
+| Nội dung | `part-N` | `part-1`, `part-2` | Cập nhật phần giáo trình |
+| Tính năng | `feature/mô-tả` | `feature/dark-mode` | Chức năng mới |
+| Sửa lỗi | `fix/mô-tả` | `fix/broken-links` | Sửa lỗi |
+| Tài liệu | `docs/mô-tả` | `docs/readme-update` | Cập nhật tài liệu |
 
-#### Vi du
+#### Ví dụ
 
 ```bash
-# Lam viec tren Phan 1
+# Làm việc trên Phần 1
 git checkout -b part-1
 
-# Them tinh nang moi
+# Thêm tính năng mới
 git checkout -b feature/search-functionality
 
-# Sua loi
+# Sửa lỗi
 git checkout -b fix/mobile-navigation
 ```
 
 ---
 
-### Quy uoc commit message
+### Quy ước commit message
 
-#### Dinh dang
+#### Định dạng
 
 ```
 <type>: <subject>
 
-[body tuy chon]
+[body tùy chọn]
 
-[footer tuy chon]
+[footer tùy chọn]
 ```
 
-#### Cac loai type
+#### Các loại type
 
-| Type | Mo ta | Vi du |
+| Type | Mô tả | Ví dụ |
 |------|-------|-------|
-| `feat` | Tinh nang hoac noi dung moi | `feat: them Bai 5 ve custom types` |
-| `fix` | Sua loi | `fix: sua lien ket hong trong Phan 1` |
-| `docs` | Thay doi tai lieu | `docs: cap nhat buoc cai dat trong README` |
-| `style` | Dinh dang, khong thay doi code | `style: format code blocks trong Bai 3` |
-| `refactor` | Tai cau truc code | `refactor: to chuc lai thu muc component` |
-| `test` | Them tests | `test: them tests cho escrow validator` |
-| `chore` | Tac vu bao tri | `chore: cap nhat dependencies` |
+| `feat` | Tính năng hoặc nội dung mới | `feat: thêm Bài 5 về custom types` |
+| `fix` | Sửa lỗi | `fix: sửa liên kết hỏng trong Phần 1` |
+| `docs` | Thay đổi tài liệu | `docs: cập nhật bước cài đặt trong README` |
+| `style` | Định dạng, không thay đổi code | `style: format code blocks trong Bài 3` |
+| `refactor` | Tái cấu trúc code | `refactor: tổ chức lại thư mục component` |
+| `test` | Thêm tests | `test: thêm tests cho escrow validator` |
+| `chore` | Tác vụ bảo trì | `chore: cập nhật dependencies` |
 
-#### Vi du
+#### Ví dụ
 
 ```bash
-# Commit message tot
-git commit -m "feat: them dau tieng Viet cho tat ca bai hoc Phan 1"
-git commit -m "fix: xu ly loi hydration o trang chu"
-git commit -m "docs: them phan xu ly su co vao Bai 1"
+# Commit message tốt
+git commit -m "feat: thêm dấu tiếng Việt cho tất cả bài học Phần 1"
+git commit -m "fix: xử lý lỗi hydration ở trang chủ"
+git commit -m "docs: thêm phần xử lý sự cố vào Bài 1"
 
-# Commit message kem (tranh dung)
+# Commit message kém (tránh dùng)
 git commit -m "update"
 git commit -m "fix stuff"
 git commit -m "WIP"
@@ -186,241 +186,199 @@ git commit -m "WIP"
 
 ---
 
-### Quy trinh Pull Request
+### Quy trình Pull Request
 
-#### Truoc khi gui
+#### Trước khi gửi
 
-Hoan thanh checklist nay:
+Hoàn thành checklist này:
 
-- [ ] Branch da cap nhat voi `main`
-- [ ] Build thanh cong o local (`npm run build`)
-- [ ] Khong co lien ket hong trong tai lieu
-- [ ] Code tuan thu [quy chuan code](./docs-project/code-standards.md) cua du an
-- [ ] Noi dung da duoc kiem tra do chinh xac
-- [ ] Noi dung tieng Viet su dung dau dung
-- [ ] Code Aiken bien dich thanh cong (`aiken build`) va tests pass (`aiken check`)
+- [ ] Branch đã cập nhật với `main`
+- [ ] Build thành công ở local (`npm run build`)
+- [ ] Không có liên kết hỏng trong tài liệu
+- [ ] Code tuân thủ quy chuẩn code của dự án
+- [ ] Nội dung đã được kiểm tra độ chính xác
+- [ ] Nội dung tiếng Việt sử dụng dấu đúng
+- [ ] Code Aiken biên dịch thành công (`aiken build`) và tests pass (`aiken check`)
 
-#### Mau Pull Request
+#### Mẫu Pull Request
 
-Khi mo PR, su dung mau sau:
+Khi mở PR, sử dụng mẫu sau:
 
 ```markdown
-## Tom tat
+## Tóm tắt
 
-Mo ta ngan gon ve cac thay doi (1-2 cau).
+Mô tả ngắn gọn về các thay đổi (1-2 câu).
 
-## Cac thay doi
+## Các thay đổi
 
-- Thay doi 1
-- Thay doi 2
-- Thay doi 3
+- Thay đổi 1
+- Thay đổi 2
+- Thay đổi 3
 
-## Loai thay doi
+## Loại thay đổi
 
-- [ ] Sua loi
-- [ ] Tinh nang moi
-- [ ] Cap nhat tai lieu
-- [ ] Tai cau truc code
+- [ ] Sửa lỗi
+- [ ] Tính năng mới
+- [ ] Cập nhật tài liệu
+- [ ] Tái cấu trúc code
 
 ## Testing
 
-Mo ta cach ban da test cac thay doi nay:
+Mô tả cách bạn đã test các thay đổi này:
 
 - [ ] `npm run build` pass
-- [ ] Da test tren development server
-- [ ] Aiken tests pass (neu ap dung)
+- [ ] Đã test trên development server
+- [ ] Aiken tests pass (nếu áp dụng)
 
-## Anh chup man hinh (neu ap dung)
+## Ảnh chụp màn hình (nếu áp dụng)
 
-Them anh chup man hinh cho cac thay doi UI.
+Thêm ảnh chụp màn hình cho các thay đổi UI.
 
-## Van de lien quan
+## Vấn đề liên quan
 
-Dong #issue_number (neu ap dung)
+Đóng #issue_number (nếu áp dụng)
 ```
-
-#### Checklist review
-
-Nguoi review se xac nhan:
-
-- [ ] Code tuan thu cac pattern da thiet lap
-- [ ] Tai lieu ro rang va chinh xac
-- [ ] Khong co thong tin nhay cam
-- [ ] Build thanh cong
-- [ ] Cac thay doi khop voi mo ta PR
 
 ---
 
-### Mau bao cao van de
+### Mẫu báo cáo vấn đề
 
-#### Bao cao loi
+#### Báo cáo lỗi
 
 ```markdown
-**Mo ta loi**
-Mo ta ro rang loi la gi.
+**Mô tả lỗi**
+Mô tả rõ ràng lỗi là gì.
 
-**Cach tai tao**
-Cac buoc de tai tao hanh vi:
-1. Di den '...'
-2. Nhan vao '...'
-3. Thay loi
+**Cách tái tạo**
+Các bước để tái tạo hành vi:
+1. Đi đến '...'
+2. Nhấn vào '...'
+3. Thấy lỗi
 
-**Hanh vi mong doi**
-Nhung gi ban mong doi se xay ra.
+**Hành vi mong đợi**
+Những gì bạn mong đợi sẽ xảy ra.
 
-**Anh chup man hinh**
-Neu ap dung, them anh chup man hinh.
+**Ảnh chụp màn hình**
+Nếu áp dụng, thêm ảnh chụp màn hình.
 
-**Moi truong**
+**Môi trường**
 - OS: [vd: macOS 14, Windows 11]
-- Trinh duyet: [vd: Chrome 120, Firefox 121]
-- Phien ban Node: [vd: 20.10.0]
-
-**Thong tin bo sung**
-Bat ky nguu canh nao khac ve van de.
+- Trình duyệt: [vd: Chrome 120, Firefox 121]
+- Phiên bản Node: [vd: 20.10.0]
 ```
 
-#### De xuat tinh nang
+#### Đề xuất tính năng
 
 ```markdown
-**De xuat tinh nang cua ban co lien quan den mot van de khong?**
-Mo ta ro rang van de. Vi du: "Toi thay kho chiu khi..."
+**Đề xuất tính năng của bạn có liên quan đến một vấn đề không?**
+Mô tả rõ ràng vấn đề. Ví dụ: "Tôi thấy khó chịu khi..."
 
-**Mo ta giai phap ban muon**
-Nhung gi ban muon xay ra.
+**Mô tả giải pháp bạn muốn**
+Những gì bạn muốn xảy ra.
 
-**Mo ta cac phuong an thay the ban da xem xet**
-Cac giai phap khac ban da xem xet.
-
-**Thong tin bo sung**
-Bat ky nguu canh, mockup, hoac vi du nao khac.
+**Mô tả các phương án thay thế bạn đã xem xét**
+Các giải pháp khác bạn đã xem xét.
 ```
 
-#### Cai tien bai hoc
+#### Cải tiến bài học
 
 ```markdown
-**Bai hoc**
-Bai hoc nao can cai tien (vd: Phan 1 - Bai 5: Bien va Hang so)
+**Bài học**
+Bài học nào cần cải tiến (vd: Phần 1 - Bài 5: Biến và Hằng số)
 
-**Loai cai tien**
-- [ ] Sua loi chinh ta hoac ngu phap
-- [ ] Lam ro giai thich
-- [ ] Them thong tin con thieu
-- [ ] Cai tien vi du code
-- [ ] Cap nhat noi dung loi thoi
+**Loại cải tiến**
+- [ ] Sửa lỗi chính tả hoặc ngữ pháp
+- [ ] Làm rõ giải thích
+- [ ] Thêm thông tin còn thiếu
+- [ ] Cải tiến ví dụ code
+- [ ] Cập nhật nội dung lỗi thời
 
-**Noi dung hien tai**
-Trich dan hoac mo ta noi dung hien tai.
+**Nội dung hiện tại**
+Trích dẫn hoặc mô tả nội dung hiện tại.
 
-**Thay doi de xuat**
-Cai tien ban de xuat.
-
-**Tai sao dieu nay quan trong**
-Dieu nay cai thien trai nghiem hoc tap nhu the nao.
+**Thay đổi đề xuất**
+Cải tiến bạn đề xuất.
 ```
 
 ---
 
-### Quy tac ung xu
+### Quy tắc ứng xử
 
-Chung toi cam ket cung cap mot moi truong chao don va hoa nhap.
+Chúng tôi cam kết cung cấp một môi trường chào đón và hòa nhập.
 
-#### Tieu chuan cua chung toi
+#### Tiêu chuẩn của chúng tôi
 
-**Nen lam:**
-- Su dung ngon ngu chao don va hoa nhap
-- Ton trong cac quan diem khac nhau
-- Chap nhan phe binh mang tinh xay dung
-- Tap trung vao nhung gi tot nhat cho cong dong
-- The hien su dong cam voi cac thanh vien cong dong khac
+**Nên làm:**
+- Sử dụng ngôn ngữ chào đón và hòa nhập
+- Tôn trọng các quan điểm khác nhau
+- Chấp nhận phê bình mang tính xây dựng
+- Tập trung vào những gì tốt nhất cho cộng đồng
+- Thể hiện sự đồng cảm với các thành viên cộng đồng khác
 
-**Khong nen lam:**
-- Su dung ngon ngu hoac hinh anh tinh duc
-- Troll, binh luan xuc pham, hoac tan cong ca nhan
-- Quay roi bat ky ai cong khai hoac rieng tu
-- Cong bo thong tin ca nhan cua nguoi khac ma khong co su cho phep
-- Tham gia vao cac hanh vi khac co the bi coi la khong phu hop
-
-#### Thuc thi
-
-Cac truong hop hanh vi khong the chap nhan duoc co the bao cao cho nguoi bao tri du an. Tat ca khieu nai se duoc xem xet va dieu tra, dua ra phan hoi duoc coi la can thiet va phu hop.
+**Không nên làm:**
+- Sử dụng ngôn ngữ hoặc hình ảnh tình dục
+- Troll, bình luận xúc phạm, hoặc tấn công cá nhân
+- Quấy rối bất kỳ ai công khai hoặc riêng tư
+- Công bố thông tin cá nhân của người khác mà không có sự cho phép
 
 ---
 
-### Quy trinh review
+### Quy trình review
 
-#### Thoi gian
+#### Thời gian
 
-| Hanh dong | Thoi gian phan hoi du kien |
+| Hành động | Thời gian phản hồi dự kiến |
 |----------|---------------------------|
-| Review ban dau | Trong vong 3-5 ngay lam viec |
-| Review tiep theo | Trong vong 2-3 ngay lam viec |
-| Merge (sau khi duoc phe duyet) | Trong vong 1-2 ngay lam viec |
+| Review ban đầu | Trong vòng 3-5 ngày làm việc |
+| Review tiếp theo | Trong vòng 2-3 ngày làm việc |
+| Merge (sau khi được phê duyệt) | Trong vòng 1-2 ngày làm việc |
 
-#### Cac giai doan review
+#### Các giai đoạn review
 
-1. **Kiem tra tu dong**: CI xac nhan build va contributor
-2. **Review ban dau**: Nguoi bao tri review cac thay doi
-3. **Phan hoi**: Nguoi review cung cap nhan xet (neu can)
-4. **Sua doi**: Nguoi dong gop xu ly phan hoi
-5. **Phe duyet**: Nguoi review phe duyet cac thay doi
-6. **Merge**: Nguoi bao tri merge vao nhanh main
-
-#### Nhan tro giup
-
-Neu PR cua ban cho review lau hon du kien:
-
-- Kiem tra xem cac kiem tra CI co pass khong
-- Dam bao tat ca nhan xet review da duoc xu ly
-- De lai binh luan lich su hoi ve tinh trang
+1. **Kiểm tra tự động**: CI xác nhận build và contributor
+2. **Review ban đầu**: Người bảo trì review các thay đổi
+3. **Phản hồi**: Người review cung cấp nhận xét (nếu cần)
+4. **Sửa đổi**: Người đóng góp xử lý phản hồi
+5. **Phê duyệt**: Người review phê duyệt các thay đổi
+6. **Merge**: Người bảo trì merge vào nhánh main
 
 ---
 
-### Ghi nhan dong gop
+### Ghi nhận đóng góp
 
-Chung toi tran trong tat ca cac dong gop, du lon hay nho.
+Chúng tôi trân trọng tất cả các đóng góp, dù lớn hay nhỏ.
 
-#### Nguoi dong gop
+#### Các loại ghi nhận
 
-Tat ca nguoi dong gop duoc ghi nhan trong:
-
-- Do thi nguoi dong gop cua GitHub
-- Ghi chu phat hanh (cho cac dong gop dang ke)
-- Phan cam on dac biet (cho cac dong gop lon)
-
-#### Cac loai ghi nhan
-
-| Dong gop | Ghi nhan |
+| Đóng góp | Ghi nhận |
 |----------|----------|
-| Sua loi | De cap trong ghi chu phat hanh |
-| Bai hoc moi | Ghi nhan o footer bai hoc |
-| Tinh nang lon | Noi bat trong README |
-| Nguoi dong gop thuong xuyen | Ghi nhan dac biet |
+| Sửa lỗi | Đề cập trong ghi chú phát hành |
+| Bài học mới | Ghi nhận ở footer bài học |
+| Tính năng lớn | Nổi bật trong README |
+| Người đóng góp thường xuyên | Ghi nhận đặc biệt |
 
 ---
 
-### Tai nguyen
+### Tài nguyên
 
-- [Tai lieu du an](./docs-project/)
-- [Quy chuan code](./docs-project/code-standards.md)
-- [Tai lieu Aiken chinh thuc](https://aiken-lang.org)
-- [Tai lieu Docusaurus](https://docusaurus.io/docs)
-- [Cong dong Discord](https://discord.gg/ub6atE94v4)
+- [Tài liệu Aiken chính thức](https://aiken-lang.org)
+- [Tài liệu Docusaurus](https://docusaurus.io/docs)
+- [Cộng đồng Discord](https://discord.gg/ub6atE94v4)
 
 ---
 
-### Cau hoi?
+### Câu hỏi?
 
-Neu ban co cau hoi ve viec dong gop:
+Nếu bạn có câu hỏi về việc đóng góp:
 
-1. Kiem tra [issues](https://github.com/CardanoAikenVN/aiken-vn/issues) hien co
-2. Tim kiem [discussions](https://github.com/CardanoAikenVN/aiken-vn/discussions)
-3. Tham gia [Discord](https://discord.gg/ub6atE94v4) cua chung toi
-4. Mo mot discussion moi
+1. Kiểm tra [issues](https://github.com/CardanoAikenVN/aiken-vn/issues) hiện có
+2. Tìm kiếm [discussions](https://github.com/CardanoAikenVN/aiken-vn/discussions)
+3. Tham gia [Discord](https://discord.gg/ub6atE94v4) của chúng tôi
+4. Mở một discussion mới
 
 ---
 
-Cam on ban da dong gop cho Vietnamese Aiken! Cung nhau, chung ta dang xay dung tuong lai cua giao duc phat trien Cardano tai Viet Nam.
+Cảm ơn bạn đã đóng góp cho Vietnamese Aiken! Cùng nhau, chúng ta đang xây dựng tương lai của giáo dục phát triển Cardano tại Việt Nam.
 
 ---
 ---
@@ -552,19 +510,6 @@ Thank you for your interest in contributing. This guide will help you get starte
 | Fix | `fix/description` | `fix/broken-links` | Bug fixes |
 | Docs | `docs/description` | `docs/readme-update` | Documentation updates |
 
-#### Examples
-
-```bash
-# Working on Part 1 lessons
-git checkout -b part-1
-
-# Adding a new feature
-git checkout -b feature/search-functionality
-
-# Fixing a bug
-git checkout -b fix/mobile-navigation
-```
-
 ---
 
 ### Commit Message Guidelines
@@ -591,20 +536,6 @@ git checkout -b fix/mobile-navigation
 | `test` | Adding tests | `test: add escrow validator tests` |
 | `chore` | Maintenance tasks | `chore: update dependencies` |
 
-#### Examples
-
-```bash
-# Good commit messages
-git commit -m "feat: add Vietnamese diacritics to all Part 1 lessons"
-git commit -m "fix: resolve hydration error on homepage"
-git commit -m "docs: add troubleshooting section to Lesson 1"
-
-# Bad commit messages (avoid these)
-git commit -m "update"
-git commit -m "fix stuff"
-git commit -m "WIP"
-```
-
 ---
 
 ### Pull Request Process
@@ -616,14 +547,12 @@ Complete this checklist:
 - [ ] Branch is up to date with `main`
 - [ ] Build passes locally (`npm run build`)
 - [ ] No broken links in documentation
-- [ ] Code follows project [code standards](./docs-project/code-standards.md)
+- [ ] Code follows project code standards
 - [ ] Content reviewed for accuracy
 - [ ] Vietnamese content uses proper diacritics
 - [ ] Aiken code compiles (`aiken build`) and tests pass (`aiken check`)
 
 #### Pull Request Template
-
-When opening a PR, use this template:
 
 ```markdown
 ## Summary
@@ -645,30 +574,10 @@ Brief description of changes (1-2 sentences).
 
 ## Testing
 
-Describe how you tested these changes:
-
 - [ ] `npm run build` passes
 - [ ] Tested on development server
 - [ ] Aiken tests pass (if applicable)
-
-## Screenshots (if applicable)
-
-Add screenshots for UI changes.
-
-## Related Issues
-
-Closes #issue_number (if applicable)
 ```
-
-#### Review Checklist
-
-Reviewers will verify:
-
-- [ ] Code follows established patterns
-- [ ] Documentation is clear and accurate
-- [ ] No sensitive information included
-- [ ] Build succeeds
-- [ ] Changes match PR description
 
 ---
 
@@ -689,55 +598,23 @@ Steps to reproduce the behavior:
 **Expected behavior**
 What you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots.
-
 **Environment**
 - OS: [e.g., macOS 14, Windows 11]
 - Browser: [e.g., Chrome 120, Firefox 121]
 - Node version: [e.g., 20.10.0]
-
-**Additional context**
-Any other context about the problem.
 ```
 
 #### Feature Request
 
 ```markdown
 **Is your feature request related to a problem?**
-A clear description of the problem. Example: "I'm frustrated when..."
+A clear description of the problem.
 
 **Describe the solution you'd like**
 What you want to happen.
 
 **Describe alternatives you've considered**
 Other solutions you've considered.
-
-**Additional context**
-Any other context, mockups, or examples.
-```
-
-#### Lesson Improvement
-
-```markdown
-**Lesson**
-Which lesson needs improvement (e.g., Part 1 - Lesson 5: Variables and Constants)
-
-**Type of Improvement**
-- [ ] Fix typo or grammatical error
-- [ ] Clarify explanation
-- [ ] Add missing information
-- [ ] Improve code example
-- [ ] Update outdated content
-
-**Current Content**
-Quote or describe the current content.
-
-**Suggested Change**
-Your proposed improvement.
-
-**Why This Matters**
-How this improves the learning experience.
 ```
 
 ---
@@ -753,18 +630,12 @@ We are committed to providing a welcoming and inclusive environment.
 - Be respectful of differing viewpoints
 - Accept constructive criticism gracefully
 - Focus on what is best for the community
-- Show empathy towards other community members
 
 **Do Not:**
 - Use sexualized language or imagery
 - Engage in trolling, insulting comments, or personal attacks
 - Harass anyone publicly or privately
 - Publish others' private information without permission
-- Engage in other conduct that could be considered inappropriate
-
-#### Enforcement
-
-Instances of unacceptable behavior may be reported to the project maintainers. All complaints will be reviewed and investigated, resulting in a response deemed necessary and appropriate.
 
 ---
 
@@ -787,29 +658,11 @@ Instances of unacceptable behavior may be reported to the project maintainers. A
 5. **Approval**: Reviewer approves changes
 6. **Merge**: Maintainer merges to main branch
 
-#### Getting Help
-
-If your PR has been waiting for review longer than expected:
-
-- Check if CI checks are passing
-- Ensure all review comments have been addressed
-- Leave a polite comment asking for status update
-
 ---
 
 ### Recognition
 
 We value all contributions, big and small.
-
-#### Contributors
-
-All contributors are recognized in:
-
-- GitHub's contributors graph
-- Release notes (for significant contributions)
-- Special thanks section (for major contributions)
-
-#### Types of Recognition
 
 | Contribution | Recognition |
 |--------------|-------------|
@@ -822,8 +675,6 @@ All contributors are recognized in:
 
 ### Resources
 
-- [Project Documentation](./docs-project/)
-- [Code Standards](./docs-project/code-standards.md)
 - [Aiken Official Docs](https://aiken-lang.org)
 - [Docusaurus Documentation](https://docusaurus.io/docs)
 - [Discord Community](https://discord.gg/ub6atE94v4)
