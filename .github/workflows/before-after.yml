@@ -1,0 +1,111 @@
+name: Before & After Screenshots
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          path: pr-branch
+
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: main-branch
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build main branch
+        working-directory: main-branch
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build PR branch
+        working-directory: pr-branch
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install before-and-after
+        run: npm i -g @vercel/before-and-after
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Serve both builds and capture screenshots
+        run: |
+          # Serve main branch on port 3000
+          npx serve main-branch/build -l 3000 &
+          MAIN_PID=$!
+
+          # Serve PR branch on port 3001
+          npx serve pr-branch/build -l 3001 &
+          PR_PID=$!
+
+          # Wait for servers to be ready
+          sleep 5
+
+          # Capture before/after screenshots
+          before-and-after http://localhost:3000 http://localhost:3001 --full --markdown > screenshots.md 2>&1 || true
+
+          # Cleanup
+          kill $MAIN_PID $PR_PID 2>/dev/null || true
+
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = '## Before & After Screenshots\n\n';
+
+            try {
+              const screenshots = fs.readFileSync('screenshots.md', 'utf8');
+              if (screenshots.trim()) {
+                body += screenshots;
+              } else {
+                body += '_No visual changes detected._';
+              }
+            } catch (e) {
+              body += '_Could not generate screenshots._\n\n```\n' + e.message + '\n```';
+            }
+
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Before & After Screenshots')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
