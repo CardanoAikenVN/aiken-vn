@@ -1,0 +1,44 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to improve Vietnamese Aiken? We'd love to hear it.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the project does this affect?
+      options:
+        - New Lesson / Content
+        - Smart Contract Example
+        - Landing Page / UI
+        - Documentation Site
+        - Developer Experience
+        - Community / Outreach
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature you'd like to see.
+      placeholder: A clear description of the feature.
+    validations:
+      required: true
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature important? What problem does it solve?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions?

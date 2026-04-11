@@ -1,0 +1,56 @@
+name: Lesson Feedback
+description: Suggest improvements to a specific lesson
+title: "[Lesson Feedback]: "
+labels: ["docs", "feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the curriculum. Your feedback on specific lessons is valuable.
+  - type: dropdown
+    id: part
+    attributes:
+      label: Part
+      description: Which curriculum part?
+      options:
+        - "Part 1: The Aiken Foundation"
+        - "Part 2: Cardano Architecture"
+        - "Part 3: Your First Validator"
+        - "Part 4: Minting Tokens & NFTs"
+        - "Part 5: The Escrow Contract"
+    validations:
+      required: true
+  - type: input
+    id: lesson
+    attributes:
+      label: Lesson Number
+      description: Which lesson? (e.g., 01, 02, 13)
+      placeholder: "01"
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Feedback Type
+      options:
+        - Incorrect information
+        - Unclear explanation
+        - Missing content
+        - Code example issue
+        - Typo / Grammar
+        - Suggestion for improvement
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: Feedback
+      description: What should be improved?
+      placeholder: Describe the issue and suggest how to fix it.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Screenshots, links, or other references that help explain your feedback.
