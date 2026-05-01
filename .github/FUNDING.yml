@@ -1,1 +1,9 @@
-github: [CardanoAikenVN]
+# Funding configuration for Vietnamese Aiken (aiken-vn)
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+#
+# As a Cardano-native project, we accept donations directly in ADA on-chain
+# instead of using GitHub Sponsors. The full sustainability plan and the
+# project's ADA donation address are documented in SUSTAINABILITY.md.
+
+custom:
+  - "https://github.com/CardanoAikenVN/aiken-vn/blob/main/SUSTAINABILITY.md#3-funding--donations"
