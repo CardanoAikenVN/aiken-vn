@@ -10,7 +10,7 @@
 
 The first open-source curriculum for mastering Aiken and Smart Contracts on Cardano, tailored for Vietnamese developers.
 
-**Live Site:** https://uberhub-mentorias.github.io/
+**Live Site:** [https://aiken-vn.vercel.app/](https://aiken-vn.vercel.app/)
 
 ### Features
 
@@ -130,7 +130,7 @@ Released under the [CC BY-4.0](https://creativecommons.org/licenses/by/4.0/) lic
 
 Tai lieu huong dan lap trinh Aiken va Smart Contract tren Cardano bang tieng Viet -- du an ma nguon mo dau tien danh cho cong dong lap trinh vien Viet Nam.
 
-**Trang web:** https://uberhub-mentorias.github.io/
+**Trang web:** [https://aiken-vn.vercel.app/](https://aiken-vn.vercel.app/)
 
 ### Tinh nang
 
